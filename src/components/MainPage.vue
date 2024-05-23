@@ -1,10 +1,10 @@
 <template>
   <el-row>
-    <el-col :span="15">
+    <el-col :span="11">
       <div id="main"
-           style="width: 900px; height: 300px"></div>
+           style="width: 750px; height: 300px"></div>
     </el-col>
-    <el-col :span="9">
+    <el-col :span="13">
       <el-row>
         <el-dropdown trigger="hover"
                      v-on:command="onAddSelect">
@@ -32,38 +32,87 @@
           </el-icon>
         </el-button>
       </el-row>
-      <el-tabs type="border-card"
-               :v-model="table_tab_name">
-        <el-tab-pane label="User">
-          <el-table :data="tableData"
+      <el-tabs type="border-card">
+        <el-tab-pane label="现金">
+          <el-table :data="data.cashData"
                     height="500"
+                    table-layout="auto"
                     style="width: 100%">
-            <el-table-column prop="date"
-                             label="Date"
-                             width="180"
-                             :sortable="true" />
-            <el-table-column prop="name"
-                             label="Name"
-                             width="180" />
-            <el-table-column prop="address"
-                             label="Address" />
-            <el-table-column label="Operations">
+            <el-table-column v-for="header, i in headers.cash"
+                             :key="i"
+                             :prop="header.prop"
+                             :label="header.label"
+                             :width="header.width"
+                             :sortable="header.sortable" />
+            <el-table-column label=""
+                             align="right">
               <template #default="scope">
                 <el-button size="small"
                            @click="handleEdit(scope.$index, scope.row)">
-                  Edit
+                  编辑
                 </el-button>
                 <el-button size="small"
                            type="danger"
                            @click="handleDelete(scope.$index, scope.row)">
-                  Delete
+                  删除
                 </el-button>
               </template>
             </el-table-column>
           </el-table>
         </el-tab-pane>
-        <el-tab-pane label="Config">Config</el-tab-pane>
-        <el-tab-pane label="Role">Role</el-tab-pane>
+        <el-tab-pane label="货币基金"><el-table :data="data.monetaryFundData"
+                    height="500"
+                    table-layout="auto"
+                    style="width: 100%">
+            <el-table-column v-for="header, i in headers.monetaryFund"
+                             :key="i"
+                             :prop="header.prop"
+                             :label="header.label"
+                             :width="header.width"
+                             :sortable="header.sortable" />
+
+            <el-table-column label=""
+                             align="right">
+              <template #default="scope">
+                <el-button size="small"
+                           @click="handleEdit(scope.$index, scope.row)">
+                  编辑
+                </el-button>
+                <el-button size="small"
+                           type="danger"
+                           @click="handleDelete(scope.$index, scope.row)">
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        <el-tab-pane label="定期存款"><el-table :data="data.fixedDepositData"
+                    height="500"
+                    table-layout="auto"
+                    style="width: 100%">
+            <el-table-column v-for="header, i in headers.fixedDeposit"
+                             :key="i"
+                             :prop="header.prop"
+                             :label="header.label"
+                             :width="header.width"
+                             :sortable="header.sortable" />
+            <el-table-column label=""
+                             align="right">
+              <template #default="scope">
+                <el-button size="small"
+                           @click="handleEdit(scope.$index, scope.row)">
+                  编辑
+                </el-button>
+                <el-button size="small"
+                           type="danger"
+                           @click="handleDelete(scope.$index, scope.row)">
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
       </el-tabs>
     </el-col>
   </el-row>
@@ -76,6 +125,7 @@ import {
   Download,
   Upload
 } from '@element-plus/icons-vue'
+import Data from '@/scripts/data.js'
 
 
 export default {
@@ -83,52 +133,9 @@ export default {
   data () {
     return {
       chart: null,
-      table_tab_name: String,
+      record: null,
+      data: null,
 
-      tableData: [
-        {
-          date: '2016-05-03',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles',
-          id: 0
-        },
-        {
-          date: '2016-05-02',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles',
-          id: 1
-        },
-        {
-          date: '2016-05-04',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles',
-          id: 2
-        },
-        {
-          date: '2016-05-01',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles',
-          id: 3
-        },
-        {
-          date: '2016-05-08',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles',
-          id: 4
-        },
-        {
-          date: '2016-05-06',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles',
-          id: 5
-        },
-        {
-          date: '2016-05-07',
-          name: 'Tom',
-          address: 'No. 189, Grove St, Los Angeles',
-          id: 6
-        },
-      ],
       handleEdit: (index, row) => {
         console.log(row.id)
       },
@@ -140,6 +147,98 @@ export default {
       },
       onAddSelect: type => {
         console.log(type)
+      },
+      headers: {
+        cash: [
+          {
+            prop: 'name',
+            label: '账户',
+            width: '80',
+            sortable: false
+          },
+          {
+            prop: 'amount',
+            label: '金额',
+            width: '80',
+            sortable: true
+          }
+        ],
+        monetaryFund: [
+          {
+            prop: 'name',
+            label: '名称',
+            width: '160',
+            sortable: false
+          },
+          {
+            prop: 'beginningAmount',
+            label: '期初金额',
+            width: '105',
+            sortable: true
+          },
+          {
+            prop: 'beginningTime',
+            label: '期初时间',
+            width: '105',
+            sortable: true
+          },
+          {
+            prop: 'currentAmount',
+            label: '当期金额',
+            width: '105',
+            sortable: true
+          },
+          {
+            prop: 'annualizedReturnRate',
+            label: '年化收益',
+            width: '105',
+            sortable: true
+          }
+        ],
+        fixedDeposit: [
+          {
+            prop: 'name',
+            label: '名称',
+            width: '80',
+            sortable: false
+          },
+          {
+            prop: 'beginningAmount',
+            label: '期初金额',
+            width: '105',
+            sortable: true
+          },
+          {
+            prop: 'beginningTime',
+            label: '期初时间',
+            width: '105',
+            sortable: true
+          },
+          {
+            prop: 'rate',
+            label: '利率',
+            width: '80',
+            sortable: true
+          },
+          {
+            prop: 'endingAmount',
+            label: '期末金额',
+            width: '105',
+            sortable: true
+          },
+          {
+            prop: 'endingTime',
+            label: '期末时间',
+            width: '105',
+            sortable: true
+          },
+          {
+            prop: 'residualMaturaty',
+            label: '剩余期限',
+            width: '105',
+            sortable: true
+          }
+        ]
       }
     }
   },
@@ -148,7 +247,14 @@ export default {
     Download,
     Upload
   },
+
+  beforeMount () {
+    this.record = new Data()
+    this.data = this.record.getData()
+  },
+
   mounted () {
+
     this.chart = echarts.init(document.getElementById('main'))
     this.chart.setOption({
       title: {
