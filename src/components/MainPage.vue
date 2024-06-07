@@ -157,7 +157,7 @@ export default {
             sortable: false
           },
           {
-            prop: 'amount',
+            prop: 'amountFmt',
             label: '金额',
             width: '80',
             sortable: true
@@ -171,25 +171,25 @@ export default {
             sortable: false
           },
           {
-            prop: 'beginningAmount',
+            prop: 'beginningAmountFmt',
             label: '期初金额',
             width: '105',
             sortable: true
           },
           {
-            prop: 'beginningTime',
+            prop: 'beginningTimeFmt',
             label: '期初时间',
             width: '105',
             sortable: true
           },
           {
-            prop: 'currentAmount',
+            prop: 'currentAmountFmt',
             label: '当期金额',
             width: '105',
             sortable: true
           },
           {
-            prop: 'annualizedReturnRate',
+            prop: 'annualizedReturnRateFmt',
             label: '年化收益',
             width: '105',
             sortable: true
@@ -203,31 +203,31 @@ export default {
             sortable: false
           },
           {
-            prop: 'beginningAmount',
+            prop: 'beginningAmountFmt',
             label: '期初金额',
             width: '105',
             sortable: true
           },
           {
-            prop: 'beginningTime',
+            prop: 'beginningTimeFmt',
             label: '期初时间',
             width: '105',
             sortable: true
           },
           {
-            prop: 'rate',
+            prop: 'rateFmt',
             label: '利率',
             width: '80',
             sortable: true
           },
           {
-            prop: 'endingAmount',
+            prop: 'endingAmountFmt',
             label: '期末金额',
             width: '105',
             sortable: true
           },
           {
-            prop: 'endingTime',
+            prop: 'endingTimeFmt',
             label: '期末时间',
             width: '105',
             sortable: true
