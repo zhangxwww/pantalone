@@ -18,11 +18,13 @@ function mockjson () {
                 history: [
                     {
                         name: "中国银行",
-                        amount: 100000.00
+                        amount: 100000.00,
+                        beginningTime: "2021-06-01"
                     },
                     {
                         name: "中国银行",
-                        amount: 200000.00
+                        amount: 200000.00,
+                        beginningTime: "2023-06-01"
                     }
                 ]
             },
@@ -31,7 +33,7 @@ function mockjson () {
                 history: [
                     {
                         name: "工商银行",
-                        amount: 200000,
+                        amount: 200000.00,
                         beginningTime: "2021-06-01"
                     }
                 ]
@@ -41,7 +43,7 @@ function mockjson () {
                 history: [
                     {
                         name: "建设银行",
-                        amount: 300000,
+                        amount: 300000.00,
                         beginningTime: "2022-01-01"
                     }
                 ]
@@ -63,7 +65,7 @@ function mockjson () {
                     {
                         name: "华夏基金",
                         beginningAmount: 100000.00,
-                        beginningTime: "2022-01-01",
+                        beginningTime: "2021-01-01",
                         currentAmount: 300000.00,
                         currentTime: "2022-06-01",
                         fastRedemption: true,
@@ -128,6 +130,7 @@ class Data {
         for (let cData of data.cashData) {
             for (let cHis of cData.history) {
                 cHis.amountFmt = cHis.amount.toFixed(2);
+                cHis.beginningTime = new Date(cHis.beginningTime);
             }
         }
         for (let mData of data.monetaryFundData) {
@@ -202,11 +205,67 @@ class Data {
         let dates = [];
         let currentDate = new Date();
 
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < 60; i += 3) {
             let newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
             dates.unshift(newDate);
         }
         return dates;
+    }
+
+    getAssetChangeData () {
+        const dates = this.sampleDates();
+        const cashData = [];
+        const monetaryFundData = [];
+        const fixedDepositData = [];
+
+        for (let date of dates) {
+            let cash = 0;
+            for (let cData of this.data.cashData) {
+                const candidate = cData.history.filter(h => h.beginningTime <= date);
+                const d = candidate[candidate.length - 1];
+                if (d && d.amount > 0) {
+                    cash += d.amount;
+                }
+            }
+            cashData.push(cash);
+
+            let monetaryFund = 0;
+            for (let mData of this.data.monetaryFundData) {
+                const first = mData.history[0];
+                let add = 0;
+                if (first.beginningTime < date) {
+                    add = first.beginningAmount;
+                }
+
+                const candidate = mData.history.filter(h => h.currentTime <= date);
+                const d = candidate[candidate.length - 1];
+                if (d && d.currentAmount > 0) {
+                    add = d.currentAmount;
+                }
+                monetaryFund += add;
+            }
+            monetaryFundData.push(monetaryFund);
+
+            let fixedDeposit = 0;
+            for (let fData of this.data.fixedDepositData) {
+                const candidate = fData.history.filter(h => h.beginningTime <= date && h.endingTime >= date);
+                const d = candidate[candidate.length - 1];
+                if (d && d.beginningAmount > 0) {
+                    fixedDeposit += d.beginningAmount;
+                }
+            }
+            fixedDepositData.push(fixedDeposit);
+        }
+        console.log(dates);
+        console.log(cashData);
+        console.log(monetaryFundData);
+        console.log(fixedDepositData);
+        return {
+            time: dates,
+            cashData: cashData,
+            monetaryFundData: monetaryFundData,
+            fixedDepositData: fixedDepositData
+        }
     }
 }
 

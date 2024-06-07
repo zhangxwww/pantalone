@@ -1,7 +1,7 @@
 <template>
   <el-row>
     <el-col :span="11">
-      <div id="main"
+      <div id="asset-change-line-graph"
            style="width: 750px; height: 300px"></div>
     </el-col>
     <el-col :span="13">
@@ -119,14 +119,14 @@
 </template>
 
 <script>
-import * as echarts from "echarts"
+// import * as echarts from "echarts"
 import {
   Plus,
   Download,
   Upload
 } from '@element-plus/icons-vue'
 import Data from '@/scripts/data.js'
-
+import { drawAssetChangeLineGraph } from '@/scripts/graph.js'
 
 export default {
   name: 'MainPage',
@@ -254,26 +254,27 @@ export default {
   },
 
   mounted () {
-
-    this.chart = echarts.init(document.getElementById('main'))
-    this.chart.setOption({
-      title: {
-        text: 'ECharts 入门示例'
-      },
-      tooltip: {},
-      xAxis: {
-        data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-      },
-      yAxis: {},
-      series: [{
-        name: '销量',
-        type: 'bar',
-        data: [5, 20, 36, 10, 10, 20]
-      }]
-    })
+    const assetChange = this.record.getAssetChangeData()
+    this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
+    // this.chart = echarts.init(document.getElementById('main'))
+    // this.chart.setOption({
+    //   title: {
+    //     text: 'ECharts 入门示例'
+    //   },
+    //   tooltip: {},
+    //   xAxis: {
+    //     data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+    //   },
+    //   yAxis: {},
+    //   series: [{
+    //     name: '销量',
+    //     type: 'bar',
+    //     data: [5, 20, 36, 10, 10, 20]
+    //   }]
+    // })
   },
   unmounted () {
-    this.chart.dispose()
+    this.assetChangeLineGraph.dispose()
   },
 
 }
