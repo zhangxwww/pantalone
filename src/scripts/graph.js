@@ -4,26 +4,27 @@ function drawAssetChangeLineGraph (domId, data) {
     const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
-            text: "资产变化"
+            text: "资产变化",
+            x: "center",
+            y: "top",
+            textAlign: "center"
         },
         tooltip: {
-            trigger: "axis"
+            trigger: "axis",
+            textStyle: {
+                align: "left"
+            },
         },
         legend: {
-            data: ["现金", "货币基金", "定期存款"]
+            data: ["现金", "货币基金", "定期存款"],
+            // top: "10%",
+            x: "center",
+            y: "bottom"
         },
         xAxis: {
             type: "category",
             boundaryGap: false,
             data: data.time,
-            axisLabel: {
-                formatter: function (value) {
-                    const date = new Date(value);
-                    const year = date.getFullYear();
-                    const month = date.getMonth() + 1;
-                    return `${year}/${month < 10 ? "0" + month : month}`;
-                }
-            }
         },
         yAxis: {
             type: "value"
@@ -34,21 +35,24 @@ function drawAssetChangeLineGraph (domId, data) {
                 type: "line",
                 data: data.cashData,
                 stack: "x",
-                areaStyle: {}
+                areaStyle: {},
+                smooth: true
             },
             {
                 name: "货币基金",
                 type: "line",
                 data: data.monetaryFundData,
                 stack: "x",
-                areaStyle: {}
+                areaStyle: {},
+                smooth: true
             },
             {
                 name: "定期存款",
                 type: "line",
                 data: data.fixedDepositData,
                 stack: "x",
-                areaStyle: {}
+                areaStyle: {},
+                smooth: true
             }
         ]
     }
@@ -56,4 +60,36 @@ function drawAssetChangeLineGraph (domId, data) {
     return chart;
 }
 
-export { drawAssetChangeLineGraph }
+function drawResidualMaturityPieGraph (domId, data) {
+    const chart = echarts.init(document.getElementById(domId));
+    const option = {
+        title: {
+            text: "剩余期限",
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        tooltip: {
+            formatter: '{c} ({d}%)'
+        },
+        series: [
+            {
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                data: data,
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    },
+                },
+            }
+        ]
+    };
+    chart.setOption(option);
+    return chart;
+}
+
+export { drawAssetChangeLineGraph, drawResidualMaturityPieGraph }

@@ -1,121 +1,123 @@
 <template>
-  <el-row>
-    <el-col :span="11">
+  <el-row style="margin-bottom: 60px">
+    <el-col :span="12">
       <div id="asset-change-line-graph"
-           style="width: 750px; height: 300px"></div>
+           style="width: 800px; height: 300px"></div>
     </el-col>
-    <el-col :span="13">
-      <el-row>
-        <el-dropdown trigger="hover"
-                     v-on:command="onAddSelect">
-          <el-button type="primary"
-                     @click="onAddClick">
-            <el-icon>
-              <plus />
-            </el-icon>
-          </el-button>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item command="1">1</el-dropdown-item>
-              <el-dropdown-item command="2">2</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-        <el-button>
-          <el-icon>
-            <download />
-          </el-icon>
-        </el-button>
-        <el-button>
-          <el-icon>
-            <upload />
-          </el-icon>
-        </el-button>
-      </el-row>
-      <el-tabs type="border-card">
-        <el-tab-pane label="现金">
-          <el-table :data="data.cashData"
-                    height="500"
-                    table-layout="auto"
-                    style="width: 100%">
-            <el-table-column v-for="header, i in headers.cash"
-                             :key="i"
-                             :prop="header.prop"
-                             :label="header.label"
-                             :width="header.width"
-                             :sortable="header.sortable" />
-            <el-table-column label=""
-                             align="right">
-              <template #default="scope">
-                <el-button size="small"
-                           @click="handleEdit(scope.$index, scope.row)">
-                  编辑
-                </el-button>
-                <el-button size="small"
-                           type="danger"
-                           @click="handleDelete(scope.$index, scope.row)">
-                  删除
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-tab-pane>
-        <el-tab-pane label="货币基金"><el-table :data="data.monetaryFundData"
-                    height="500"
-                    table-layout="auto"
-                    style="width: 100%">
-            <el-table-column v-for="header, i in headers.monetaryFund"
-                             :key="i"
-                             :prop="header.prop"
-                             :label="header.label"
-                             :width="header.width"
-                             :sortable="header.sortable" />
-
-            <el-table-column label=""
-                             align="right">
-              <template #default="scope">
-                <el-button size="small"
-                           @click="handleEdit(scope.$index, scope.row)">
-                  编辑
-                </el-button>
-                <el-button size="small"
-                           type="danger"
-                           @click="handleDelete(scope.$index, scope.row)">
-                  删除
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-tab-pane>
-        <el-tab-pane label="定期存款"><el-table :data="data.fixedDepositData"
-                    height="500"
-                    table-layout="auto"
-                    style="width: 100%">
-            <el-table-column v-for="header, i in headers.fixedDeposit"
-                             :key="i"
-                             :prop="header.prop"
-                             :label="header.label"
-                             :width="header.width"
-                             :sortable="header.sortable" />
-            <el-table-column label=""
-                             align="right">
-              <template #default="scope">
-                <el-button size="small"
-                           @click="handleEdit(scope.$index, scope.row)">
-                  编辑
-                </el-button>
-                <el-button size="small"
-                           type="danger"
-                           @click="handleDelete(scope.$index, scope.row)">
-                  删除
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-tab-pane>
-      </el-tabs>
+    <el-col :span="6">
+      <div id="residual-maturity-pie-graph"
+           style="width: 400px; height: 300px"></div>
     </el-col>
   </el-row>
+  <el-row>
+    <el-dropdown trigger="hover"
+                 v-on:command="onAddSelect">
+      <el-button type="primary"
+                 @click="onAddClick">
+        <el-icon>
+          <plus />
+        </el-icon>
+      </el-button>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item command="1">1</el-dropdown-item>
+          <el-dropdown-item command="2">2</el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
+    <el-button>
+      <el-icon>
+        <download />
+      </el-icon>
+    </el-button>
+    <el-button>
+      <el-icon>
+        <upload />
+      </el-icon>
+    </el-button>
+  </el-row>
+  <el-tabs type="border-card">
+    <el-tab-pane label="现金">
+      <el-table :data="data.cashData"
+                height="500"
+                table-layout="auto"
+                style="width: 100%">
+        <el-table-column v-for="header, i in headers.cash"
+                         :key="i"
+                         :prop="header.prop"
+                         :label="header.label"
+                         :width="header.width"
+                         :sortable="header.sortable" />
+        <el-table-column label=""
+                         align="right">
+          <template #default="scope">
+            <el-button size="small"
+                       @click="handleEdit(scope.$index, scope.row)">
+              编辑
+            </el-button>
+            <el-button size="small"
+                       type="danger"
+                       @click="handleDelete(scope.$index, scope.row)">
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-tab-pane>
+    <el-tab-pane label="货币基金"><el-table :data="data.monetaryFundData"
+                height="500"
+                table-layout="auto"
+                style="width: 100%">
+        <el-table-column v-for="header, i in headers.monetaryFund"
+                         :key="i"
+                         :prop="header.prop"
+                         :label="header.label"
+                         :width="header.width"
+                         :sortable="header.sortable" />
+
+        <el-table-column label=""
+                         align="right">
+          <template #default="scope">
+            <el-button size="small"
+                       @click="handleEdit(scope.$index, scope.row)">
+              编辑
+            </el-button>
+            <el-button size="small"
+                       type="danger"
+                       @click="handleDelete(scope.$index, scope.row)">
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-tab-pane>
+    <el-tab-pane label="定期存款"><el-table :data="data.fixedDepositData"
+                height="500"
+                table-layout="auto"
+                style="width: 100%">
+        <el-table-column v-for="header, i in headers.fixedDeposit"
+                         :key="i"
+                         :prop="header.prop"
+                         :label="header.label"
+                         :width="header.width"
+                         :sortable="header.sortable" />
+        <el-table-column label=""
+                         align="right">
+          <template #default="scope">
+            <el-button size="small"
+                       @click="handleEdit(scope.$index, scope.row)">
+              编辑
+            </el-button>
+            <el-button size="small"
+                       type="danger"
+                       @click="handleDelete(scope.$index, scope.row)">
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-tab-pane>
+  </el-tabs>
 </template>
 
 <script>
@@ -127,6 +129,7 @@ import {
 } from '@element-plus/icons-vue'
 import Data from '@/scripts/data.js'
 import { drawAssetChangeLineGraph } from '@/scripts/graph.js'
+import { drawResidualMaturityPieGraph } from '@/scripts/graph.js'
 
 export default {
   name: 'MainPage',
@@ -256,25 +259,14 @@ export default {
   mounted () {
     const assetChange = this.record.getAssetChangeData()
     this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
-    // this.chart = echarts.init(document.getElementById('main'))
-    // this.chart.setOption({
-    //   title: {
-    //     text: 'ECharts 入门示例'
-    //   },
-    //   tooltip: {},
-    //   xAxis: {
-    //     data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-    //   },
-    //   yAxis: {},
-    //   series: [{
-    //     name: '销量',
-    //     type: 'bar',
-    //     data: [5, 20, 36, 10, 10, 20]
-    //   }]
-    // })
+
+    const residualMaturaty = this.record.getResidualMaturityData()
+    this.residualMaturatyPieGraph = drawResidualMaturityPieGraph('residual-maturity-pie-graph', residualMaturaty)
+
   },
   unmounted () {
     this.assetChangeLineGraph.dispose()
+    this.residualMaturatyPieGraph.dispose()
   },
 
 }

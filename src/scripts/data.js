@@ -2,11 +2,16 @@ function clone (x) {
     return JSON.parse(JSON.stringify(x));
 }
 
-function timeFormat (t) {
+function timeFormat (t, short = false) {
     let year = t.getFullYear();
     let month = t.getMonth() + 1;
     let day = t.getDate();
-    let formatted = `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
+    let formatted;
+    if (short) {
+        formatted = `${year}/${month < 10 ? '0' + month : month}`;
+    } else {
+        formatted = `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
+    }
     return formatted;
 }
 
@@ -86,6 +91,20 @@ function mockjson () {
                         holding: false
                     }
                 ]
+            },
+            {
+                id: 3,
+                history: [
+                    {
+                        name: "天弘基金",
+                        beginningAmount: 40000.00,
+                        beginningTime: "2022-01-01",
+                        currentAmount: 50000.00,
+                        currentTime: "2024-01-01",
+                        fastRedemption: false,
+                        holding: true
+                    }
+                ]
             }
         ],
         fixedDepositData: [
@@ -109,6 +128,54 @@ function mockjson () {
                         beginningAmount: 200000.00,
                         rate: 0.02,
                         maturity: 365,
+                        beginningTime: "2024-01-01",
+                    }
+                ]
+            },
+            {
+                id: 3,
+                history: [
+                    {
+                        name: "建设银行",
+                        beginningAmount: 300000.00,
+                        rate: 0.03,
+                        maturity: 30,
+                        beginningTime: "2024-06-01",
+                    }
+                ]
+            },
+            {
+                id: 4,
+                history: [
+                    {
+                        name: "农业银行",
+                        beginningAmount: 100000.00,
+                        rate: 0.04,
+                        maturity: 90,
+                        beginningTime: "2024-04-01",
+                    }
+                ]
+            },
+            {
+                id: 5,
+                history: [
+                    {
+                        name: "交通银行",
+                        beginningAmount: 200000.00,
+                        rate: 0.05,
+                        maturity: 180,
+                        beginningTime: "2024-03-01",
+                    }
+                ]
+            },
+            {
+                id: 6,
+                history: [
+                    {
+                        name: "邮政储蓄",
+                        beginningAmount: 300000.00,
+                        rate: 0.06,
+                        maturity: 700,
                         beginningTime: "2024-01-01",
                     }
                 ]
@@ -256,16 +323,59 @@ class Data {
             }
             fixedDepositData.push(fixedDeposit);
         }
-        console.log(dates);
-        console.log(cashData);
-        console.log(monetaryFundData);
-        console.log(fixedDepositData);
         return {
-            time: dates,
+            time: dates.map(t => timeFormat(t, true)),
             cashData: cashData,
             monetaryFundData: monetaryFundData,
             fixedDepositData: fixedDepositData
         }
+    }
+
+    getResidualMaturityData () {
+        const maturitiyData = [
+            { name: "T+0", amount: 0 },
+            { name: "T+1", amount: 0 },
+            { name: "30日内", amount: 0 },
+            { name: "90日内", amount: 0 },
+            { name: "180日内", amount: 0 },
+            { name: "365日内", amount: 0 },
+            { name: "365日以上", amount: 0 }
+        ];
+        for (let cData of this.data.cashData) {
+            const last = cData.history[cData.history.length - 1];
+            maturitiyData[0].amount += last.amount;
+        }
+        for (let mData of this.data.monetaryFundData) {
+            const last = mData.history[mData.history.length - 1];
+            if (!last.holding) {
+                continue;
+            }
+            if (last.fastRedemption) {
+                maturitiyData[0].amount += last.currentAmount;
+            } else {
+                maturitiyData[1].amount += last.currentAmount;
+            }
+        }
+        for (let fData of this.data.fixedDepositData) {
+            const last = fData.history[fData.history.length - 1];
+            if (last.maturity < 0) {
+                continue;
+            } else if (last.maturity <= 30) {
+                maturitiyData[2].amount += last.beginningAmount;
+            } else if (last.maturity <= 90) {
+                maturitiyData[3].amount += last.beginningAmount;
+            } else if (last.maturity <= 180) {
+                maturitiyData[4].amount += last.beginningAmount;
+            } else if (last.maturity <= 365) {
+                maturitiyData[5].amount += last.beginningAmount;
+            } else {
+                maturitiyData[6].amount += last.beginningAmount;
+            }
+        }
+        maturitiyData.forEach(item => {
+            item.value = item.amount;
+        });
+        return maturitiyData;
     }
 }
 
