@@ -60,11 +60,12 @@ function drawAssetChangeLineGraph (domId, data) {
     return chart;
 }
 
-function drawResidualMaturityPieGraph (domId, data) {
+
+function drawPieGraph (domId, data, title) {
     const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
-            text: "剩余期限",
+            text: title,
             x: "center",
             y: "top",
             textAlign: "center"
@@ -92,4 +93,17 @@ function drawResidualMaturityPieGraph (domId, data) {
     return chart;
 }
 
-export { drawAssetChangeLineGraph, drawResidualMaturityPieGraph }
+
+function drawResidualMaturityPieGraph (domId, data) {
+    return drawPieGraph(domId, data, "剩余期限");
+}
+
+function drawExpectedReturnPieGraph (domId, data) {
+    return drawPieGraph(domId, data, "预期收益");
+}
+
+export {
+    drawAssetChangeLineGraph,
+    drawResidualMaturityPieGraph,
+    drawExpectedReturnPieGraph
+}

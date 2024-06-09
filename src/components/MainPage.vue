@@ -8,6 +8,10 @@
       <div id="residual-maturity-pie-graph"
            style="width: 400px; height: 300px"></div>
     </el-col>
+    <el-col :span="6">
+      <div id="expected-return-pie-graph"
+           style="width: 400px; height: 300px"></div>
+    </el-col>
   </el-row>
   <el-row>
     <el-dropdown trigger="hover"
@@ -130,6 +134,7 @@ import {
 import Data from '@/scripts/data.js'
 import { drawAssetChangeLineGraph } from '@/scripts/graph.js'
 import { drawResidualMaturityPieGraph } from '@/scripts/graph.js'
+import { drawExpectedReturnPieGraph } from '@/scripts/graph.js'
 
 export default {
   name: 'MainPage',
@@ -196,6 +201,15 @@ export default {
             label: '年化收益',
             width: '105',
             sortable: true
+          },
+          {
+            prop: 'fastRedemptionFmt',
+            label: '快速赎回',
+            width: '105',
+            sortable: true,
+            sort_method: (a, b) => {
+              return a === b ? 0 : a ? -1 : 1;
+            }
           }
         ],
         fixedDeposit: [
@@ -257,16 +271,20 @@ export default {
   },
 
   mounted () {
-    const assetChange = this.record.getAssetChangeData()
+    const assetChange = this.record.getAssetChangeData(60)
     this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
 
     const residualMaturaty = this.record.getResidualMaturityData()
     this.residualMaturatyPieGraph = drawResidualMaturityPieGraph('residual-maturity-pie-graph', residualMaturaty)
 
+    const expectedReturn = this.record.getExpectedReturnData()
+    this.expectedReturnPieGraph = drawExpectedReturnPieGraph('expected-return-pie-graph', expectedReturn)
+
   },
   unmounted () {
     this.assetChangeLineGraph.dispose()
     this.residualMaturatyPieGraph.dispose()
+    this.expectedReturnPieGraph.dispose()
   },
 
 }

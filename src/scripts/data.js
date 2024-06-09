@@ -212,6 +212,7 @@ class Data {
                 mHis.annualizedReturnRateFmt = (mHis.annualizedReturnRate * 100).toFixed(2) + '%';
                 mHis.beginningAmountFmt = mHis.beginningAmount.toFixed(2);
                 mHis.currentAmountFmt = mHis.currentAmount.toFixed(2);
+                mHis.fastRedemptionFmt = mHis.fastRedemption ? '是' : '否';
             }
         }
         for (let fData of data.fixedDepositData) {
@@ -268,19 +269,20 @@ class Data {
         //
     }
 
-    sampleDates () {
+    sampleDates (months) {
         let dates = [];
         let currentDate = new Date();
 
-        for (let i = 0; i < 60; i += 3) {
+        const interval = Math.ceil(months / 12);
+        for (let i = 0; i < months; i += interval) {
             let newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
             dates.unshift(newDate);
         }
         return dates;
     }
 
-    getAssetChangeData () {
-        const dates = this.sampleDates();
+    getAssetChangeData (months) {
+        const dates = this.sampleDates(months);
         const cashData = [];
         const monetaryFundData = [];
         const fixedDepositData = [];
@@ -358,15 +360,15 @@ class Data {
         }
         for (let fData of this.data.fixedDepositData) {
             const last = fData.history[fData.history.length - 1];
-            if (last.maturity < 0) {
+            if (last.residualMaturaty < 0) {
                 continue;
-            } else if (last.maturity <= 30) {
+            } else if (last.residualMaturaty <= 30) {
                 maturitiyData[2].amount += last.beginningAmount;
-            } else if (last.maturity <= 90) {
+            } else if (last.residualMaturaty <= 90) {
                 maturitiyData[3].amount += last.beginningAmount;
-            } else if (last.maturity <= 180) {
+            } else if (last.residualMaturaty <= 180) {
                 maturitiyData[4].amount += last.beginningAmount;
-            } else if (last.maturity <= 365) {
+            } else if (last.residualMaturaty <= 365) {
                 maturitiyData[5].amount += last.beginningAmount;
             } else {
                 maturitiyData[6].amount += last.beginningAmount;
@@ -376,6 +378,61 @@ class Data {
             item.value = item.amount;
         });
         return maturitiyData;
+    }
+
+    getExpectedReturnData () {
+        const expectedReturn = [
+            { name: "<1%", amount: 0 },
+            { name: "1%-2%", amount: 0 },
+            { name: "2%-5%", amount: 0 },
+            { name: "5%-10%", amount: 0 },
+            { name: ">10%", amount: 0 }
+        ]
+
+        console.log(this.data.fixedDepositData);
+
+        for (let cData of this.data.cashData) {
+            const last = cData.history[cData.history.length - 1];
+            expectedReturn[0].amount += last.amount;
+        }
+        for (let mData of this.data.monetaryFundData) {
+            const last = mData.history[mData.history.length - 1];
+            if (!last.holding) {
+                continue;
+            }
+            if (last.annualizedReturnRate < 0.01) {
+                expectedReturn[0].amount += last.currentAmount;
+            } else if (last.annualizedReturnRate < 0.02) {
+                expectedReturn[1].amount += last.currentAmount;
+            } else if (last.annualizedReturnRate < 0.05) {
+                expectedReturn[2].amount += last.currentAmount;
+            } else if (last.annualizedReturnRate < 0.1) {
+                expectedReturn[3].amount += last.currentAmount;
+            } else {
+                expectedReturn[4].amount += last.currentAmount;
+            }
+        }
+        for (let fData of this.data.fixedDepositData) {
+            const last = fData.history[fData.history.length - 1];
+            if (last.residualMaturaty < 0) {
+                continue;
+            }
+            if (last.rate < 0.01) {
+                expectedReturn[0].amount += last.beginningAmount;
+            } else if (last.rate < 0.02) {
+                expectedReturn[1].amount += last.beginningAmount;
+            } else if (last.rate < 0.05) {
+                expectedReturn[2].amount += last.beginningAmount;
+            } else if (last.rate < 0.1) {
+                expectedReturn[3].amount += last.beginningAmount;
+            } else {
+                expectedReturn[4].amount += last.beginningAmount;
+            }
+        }
+        expectedReturn.forEach(item => {
+            item.value = item.amount;
+        });
+        return expectedReturn;
     }
 }
 
