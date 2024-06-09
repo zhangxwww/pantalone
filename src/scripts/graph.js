@@ -17,7 +17,6 @@ function drawAssetChangeLineGraph (domId, data) {
         },
         legend: {
             data: ["现金", "货币基金", "定期存款"],
-            // top: "10%",
             x: "center",
             y: "bottom"
         },
@@ -163,20 +162,65 @@ function drawLiquidityReturnPositoinScatterGraph (domId, data) {
                         shadowColor: 'rgba(0, 0, 0, 0.5)'
                     },
                 },
-                // itemStyle: {
-                //     color: {}
-                // }
             }
         ]
     };
     chart.setOption(option);
     return chart;
+}
 
+function drawAverageReturnLineGraph (domId, data) {
+    const chart = echarts.init(document.getElementById(domId));
+    const option = {
+        title: {
+            text: "平均收益",
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: data.time,
+        },
+        yAxis: {
+            type: "value",
+            axisLabel: {
+                formatter: value => {
+                    return (value * 100).toFixed(0) + "%";
+                }
+            }
+        },
+        series: [
+            {
+                name: "平均收益",
+                type: "line",
+                data: data.data,
+                smooth: true
+            }
+        ],
+        tooltip: {
+            trigger: "axis",
+            textStyle: {
+                align: "left"
+            },
+            formatter: params => {
+                let name = params[0].name;
+                for (let i = 0; i < params.length; i++) {
+                    name += `<br>${params[i].marker}${params[i].seriesName}: ${params[i].value.toFixed(4) * 100}%`;
+                }
+                return name;
+            }
+        },
+    }
+    chart.setOption(option);
+    return chart;
 }
 
 export {
     drawAssetChangeLineGraph,
     drawResidualMaturityPieGraph,
     drawExpectedReturnPieGraph,
-    drawLiquidityReturnPositoinScatterGraph
+    drawLiquidityReturnPositoinScatterGraph,
+    drawAverageReturnLineGraph
 }

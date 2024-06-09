@@ -498,6 +498,37 @@ class Data {
             amount: data.map(d => d.amount)
         };
     }
+
+    getAverageReturnData (months) {
+        const dates = this.sampleDates(months);
+        const weightedReturn = [];
+
+        for (let date of dates) {
+            let weighted = 0;
+            let sum = 0;
+            for (let mData of this.data.monetaryFundData) {
+                const candidate = mData.history.filter(h => h.currentTime <= date);
+                const d = candidate[candidate.length - 1];
+                if (d && d.currentAmount > 0) {
+                    weighted += d.currentAmount * d.annualizedReturnRate;
+                    sum += d.currentAmount;
+                }
+            }
+            for (let fData of this.data.fixedDepositData) {
+                const candidate = fData.history.filter(h => h.beginningTime <= date && h.endingTime >= date);
+                const d = candidate[candidate.length - 1];
+                if (d && d.beginningAmount > 0) {
+                    weighted += d.beginningAmount * d.rate;
+                    sum += d.beginningAmount;
+                }
+            }
+            weightedReturn.push(weighted / sum);
+        }
+        return {
+            time: dates.map(t => timeFormat(t, true)),
+            data: weightedReturn
+        }
+    }
 }
 
 export default Data;

@@ -14,8 +14,12 @@
     </el-col>
   </el-row>
   <el-row>
-    <el-col :span="6">
+    <el-col :span="12">
       <div id="liquidity-return-position-scatter-graph"
+           style="width: 800px; height: 300px"></div>
+    </el-col>
+    <el-col :span="12">
+      <div id="average-return-line-graph"
            style="width: 800px; height: 300px"></div>
     </el-col>
   </el-row>
@@ -142,6 +146,7 @@ import { drawAssetChangeLineGraph } from '@/scripts/graph.js'
 import { drawResidualMaturityPieGraph } from '@/scripts/graph.js'
 import { drawExpectedReturnPieGraph } from '@/scripts/graph.js'
 import { drawLiquidityReturnPositoinScatterGraph } from '@/scripts/graph.js'
+import { drawAverageReturnLineGraph } from '@/scripts/graph.js'
 
 export default {
   name: 'MainPage',
@@ -278,7 +283,9 @@ export default {
   },
 
   mounted () {
-    const assetChange = this.record.getAssetChangeData(60)
+    const months = 60;
+
+    const assetChange = this.record.getAssetChangeData(months)
     this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
 
     const residualMaturaty = this.record.getResidualMaturityData()
@@ -289,12 +296,16 @@ export default {
 
     const liquidityReturnPosition = this.record.getLiquidityReturnPositionData()
     this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositoinScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition)
+
+    const averageReturn = this.record.getAverageReturnData(months)
+    this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)
   },
   unmounted () {
     this.assetChangeLineGraph.dispose()
     this.residualMaturatyPieGraph.dispose()
     this.expectedReturnPieGraph.dispose()
     this.liquidityReturnPositionScatterGraph.dispose()
+    this.averageReturnLineGraph.dispose()
   },
 
 }
