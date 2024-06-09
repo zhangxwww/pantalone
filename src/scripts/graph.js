@@ -102,8 +102,81 @@ function drawExpectedReturnPieGraph (domId, data) {
     return drawPieGraph(domId, data, "预期收益");
 }
 
+function drawLiquidityReturnPositoinScatterGraph (domId, data) {
+    const chart = echarts.init(document.getElementById(domId));
+    let amount = [];
+    amount.push(...data.amount);
+    const maxAmount = Math.max(...amount);
+    const minAmount = Math.min(...amount);
+    const diffAmount = maxAmount - minAmount;
+    amount = amount.map((value) => {
+        return (value - minAmount) / diffAmount * 25 + 25;
+    });
+    const option = {
+        title: {
+            text: "流动性-收益-规模",
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        xAxis: {
+            type: "log",
+            logBase: 10,
+            name: "流动性",
+        },
+        yAxis: {
+            name: "收益",
+        },
+        tooltip: {
+            formatter: function (params) {
+                return `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left">流动性</td>
+                            <td align="right"><b>${params.data[0]}</b></td>
+                        </tr>
+                        <tr>
+                            <td align="left">收益</td>
+                            <td align="right"><b>${params.data[1].toFixed(2)}</b></td>
+                        </tr>
+                        <tr>
+                            <td align="left">规模</td>
+                            <td align="right"><b>${data.amount[params.dataIndex].toFixed(2)}</b></td>
+                        </tr>
+                    </tbody>
+                </table>
+                `
+            }
+        },
+        series: [
+            {
+                type: 'scatter',
+                data: data.data,
+                symbolSize: (value, params) => {
+                    return amount[params.dataIndex];
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 5,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    },
+                },
+                // itemStyle: {
+                //     color: {}
+                // }
+            }
+        ]
+    };
+    chart.setOption(option);
+    return chart;
+
+}
+
 export {
     drawAssetChangeLineGraph,
     drawResidualMaturityPieGraph,
-    drawExpectedReturnPieGraph
+    drawExpectedReturnPieGraph,
+    drawLiquidityReturnPositoinScatterGraph
 }

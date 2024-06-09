@@ -14,6 +14,12 @@
     </el-col>
   </el-row>
   <el-row>
+    <el-col :span="6">
+      <div id="liquidity-return-position-scatter-graph"
+           style="width: 800px; height: 300px"></div>
+    </el-col>
+  </el-row>
+  <el-row>
     <el-dropdown trigger="hover"
                  v-on:command="onAddSelect">
       <el-button type="primary"
@@ -135,6 +141,7 @@ import Data from '@/scripts/data.js'
 import { drawAssetChangeLineGraph } from '@/scripts/graph.js'
 import { drawResidualMaturityPieGraph } from '@/scripts/graph.js'
 import { drawExpectedReturnPieGraph } from '@/scripts/graph.js'
+import { drawLiquidityReturnPositoinScatterGraph } from '@/scripts/graph.js'
 
 export default {
   name: 'MainPage',
@@ -280,11 +287,14 @@ export default {
     const expectedReturn = this.record.getExpectedReturnData()
     this.expectedReturnPieGraph = drawExpectedReturnPieGraph('expected-return-pie-graph', expectedReturn)
 
+    const liquidityReturnPosition = this.record.getLiquidityReturnPositionData()
+    this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositoinScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition)
   },
   unmounted () {
     this.assetChangeLineGraph.dispose()
     this.residualMaturatyPieGraph.dispose()
     this.expectedReturnPieGraph.dispose()
+    this.liquidityReturnPositionScatterGraph.dispose()
   },
 
 }

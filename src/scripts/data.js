@@ -62,7 +62,7 @@ function mockjson () {
                         name: "华夏基金",
                         beginningAmount: 100000.00,
                         beginningTime: "2021-01-01",
-                        currentAmount: 200000.00,
+                        currentAmount: 102000.00,
                         currentTime: "2021-06-01",
                         fastRedemption: true,
                         holding: true
@@ -71,7 +71,7 @@ function mockjson () {
                         name: "华夏基金",
                         beginningAmount: 100000.00,
                         beginningTime: "2021-01-01",
-                        currentAmount: 300000.00,
+                        currentAmount: 103000.00,
                         currentTime: "2022-06-01",
                         fastRedemption: true,
                         holding: true
@@ -99,7 +99,7 @@ function mockjson () {
                         name: "天弘基金",
                         beginningAmount: 40000.00,
                         beginningTime: "2022-01-01",
-                        currentAmount: 50000.00,
+                        currentAmount: 43000.00,
                         currentTime: "2024-01-01",
                         fastRedemption: false,
                         holding: true
@@ -389,8 +389,6 @@ class Data {
             { name: ">10%", amount: 0 }
         ]
 
-        console.log(this.data.fixedDepositData);
-
         for (let cData of this.data.cashData) {
             const last = cData.history[cData.history.length - 1];
             expectedReturn[0].amount += last.amount;
@@ -433,6 +431,72 @@ class Data {
             item.value = item.amount;
         });
         return expectedReturn;
+    }
+
+    getLiquidityReturnPositionData () {
+        let data = []
+        for (let cData of this.data.cashData) {
+            const last = cData.history[cData.history.length - 1];
+            data.push({
+                liquidity: 1,
+                return: 0,
+                amount: last.amount
+            })
+        }
+        for (let mData of this.data.monetaryFundData) {
+            const last = mData.history[mData.history.length - 1];
+            if (!last.holding) {
+                continue;
+            }
+            if (last.fastRedemption) {
+                data.push({
+                    liquidity: 1,
+                    return: last.annualizedReturnRate,
+                    amount: last.currentAmount
+                })
+            } else {
+                data.push({
+                    liquidity: 1,
+                    return: last.annualizedReturnRate,
+                    amount: last.currentAmount
+                })
+            }
+        }
+        for (let fData of this.data.fixedDepositData) {
+            const last = fData.history[fData.history.length - 1];
+            if (last.residualMaturaty <= 0) {
+                continue;
+            }
+            data.push({
+                liquidity: last.residualMaturaty,
+                return: last.rate,
+                amount: last.beginningAmount
+            })
+        }
+        data = data.sort((a, b) => {
+            if (a.liquidity === b.liquidity) {
+                return a.return - b.return;
+            }
+            return a.liquidity - b.liquidity;
+        });
+        data = data.reduce((acc, cur) => {
+            if (acc.length === 0) {
+                acc.push(cur);
+            } else {
+                const last = acc[acc.length - 1];
+                if (last.liquidity === cur.liquidity && last.return === cur.return) {
+                    last.amount += cur.amount;
+                } else {
+                    acc.push(cur);
+                }
+            }
+            return acc;
+        }, []);
+
+        return {
+            data: data.map(d => [d.liquidity, d.return]),
+            amount: data.map(d => d.amount)
+        };
     }
 }
 
