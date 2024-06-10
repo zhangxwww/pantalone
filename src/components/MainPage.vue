@@ -98,11 +98,6 @@
                          @click="handleEdit(scope.$index, scope.row)">
                 编辑
               </el-button>
-              <el-button size="small"
-                         type="danger"
-                         @click="handleDelete(scope.$index, scope.row)">
-                删除
-              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -314,9 +309,6 @@ export default {
       handleEdit: (index, row) => {
         console.log(row.id)
       },
-      handleDelete: (index, row) => {
-        console.log(index, row)
-      },
       onAddSelect: type => {
         console.log(type)
         switch (type) {
@@ -347,14 +339,23 @@ export default {
             break
         }
       },
+      addCashData: () => {
+        console.log(this.addCashForm)
+        this.record.addData('cash', {
+          name: this.addCashForm.name,
+          amount: this.addCashForm.amount
+        })
+      },
       onConfirmAdd: (type) => {
         switch (type) {
           case 'cash':
             this.$refs['addCashForm'].validate((valid) => {
               if (valid) {
-                console.log(this.addCashForm)
                 this.showAddCashDialog = false
-                // this.$refs['addCashForm'].resetFields()
+                this.addCashData()
+                this.data = this.record.getData()
+                this.draw()
+                this.$refs['addCashForm'].resetFields()
               } else {
                 console.log('error submit!!')
               }
@@ -386,6 +387,24 @@ export default {
       },
       onUpload: (file) => {
         storage.upload(file);
+      },
+      draw: () => {
+        const months = 60;
+
+        const assetChange = this.record.getAssetChangeData(months)
+        this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
+
+        const residualMaturaty = this.record.getResidualMaturityData()
+        this.residualMaturatyPieGraph = drawResidualMaturityPieGraph('residual-maturity-pie-graph', residualMaturaty)
+
+        const expectedReturn = this.record.getExpectedReturnData()
+        this.expectedReturnPieGraph = drawExpectedReturnPieGraph('expected-return-pie-graph', expectedReturn)
+
+        const liquidityReturnPosition = this.record.getLiquidityReturnPositionData()
+        this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositoinScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition)
+
+        const averageReturn = this.record.getAverageReturnData(months)
+        this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)
       },
       headers: {
         cash: [
@@ -573,22 +592,7 @@ export default {
   },
 
   mounted () {
-    const months = 60;
-
-    const assetChange = this.record.getAssetChangeData(months)
-    this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
-
-    const residualMaturaty = this.record.getResidualMaturityData()
-    this.residualMaturatyPieGraph = drawResidualMaturityPieGraph('residual-maturity-pie-graph', residualMaturaty)
-
-    const expectedReturn = this.record.getExpectedReturnData()
-    this.expectedReturnPieGraph = drawExpectedReturnPieGraph('expected-return-pie-graph', expectedReturn)
-
-    const liquidityReturnPosition = this.record.getLiquidityReturnPositionData()
-    this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositoinScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition)
-
-    const averageReturn = this.record.getAverageReturnData(months)
-    this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)
+    this.draw();
   },
   unmounted () {
     this.assetChangeLineGraph.dispose()

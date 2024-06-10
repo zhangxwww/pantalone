@@ -248,7 +248,11 @@ class Data {
             fixedDepositData: []
         };
         for (let cdata of this.data.cashData) {
-            data.cashData.push(cdata.history[cdata.history.length - 1]);
+            const last = cdata.history[cdata.history.length - 1];
+            if (last.amount <= 0) {
+                continue;
+            }
+            data.cashData.push(last);
         }
         for (let mdata of this.data.monetaryFundData) {
             // filter: holding === true
@@ -270,8 +274,29 @@ class Data {
     }
 
     // eslint-disable-next-line no-unused-vars
-    addData (data, type) {
-        //
+    addData (type, data) {
+        if (type === 'cash') {
+            this.addCashData(data);
+        } else if (type === 'monetaryFund') {
+            this.addMonetaryFundData(data);
+        } else if (type === 'fixedDeposit') {
+            this.addFixedDepositData(data);
+        }
+        storage.save(this.json);
+    }
+
+    addCashData (data) {
+        const newData = {
+            name: data.name,
+            amount: parseFloat(data.amount),
+            beginningTime: timeFormat(new Date())
+        };
+        const maxId = Math.max(...this.json.cashData.map(d => d.id), 0);
+        this.json.cashData.push({
+            id: maxId + 1,
+            history: [newData]
+        });
+        this.data = this.prepareData();
     }
 
     sampleDates (months) {
