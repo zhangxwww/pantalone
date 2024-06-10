@@ -1,4 +1,7 @@
 <template>
+  <el-image :src="require('@/assets/logo.png')"
+            fit="contain"
+            style="width: 15%; margin-bottom: 50px"></el-image>
   <el-row style="margin-bottom: 60px">
     <el-col :span="12">
       <div id="asset-change-line-graph"
@@ -171,7 +174,6 @@ export default {
   name: 'MainPage',
   data () {
     return {
-      chart: null,
       record: null,
       data: null,
 
