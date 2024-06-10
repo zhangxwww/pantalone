@@ -248,26 +248,29 @@ class Data {
             fixedDepositData: []
         };
         for (let cdata of this.data.cashData) {
-            const last = cdata.history[cdata.history.length - 1];
+            const last = clone(cdata.history[cdata.history.length - 1]);
             if (last.amount <= 0) {
                 continue;
             }
+            last.id = cdata.id;
             data.cashData.push(last);
         }
         for (let mdata of this.data.monetaryFundData) {
             // filter: holding === true
-            const last = mdata.history[mdata.history.length - 1];
+            const last = clone(mdata.history[mdata.history.length - 1]);
             if (last.holding !== true) {
                 continue;
             }
+            last.id = mdata.id;
             data.monetaryFundData.push(last);
         }
         for (let fdata of this.data.fixedDepositData) {
             // filter: endingTime >= now
-            const last = fdata.history[fdata.history.length - 1];
+            const last = clone(fdata.history[fdata.history.length - 1]);
             if (new Date() > last.endingTime) {
                 continue;
             }
+            last.id = fdata.id;
             data.fixedDepositData.push(last);
         }
         return data;

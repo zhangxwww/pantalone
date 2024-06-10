@@ -303,7 +303,7 @@ export default {
       },
 
       handleEdit: (index, row) => {
-        console.log(row.id)
+        console.log(row)
       },
       onAddSelect: type => {
         console.log(type)
