@@ -282,6 +282,7 @@ class Data {
         } else if (type === 'fixedDeposit') {
             this.addFixedDepositData(data);
         }
+        this.data = this.prepareData();
         storage.save(this.json);
     }
 
@@ -296,7 +297,38 @@ class Data {
             id: maxId + 1,
             history: [newData]
         });
-        this.data = this.prepareData();
+    }
+
+    addMonetaryFundData (data) {
+        const newData = {
+            name: data.name,
+            beginningAmount: parseFloat(data.beginningAmount),
+            beginningTime: timeFormat(data.beginningTime),
+            currentAmount: parseFloat(data.currentAmount),
+            currentTime: timeFormat(new Date()),
+            fastRedemption: data.fastRedemption,
+            holding: data.holding
+        };
+        const maxId = Math.max(...this.json.monetaryFundData.map(d => d.id), 0);
+        this.json.monetaryFundData.push({
+            id: maxId + 1,
+            history: [newData]
+        });
+    }
+
+    addFixedDepositData (data) {
+        const newData = {
+            name: data.name,
+            beginningAmount: parseFloat(data.beginningAmount),
+            rate: parseFloat(data.rate),
+            maturity: parseInt(data.maturity),
+            beginningTime: timeFormat(data.beginningTime)
+        };
+        const maxId = Math.max(...this.json.fixedDepositData.map(d => d.id), 0);
+        this.json.fixedDepositData.push({
+            id: maxId + 1,
+            history: [newData]
+        });
     }
 
     sampleDates (months) {
@@ -305,7 +337,7 @@ class Data {
 
         const interval = Math.ceil(months / 12);
         for (let i = 0; i < months; i += interval) {
-            let newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+            let newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, currentDate.getDate() + 1);
             dates.unshift(newDate);
         }
         return dates;

@@ -119,11 +119,6 @@
                          @click="handleEdit(scope.$index, scope.row)">
                 编辑
               </el-button>
-              <el-button size="small"
-                         type="danger"
-                         @click="handleDelete(scope.$index, scope.row)">
-                删除
-              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -143,11 +138,6 @@
               <el-button size="small"
                          @click="handleEdit(scope.$index, scope.row)">
                 编辑
-              </el-button>
-              <el-button size="small"
-                         type="danger"
-                         @click="handleDelete(scope.$index, scope.row)">
-                删除
               </el-button>
             </template>
           </el-table-column>
@@ -231,35 +221,41 @@
              title="添加定期存款项目"
              width="300px">
     <el-form :model="addFixedDepositForm"
+             :rules="fixedDepositRules"
              ref="addFixedDepositForm">
-      <el-form-item label="名称">
+      <el-form-item label="名称"
+                    prop="name">
         <el-input v-model="addFixedDepositForm.name"></el-input>
       </el-form-item>
-      <el-form-item label="期初金额">
+      <el-form-item label="期初金额"
+                    prop="beginningAmount">
         <el-input v-model="addFixedDepositForm.beginningAmount"></el-input>
       </el-form-item>
-      <el-form-item label="期初时间">
+      <el-form-item label="期初时间"
+                    prop="beginningTime">
         <el-date-picker v-model="addFixedDepositForm.beginningTime"
                         type="date"
                         placeholder="选择日期">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="利率">
+      <el-form-item label="利率"
+                    prop="rate">
         <el-input v-model="addFixedDepositForm.rate"></el-input>
       </el-form-item>
-      <el-form-item label="期限">
+      <el-form-item label="期限"
+                    prop="maturity">
         <el-input v-model.number="addFixedDepositForm.maturity"></el-input>
       </el-form-item>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="onCancelAdd('fixed-deposit')">取消</el-button>
-          <el-button type="primary"
-                     @click="onConfirmAdd('fixed-deposit')">
-            确认
-          </el-button>
-        </div>
-      </template>
     </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="onCancelAdd('fixed-deposit')">取消</el-button>
+        <el-button type="primary"
+                   @click="onConfirmAdd('fixed-deposit')">
+          确认
+        </el-button>
+      </div>
+    </template>
   </el-dialog>
 
 </template>
@@ -346,6 +342,27 @@ export default {
           amount: this.addCashForm.amount
         })
       },
+      addMonetaryFundData: () => {
+        console.log(this.addMonetaryFundForm)
+        this.record.addData('monetaryFund', {
+          name: this.addMonetaryFundForm.name,
+          beginningAmount: this.addMonetaryFundForm.beginningAmount,
+          beginningTime: this.addMonetaryFundForm.beginningTime,
+          currentAmount: this.addMonetaryFundForm.currentAmount,
+          fastRedemption: this.addMonetaryFundForm.fastRedemption,
+          holding: this.addMonetaryFundForm.holding
+        })
+      },
+      addFixedDepositData: () => {
+        console.log(this.addFixedDepositForm)
+        this.record.addData('fixedDeposit', {
+          name: this.addFixedDepositForm.name,
+          beginningAmount: this.addFixedDepositForm.beginningAmount,
+          beginningTime: this.addFixedDepositForm.beginningTime,
+          rate: this.addFixedDepositForm.rate,
+          maturity: this.addFixedDepositForm.maturity
+        })
+      },
       onConfirmAdd: (type) => {
         switch (type) {
           case 'cash':
@@ -356,8 +373,6 @@ export default {
                 this.data = this.record.getData()
                 this.draw()
                 this.$refs['addCashForm'].resetFields()
-              } else {
-                console.log('error submit!!')
               }
             })
             break
@@ -366,7 +381,10 @@ export default {
               if (valid) {
                 console.log(this.addMonetaryFundForm)
                 this.showAddMonetaryFundDialog = false
-                // this.$refs['addMonetaryFundForm'].resetFields()
+                this.addMonetaryFundData()
+                this.data = this.record.getData()
+                this.draw()
+                this.$refs['addMonetaryFundForm'].resetFields()
               }
             })
             break
@@ -375,7 +393,10 @@ export default {
               if (valid) {
                 console.log(this.addFixedDepositForm)
                 this.showAddFixedDepositDialog = false
-                // this.$refs['addFixedDepositForm'].resetFields()
+                this.addFixedDepositData()
+                this.data = this.record.getData()
+                this.draw()
+                this.$refs['addFixedDepositForm'].resetFields()
               }
             })
             break
