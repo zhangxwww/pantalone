@@ -35,16 +35,18 @@
             :offset="5">
       <el-dropdown trigger="hover"
                    v-on:command="onAddSelect">
-        <el-button type="primary"
-                   @click="onAddClick">
+        <el-button type="primary">
           <el-icon>
             <plus />
           </el-icon>
         </el-button>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="1">1</el-dropdown-item>
-            <el-dropdown-item command="2">2</el-dropdown-item>
+            <el-dropdown-item v-for="menu in dropdownMenus"
+                              :key="menu.command"
+                              :command="menu.command">
+              {{ menu.label }}
+            </el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -158,6 +160,113 @@
       </el-tab-pane>
     </el-tabs>
   </el-row>
+
+  <el-dialog v-model="showAddCashDialog"
+             title="添加现金项目"
+             width="300px">
+    <el-form :model="addCashForm"
+             ref="addCashForm"
+             :rules="cashRules">
+      <el-form-item label="账户"
+                    prop="name">
+        <el-input v-model="addCashForm.name"></el-input>
+      </el-form-item>
+      <el-form-item label="金额"
+                    prop="amount">
+        <el-input v-model="addCashForm.amount"></el-input>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="onCancelAdd('cash')">取消</el-button>
+        <el-button type="primary"
+                   @click="onConfirmAdd('cash')">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <el-dialog v-model="showAddMonetaryFundDialog"
+             title="添加货币基金项目"
+             width="300px">
+    <el-form :model="addMonetaryFundForm"
+             ref="addMonetaryFundForm"
+             :rules="monetaryFundRules">
+      <el-form-item label="名称"
+                    prop="name">
+        <el-input v-model="addMonetaryFundForm.name"></el-input>
+      </el-form-item>
+      <el-form-item label="期初金额"
+                    prop="beginningAmount">
+        <el-input v-model="addMonetaryFundForm.beginningAmount"></el-input>
+      </el-form-item>
+      <el-form-item label="期初时间"
+                    prop="beginningTime">
+        <el-date-picker v-model="addMonetaryFundForm.beginningTime"
+                        type="date"
+                        placeholder="选择日期">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="当期金额"
+                    prop="currentAmount">
+        <el-input v-model="addMonetaryFundForm.currentAmount"></el-input>
+      </el-form-item>
+      <el-form-item label="快速赎回"
+                    prop="fastRedemption">
+        <el-switch v-model="addMonetaryFundForm.fastRedemption"></el-switch>
+      </el-form-item>
+      <el-form-item label="当前持有"
+                    prop="holding">
+        <el-switch v-model="addMonetaryFundForm.holding"></el-switch>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="onCancelAdd('monetary-fund')">取消</el-button>
+        <el-button type="primary"
+                   @click="onConfirmAdd('monetary-fund')">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <el-dialog v-model="showAddFixedDepositDialog"
+             title="添加定期存款项目"
+             width="300px">
+    <el-form :model="addFixedDepositForm"
+             ref="addFixedDepositForm">
+      <el-form-item label="名称">
+        <el-input v-model="addFixedDepositForm.name"></el-input>
+      </el-form-item>
+      <el-form-item label="期初金额">
+        <el-input v-model="addFixedDepositForm.beginningAmount"></el-input>
+      </el-form-item>
+      <el-form-item label="期初时间">
+        <el-date-picker v-model="addFixedDepositForm.beginningTime"
+                        type="date"
+                        placeholder="选择日期">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="利率">
+        <el-input v-model="addFixedDepositForm.rate"></el-input>
+      </el-form-item>
+      <el-form-item label="期限">
+        <el-input v-model.number="addFixedDepositForm.maturity"></el-input>
+      </el-form-item>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="onCancelAdd('fixed-deposit')">取消</el-button>
+          <el-button type="primary"
+                     @click="onConfirmAdd('fixed-deposit')">
+            确认
+          </el-button>
+        </div>
+      </template>
+    </el-form>
+  </el-dialog>
+
 </template>
 
 <script>
@@ -169,6 +278,7 @@ import { drawExpectedReturnPieGraph } from '@/scripts/graph.js'
 import { drawLiquidityReturnPositoinScatterGraph } from '@/scripts/graph.js'
 import { drawAverageReturnLineGraph } from '@/scripts/graph.js'
 import storage from '@/scripts/storage.js'
+import { isNumberValidator } from '@/scripts/validator.js'
 
 export default {
   name: 'MainPage',
@@ -177,17 +287,98 @@ export default {
       record: null,
       data: null,
 
+      showAddCashDialog: false,
+      showAddMonetaryFundDialog: false,
+      showAddFixedDepositDialog: false,
+
+      addCashForm: {
+        name: '',
+        amount: 0
+      },
+      addMonetaryFundForm: {
+        name: '',
+        beginningAmount: 0,
+        beginningTime: '',
+        currentAmount: 0,
+        fastRedemption: false,
+        holding: true
+      },
+      addFixedDepositForm: {
+        name: '',
+        beginningAmount: 0,
+        beginningTime: '',
+        rate: 0,
+        maturity: 0
+      },
+
       handleEdit: (index, row) => {
         console.log(row.id)
       },
       handleDelete: (index, row) => {
         console.log(index, row)
       },
-      onAddClick: () => {
-        console.log('click add')
-      },
       onAddSelect: type => {
         console.log(type)
+        switch (type) {
+          case 'cash':
+            this.showAddCashDialog = true
+            break
+          case 'monetary-fund':
+            this.showAddMonetaryFundDialog = true
+            break
+          case 'fixed-deposit':
+            this.showAddFixedDepositDialog = true
+            break
+        }
+      },
+      onCancelAdd: (type) => {
+        switch (type) {
+          case 'cash':
+            this.showAddCashDialog = false
+            this.$refs['addCashForm'].resetFields()
+            break
+          case 'monetary-fund':
+            this.showAddMonetaryFundDialog = false
+            this.$refs['addMonetaryFundForm'].resetFields()
+            break
+          case 'fixed-deposit':
+            this.showAddFixedDepositDialog = false
+            this.$refs['addFixedDepositForm'].resetFields()
+            break
+        }
+      },
+      onConfirmAdd: (type) => {
+        switch (type) {
+          case 'cash':
+            this.$refs['addCashForm'].validate((valid) => {
+              if (valid) {
+                console.log(this.addCashForm)
+                this.showAddCashDialog = false
+                // this.$refs['addCashForm'].resetFields()
+              } else {
+                console.log('error submit!!')
+              }
+            })
+            break
+          case 'monetary-fund':
+            this.$refs['addMonetaryFundForm'].validate((valid) => {
+              if (valid) {
+                console.log(this.addMonetaryFundForm)
+                this.showAddMonetaryFundDialog = false
+                // this.$refs['addMonetaryFundForm'].resetFields()
+              }
+            })
+            break
+          case 'fixed-deposit':
+            this.$refs['addFixedDepositForm'].validate((valid) => {
+              if (valid) {
+                console.log(this.addFixedDepositForm)
+                this.showAddFixedDepositDialog = false
+                // this.$refs['addFixedDepositForm'].resetFields()
+              }
+            })
+            break
+        }
       },
       onDownload: () => {
         console.log('download')
@@ -296,7 +487,78 @@ export default {
             sortable: true
           }
         ]
-      }
+      },
+      dropdownMenus: [
+        {
+          command: 'cash',
+          label: '现金'
+        },
+        {
+          command: 'monetary-fund',
+          label: '货币基金'
+        },
+        {
+          command: 'fixed-deposit',
+          label: '定期存款'
+        }
+      ],
+      cashRules: {
+        name: [
+          { required: true, message: '请输入账户名称', trigger: 'blur' }
+        ],
+        amount: [
+          { required: true, message: '请输入金额', trigger: 'blur' },
+          {
+            message: '金额必须为数字值', trigger: 'blur', validator: isNumberValidator
+          }
+        ]
+      },
+      monetaryFundRules: {
+        name: [
+          { required: true, message: '请输入名称', trigger: 'blur' }
+        ],
+        beginningAmount: [
+          { required: true, message: '请输入期初金额', trigger: 'blur' },
+          {
+            message: '期初金额必须为数字值', trigger: 'blur', validator: isNumberValidator
+          }
+        ],
+        beginningTime: [
+          { required: true, message: '请选择期初时间', trigger: 'blur' }
+        ],
+        currentAmount: [
+          { required: true, message: '请输入当期金额', trigger: 'blur' },
+          {
+            message: '当期金额必须为数字值', trigger: 'blur', validator: isNumberValidator
+          }
+        ]
+      },
+      fixedDepositRules: {
+        name: [
+          { required: true, message: '请输入名称', trigger: 'blur' }
+        ],
+        beginningAmount: [
+          { required: true, message: '请输入期初金额', trigger: 'blur' },
+          {
+            message: '期初金额必须为数字值', trigger: 'blur', validator: isNumberValidator
+          }
+        ],
+        beginningTime: [
+          { required: true, message: '请选择期初时间', trigger: 'blur' }
+        ],
+        rate: [
+          { required: true, message: '请输入利率', trigger: 'blur' },
+          {
+            message: '利率必须为数字值', trigger: 'blur', validator: isNumberValidator
+          }
+        ],
+        maturity: [
+          { required: true, message: '请输入期限', trigger: 'blur' },
+          {
+            message: '期限必须为数字值', trigger: 'blur', type: 'number'
+          }
+        ]
+      },
     }
   },
   components: {
