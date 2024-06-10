@@ -2,14 +2,10 @@
     "name": "pantalone",
     "version": "0.1.0",
     "private": true,
-    "main": "electron/main.js",
     "scripts": {
         "serve": "vue-cli-service serve",
         "build": "vue-cli-service build",
-        "lint": "vue-cli-service lint",
-        "electron": "electron .",
-        "electron:build": "vue-cli-service build && electron-builder",
-        "electron:serve": "concurrently \"npm:serve\" \"npm:electron\""
+        "lint": "vue-cli-service lint"
     },
     "dependencies": {
         "@element-plus/icons-vue": "^2.3.1",
@@ -24,8 +20,6 @@
         "@vue/cli-service": "~4.5.11",
         "@vue/compiler-sfc": "^3.0.0",
         "babel-eslint": "^10.1.0",
-        "concurrently": "^8.2.2",
-        "electron": "^30.0.6",
         "eslint": "^6.7.2",
         "eslint-plugin-vue": "^7.0.0"
     },

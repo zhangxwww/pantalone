@@ -1,3 +1,6 @@
+import storage from './storage.js';
+
+
 function clone (x) {
     return JSON.parse(JSON.stringify(x));
 }
@@ -15,6 +18,7 @@ function timeFormat (t, short = false) {
     return formatted;
 }
 
+// eslint-disable-next-line no-unused-vars
 function mockjson () {
     return {
         cashData: [
@@ -186,9 +190,10 @@ function mockjson () {
 
 class Data {
     // eslint-disable-next-line no-unused-vars
-    constructor(json) {
+    constructor() {
         // this.data = json;
-        this.json = mockjson();
+        this.json = storage.load();
+        // this.json = mockjson();
         this.data = this.prepareData();
     }
 

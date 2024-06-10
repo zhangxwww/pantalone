@@ -39,16 +39,26 @@
         </el-dropdown-menu>
       </template>
     </el-dropdown>
-    <el-button>
+    <el-button @click="onDownload">
       <el-icon>
         <download />
       </el-icon>
     </el-button>
-    <el-button>
-      <el-icon>
-        <upload />
-      </el-icon>
-    </el-button>
+
+    <el-upload ref="upload"
+               :on-change="onUpload"
+               :auto-upload="false"
+               :show-file-list="false"
+               :limit="1">
+      <template #trigger>
+        <el-button>
+          <el-icon>
+            <upload />
+          </el-icon>
+        </el-button>
+      </template>
+    </el-upload>
+
   </el-row>
   <el-tabs type="border-card">
     <el-tab-pane label="现金">
@@ -135,18 +145,14 @@
 </template>
 
 <script>
-// import * as echarts from "echarts"
-import {
-  Plus,
-  Download,
-  Upload
-} from '@element-plus/icons-vue'
+import { Plus, Download, Upload } from '@element-plus/icons-vue'
 import Data from '@/scripts/data.js'
 import { drawAssetChangeLineGraph } from '@/scripts/graph.js'
 import { drawResidualMaturityPieGraph } from '@/scripts/graph.js'
 import { drawExpectedReturnPieGraph } from '@/scripts/graph.js'
 import { drawLiquidityReturnPositoinScatterGraph } from '@/scripts/graph.js'
 import { drawAverageReturnLineGraph } from '@/scripts/graph.js'
+import storage from '@/scripts/storage.js'
 
 export default {
   name: 'MainPage',
@@ -167,6 +173,13 @@ export default {
       },
       onAddSelect: type => {
         console.log(type)
+      },
+      onDownload: () => {
+        console.log('download')
+        storage.download();
+      },
+      onUpload: (file) => {
+        storage.upload(file);
       },
       headers: {
         cash: [
