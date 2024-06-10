@@ -23,125 +23,138 @@
            style="width: 800px; height: 300px"></div>
     </el-col>
   </el-row>
-  <el-row>
-    <el-dropdown trigger="hover"
-                 v-on:command="onAddSelect">
-      <el-button type="primary"
-                 @click="onAddClick">
-        <el-icon>
-          <plus />
-        </el-icon>
-      </el-button>
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item command="1">1</el-dropdown-item>
-          <el-dropdown-item command="2">2</el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
-    <el-button @click="onDownload">
-      <el-icon>
-        <download />
-      </el-icon>
-    </el-button>
-
-    <el-upload ref="upload"
-               :on-change="onUpload"
-               :auto-upload="false"
-               :show-file-list="false"
-               :limit="1">
-      <template #trigger>
-        <el-button>
+  <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
+    <el-col :span="6"
+            :offset="9">
+      <span style="font-size: var(--el-font-size-large); font-weight: bold">项目明细</span>
+    </el-col>
+    <el-col :span="1"
+            :offset="5">
+      <el-dropdown trigger="hover"
+                   v-on:command="onAddSelect">
+        <el-button type="primary"
+                   @click="onAddClick">
           <el-icon>
-            <upload />
+            <plus />
           </el-icon>
         </el-button>
-      </template>
-    </el-upload>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="1">1</el-dropdown-item>
+            <el-dropdown-item command="2">2</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    </el-col>
 
+    <el-col :span="1"
+            style="margin-left: 10px">
+      <el-button @click="onDownload">
+        <el-icon>
+          <download />
+        </el-icon>
+      </el-button>
+    </el-col>
+
+    <el-col :span="1"
+            style="margin-left: 10px">
+      <el-upload ref="upload"
+                 :on-change="onUpload"
+                 :auto-upload="false"
+                 :show-file-list="false"
+                 :limit="1">
+        <template #trigger>
+          <el-button>
+            <el-icon>
+              <upload />
+            </el-icon>
+          </el-button>
+        </template>
+      </el-upload>
+    </el-col>
   </el-row>
-  <el-tabs type="border-card">
-    <el-tab-pane label="现金">
-      <el-table :data="data.cashData"
-                height="500"
-                table-layout="auto"
-                style="width: 100%">
-        <el-table-column v-for="header, i in headers.cash"
-                         :key="i"
-                         :prop="header.prop"
-                         :label="header.label"
-                         :width="header.width"
-                         :sortable="header.sortable" />
-        <el-table-column label=""
-                         align="right">
-          <template #default="scope">
-            <el-button size="small"
-                       @click="handleEdit(scope.$index, scope.row)">
-              编辑
-            </el-button>
-            <el-button size="small"
-                       type="danger"
-                       @click="handleDelete(scope.$index, scope.row)">
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-tab-pane>
-    <el-tab-pane label="货币基金"><el-table :data="data.monetaryFundData"
-                height="500"
-                table-layout="auto"
-                style="width: 100%">
-        <el-table-column v-for="header, i in headers.monetaryFund"
-                         :key="i"
-                         :prop="header.prop"
-                         :label="header.label"
-                         :width="header.width"
-                         :sortable="header.sortable" />
+  <el-row>
+    <el-tabs type="border-card"
+             style="width: 70%; margin-left: 15%; margin-bottom: 5%">
+      <el-tab-pane label="现金">
+        <el-table :data="data.cashData"
+                  table-layout="auto"
+                  style="width: 100%">
+          <el-table-column v-for="header, i in headers.cash"
+                           :key="i"
+                           :prop="header.prop"
+                           :label="header.label"
+                           :width="header.width"
+                           :sortable="header.sortable" />
+          <el-table-column label=""
+                           align="right">
+            <template #default="scope">
+              <el-button size="small"
+                         @click="handleEdit(scope.$index, scope.row)">
+                编辑
+              </el-button>
+              <el-button size="small"
+                         type="danger"
+                         @click="handleDelete(scope.$index, scope.row)">
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+      <el-tab-pane label="货币基金"><el-table :data="data.monetaryFundData"
+                  table-layout="auto"
+                  style="width: 100%">
+          <el-table-column v-for="header, i in headers.monetaryFund"
+                           :key="i"
+                           :prop="header.prop"
+                           :label="header.label"
+                           :width="header.width"
+                           :sortable="header.sortable" />
 
-        <el-table-column label=""
-                         align="right">
-          <template #default="scope">
-            <el-button size="small"
-                       @click="handleEdit(scope.$index, scope.row)">
-              编辑
-            </el-button>
-            <el-button size="small"
-                       type="danger"
-                       @click="handleDelete(scope.$index, scope.row)">
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-tab-pane>
-    <el-tab-pane label="定期存款"><el-table :data="data.fixedDepositData"
-                height="500"
-                table-layout="auto"
-                style="width: 100%">
-        <el-table-column v-for="header, i in headers.fixedDeposit"
-                         :key="i"
-                         :prop="header.prop"
-                         :label="header.label"
-                         :width="header.width"
-                         :sortable="header.sortable" />
-        <el-table-column label=""
-                         align="right">
-          <template #default="scope">
-            <el-button size="small"
-                       @click="handleEdit(scope.$index, scope.row)">
-              编辑
-            </el-button>
-            <el-button size="small"
-                       type="danger"
-                       @click="handleDelete(scope.$index, scope.row)">
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-tab-pane>
-  </el-tabs>
+          <el-table-column label=""
+                           align="right">
+            <template #default="scope">
+              <el-button size="small"
+                         @click="handleEdit(scope.$index, scope.row)">
+                编辑
+              </el-button>
+              <el-button size="small"
+                         type="danger"
+                         @click="handleDelete(scope.$index, scope.row)">
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+      <el-tab-pane label="定期存款"><el-table :data="data.fixedDepositData"
+                  table-layout="auto"
+                  style="width: 100%">
+          <el-table-column v-for="header, i in headers.fixedDeposit"
+                           :key="i"
+                           :prop="header.prop"
+                           :label="header.label"
+                           :width="header.width"
+                           :sortable="header.sortable" />
+          <el-table-column label=""
+                           align="right">
+            <template #default="scope">
+              <el-button size="small"
+                         @click="handleEdit(scope.$index, scope.row)">
+                编辑
+              </el-button>
+              <el-button size="small"
+                         type="danger"
+                         @click="handleDelete(scope.$index, scope.row)">
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
+    </el-tabs>
+  </el-row>
 </template>
 
 <script>
