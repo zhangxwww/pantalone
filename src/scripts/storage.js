@@ -21,7 +21,6 @@ function load () {
 function upload (file) {
     const reader = new FileReader();
     reader.onload = (e) => {
-        console.log(e.target.result);
         localStorage.setItem("pantalone-data", e.target.result);
         location.reload();
     }

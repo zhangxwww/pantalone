@@ -235,7 +235,6 @@ class Data {
                 fHis.rateFmt = (fHis.rate * 100).toFixed(2) + '%';
             }
         }
-        console.log(data)
         return data;
     }
 

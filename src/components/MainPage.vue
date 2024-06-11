@@ -305,8 +305,6 @@ export default {
       },
 
       handleEdit: (row, type) => {
-        console.log(row)
-        console.log(type)
         this.editId = row.id
 
         if (type === 'cash') {
@@ -331,7 +329,6 @@ export default {
         }
       },
       onAddSelect: type => {
-        console.log(type)
         switch (type) {
           case 'cash':
             this.showAddCashDialog = true
@@ -361,14 +358,12 @@ export default {
         }
       },
       addCashData: () => {
-        console.log(this.addCashForm, this.editId)
         this.record.addData('cash', {
           name: this.addCashForm.name,
           amount: this.addCashForm.amount
         }, this.editId)
       },
       addMonetaryFundData: () => {
-        console.log(this.addMonetaryFundForm)
         this.record.addData('monetaryFund', {
           name: this.addMonetaryFundForm.name,
           beginningAmount: this.addMonetaryFundForm.beginningAmount,
@@ -379,7 +374,6 @@ export default {
         }, this.editId)
       },
       addFixedDepositData: () => {
-        console.log(this.addFixedDepositForm)
         this.record.addData('fixedDeposit', {
           name: this.addFixedDepositForm.name,
           beginningAmount: this.addFixedDepositForm.beginningAmount,
@@ -405,7 +399,6 @@ export default {
           case 'monetary-fund':
             this.$refs['addMonetaryFundForm'].validate((valid) => {
               if (valid) {
-                console.log(this.addMonetaryFundForm)
                 this.showAddMonetaryFundDialog = false
                 this.addMonetaryFundData()
                 this.data = this.record.getData()
@@ -418,7 +411,6 @@ export default {
           case 'fixed-deposit':
             this.$refs['addFixedDepositForm'].validate((valid) => {
               if (valid) {
-                console.log(this.addFixedDepositForm)
                 this.showAddFixedDepositDialog = false
                 this.addFixedDepositData()
                 this.data = this.record.getData()
@@ -431,7 +423,6 @@ export default {
         }
       },
       onDownload: () => {
-        console.log('download')
         storage.download();
       },
       onUpload: (file) => {
