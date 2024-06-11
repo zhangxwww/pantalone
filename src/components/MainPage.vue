@@ -438,7 +438,7 @@ export default {
         storage.upload(file);
       },
       draw: () => {
-        const months = 60;
+        const months = 24;
 
         const assetChange = this.record.getAssetChangeData(months)
         this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
@@ -460,7 +460,7 @@ export default {
           {
             prop: 'name',
             label: '账户',
-            width: '80',
+            width: '120',
             sortable: false
           },
           {
@@ -474,7 +474,7 @@ export default {
           {
             prop: 'name',
             label: '名称',
-            width: '160',
+            width: '320',
             sortable: false
           },
           {
@@ -515,7 +515,7 @@ export default {
           {
             prop: 'name',
             label: '名称',
-            width: '80',
+            width: '240',
             sortable: false
           },
           {
