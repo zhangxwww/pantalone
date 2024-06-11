@@ -189,11 +189,8 @@ function mockjson () {
 }
 
 class Data {
-    // eslint-disable-next-line no-unused-vars
     constructor() {
-        // this.data = json;
         this.json = storage.load();
-        // this.json = mockjson();
         this.data = this.prepareData();
     }
 
@@ -238,6 +235,7 @@ class Data {
                 fHis.rateFmt = (fHis.rate * 100).toFixed(2) + '%';
             }
         }
+        console.log(data)
         return data;
     }
 
@@ -248,53 +246,95 @@ class Data {
             fixedDepositData: []
         };
         for (let cdata of this.data.cashData) {
-            const last = clone(cdata.history[cdata.history.length - 1]);
+            const last = cdata.history[cdata.history.length - 1];
             if (last.amount <= 0) {
                 continue;
             }
-            last.id = cdata.id;
-            data.cashData.push(last);
+            const d = {
+                name: last.name,
+                amount: last.amount,
+                amountFmt: last.amountFmt,
+                beginningTime: last.beginningTime
+            };
+            d.id = cdata.id;
+            data.cashData.push(d);
         }
         for (let mdata of this.data.monetaryFundData) {
             // filter: holding === true
-            const last = clone(mdata.history[mdata.history.length - 1]);
+            const last = mdata.history[mdata.history.length - 1];
             if (last.holding !== true) {
                 continue;
             }
-            last.id = mdata.id;
-            data.monetaryFundData.push(last);
+            const d = {
+                name: last.name,
+                beginningAmount: last.beginningAmount,
+                beginningAmountFmt: last.beginningAmountFmt,
+                beginningTime: last.beginningTime,
+                beginningTimeFmt: last.beginningTimeFmt,
+                currentAmount: last.currentAmount,
+                currentAmountFmt: last.currentAmountFmt,
+                currentTime: last.currentTime,
+                fastRedemption: last.fastRedemption,
+                fastRedemptionFmt: last.fastRedemptionFmt,
+                annualizedReturnRate: last.annualizedReturnRate,
+                annualizedReturnRateFmt: last.annualizedReturnRateFmt,
+                holding: last.holding
+            };
+            d.id = mdata.id;
+            data.monetaryFundData.push(d);
         }
         for (let fdata of this.data.fixedDepositData) {
             // filter: endingTime >= now
-            const last = clone(fdata.history[fdata.history.length - 1]);
+            let last = fdata.history[fdata.history.length - 1];
             if (new Date() > last.endingTime) {
                 continue;
             }
-            last.id = fdata.id;
-            data.fixedDepositData.push(last);
+            const d = {
+                name: last.name,
+                beginningAmount: last.beginningAmount,
+                beginningAmountFmt: last.beginningAmountFmt,
+                rate: last.rate,
+                rateFmt: last.rateFmt,
+                maturity: last.maturity,
+                beginningTime: last.beginningTime,
+                beginningTimeFmt: last.beginningTimeFmt,
+                endingAmount: last.endingAmount,
+                endingAmountFmt: last.endingAmountFmt,
+                endingTime: last.endingTime,
+                endingTimeFmt: last.endingTimeFmt,
+                residualMaturaty: last.residualMaturaty
+            };
+            d.id = fdata.id;
+            data.fixedDepositData.push(d);
         }
         return data;
     }
 
-    // eslint-disable-next-line no-unused-vars
-    addData (type, data) {
+    addData (type, data, id) {
         if (type === 'cash') {
-            this.addCashData(data);
+            this.addCashData(data, id);
         } else if (type === 'monetaryFund') {
-            this.addMonetaryFundData(data);
+            this.addMonetaryFundData(data, id);
         } else if (type === 'fixedDeposit') {
-            this.addFixedDepositData(data);
+            this.addFixedDepositData(data, id);
         }
         this.data = this.prepareData();
         storage.save(this.json);
     }
 
-    addCashData (data) {
+    addCashData (data, id) {
         const newData = {
             name: data.name,
             amount: parseFloat(data.amount),
             beginningTime: timeFormat(new Date())
         };
+        if (id) {
+            const target = this.json.cashData.find(d => d.id === id);
+            if (target) {
+                target.history.push(newData);
+                return;
+            }
+        }
         const maxId = Math.max(...this.json.cashData.map(d => d.id), 0);
         this.json.cashData.push({
             id: maxId + 1,
@@ -302,7 +342,7 @@ class Data {
         });
     }
 
-    addMonetaryFundData (data) {
+    addMonetaryFundData (data, id) {
         const newData = {
             name: data.name,
             beginningAmount: parseFloat(data.beginningAmount),
@@ -312,6 +352,13 @@ class Data {
             fastRedemption: data.fastRedemption,
             holding: data.holding
         };
+        if (id) {
+            const target = this.json.monetaryFundData.find(d => d.id === id);
+            if (target) {
+                target.history.push(newData);
+                return;
+            }
+        }
         const maxId = Math.max(...this.json.monetaryFundData.map(d => d.id), 0);
         this.json.monetaryFundData.push({
             id: maxId + 1,
@@ -319,7 +366,7 @@ class Data {
         });
     }
 
-    addFixedDepositData (data) {
+    addFixedDepositData (data, id) {
         const newData = {
             name: data.name,
             beginningAmount: parseFloat(data.beginningAmount),
@@ -327,6 +374,13 @@ class Data {
             maturity: parseInt(data.maturity),
             beginningTime: timeFormat(data.beginningTime)
         };
+        if (id) {
+            const target = this.json.fixedDepositData.find(d => d.id === id);
+            if (target) {
+                target.history.push(newData);
+                return;
+            }
+        }
         const maxId = Math.max(...this.json.fixedDepositData.map(d => d.id), 0);
         this.json.fixedDepositData.push({
             id: maxId + 1,

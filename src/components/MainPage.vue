@@ -1,8 +1,8 @@
 <template>
-  <el-image :src="require('@/assets/logo.png')"
+  <!-- <el-image :src="require('@/assets/logo.png')"
             fit="contain"
-            style="width: 15%; margin-bottom: 50px"></el-image>
-  <el-row style="margin-bottom: 60px">
+            style="width: 15%; margin-bottom: 50px"></el-image> -->
+  <el-row style="margin-bottom: 60px; margin-top: 60px">
     <el-col :span="12">
       <div id="asset-change-line-graph"
            style="width: 800px; height: 300px"></div>
@@ -95,7 +95,7 @@
                            align="right">
             <template #default="scope">
               <el-button size="small"
-                         @click="handleEdit(scope.$index, scope.row)">
+                         @click="handleEdit(scope.row, 'cash')">
                 编辑
               </el-button>
             </template>
@@ -116,7 +116,7 @@
                            align="right">
             <template #default="scope">
               <el-button size="small"
-                         @click="handleEdit(scope.$index, scope.row)">
+                         @click="handleEdit(scope.row, 'monetary-fund')">
                 编辑
               </el-button>
             </template>
@@ -136,7 +136,7 @@
                            align="right">
             <template #default="scope">
               <el-button size="small"
-                         @click="handleEdit(scope.$index, scope.row)">
+                         @click="handleEdit(scope.row, 'fixed-deposit')">
                 编辑
               </el-button>
             </template>
@@ -282,6 +282,8 @@ export default {
       showAddMonetaryFundDialog: false,
       showAddFixedDepositDialog: false,
 
+      editId: null,
+
       addCashForm: {
         name: '',
         amount: 0
@@ -302,8 +304,31 @@ export default {
         maturity: 0
       },
 
-      handleEdit: (index, row) => {
+      handleEdit: (row, type) => {
         console.log(row)
+        console.log(type)
+        this.editId = row.id
+
+        if (type === 'cash') {
+          this.addCashForm.name = row.name
+          this.addCashForm.amount = row.amount
+          this.showAddCashDialog = true
+        } else if (type === 'monetary-fund') {
+          this.addMonetaryFundForm.name = row.name
+          this.addMonetaryFundForm.beginningAmount = row.beginningAmount
+          this.addMonetaryFundForm.beginningTime = row.beginningTime
+          this.addMonetaryFundForm.currentAmount = row.currentAmount
+          this.addMonetaryFundForm.fastRedemption = row.fastRedemption
+          this.addMonetaryFundForm.holding = row.holding
+          this.showAddMonetaryFundDialog = true
+        } else if (type === 'fixed-deposit') {
+          this.addFixedDepositForm.name = row.name
+          this.addFixedDepositForm.beginningAmount = row.beginningAmount
+          this.addFixedDepositForm.beginningTime = row.beginningTime
+          this.addFixedDepositForm.rate = row.rate
+          this.addFixedDepositForm.maturity = row.maturity
+          this.showAddFixedDepositDialog = true
+        }
       },
       onAddSelect: type => {
         console.log(type)
@@ -336,11 +361,11 @@ export default {
         }
       },
       addCashData: () => {
-        console.log(this.addCashForm)
+        console.log(this.addCashForm, this.editId)
         this.record.addData('cash', {
           name: this.addCashForm.name,
           amount: this.addCashForm.amount
-        })
+        }, this.editId)
       },
       addMonetaryFundData: () => {
         console.log(this.addMonetaryFundForm)
@@ -351,7 +376,7 @@ export default {
           currentAmount: this.addMonetaryFundForm.currentAmount,
           fastRedemption: this.addMonetaryFundForm.fastRedemption,
           holding: this.addMonetaryFundForm.holding
-        })
+        }, this.editId)
       },
       addFixedDepositData: () => {
         console.log(this.addFixedDepositForm)
@@ -361,7 +386,7 @@ export default {
           beginningTime: this.addFixedDepositForm.beginningTime,
           rate: this.addFixedDepositForm.rate,
           maturity: this.addFixedDepositForm.maturity
-        })
+        }, this.editId)
       },
       onConfirmAdd: (type) => {
         switch (type) {
@@ -373,6 +398,7 @@ export default {
                 this.data = this.record.getData()
                 this.draw()
                 this.$refs['addCashForm'].resetFields()
+                this.editId = null
               }
             })
             break
@@ -385,6 +411,7 @@ export default {
                 this.data = this.record.getData()
                 this.draw()
                 this.$refs['addMonetaryFundForm'].resetFields()
+                this.editId = null
               }
             })
             break
@@ -397,6 +424,7 @@ export default {
                 this.data = this.record.getData()
                 this.draw()
                 this.$refs['addFixedDepositForm'].resetFields()
+                this.editId = null
               }
             })
             break
