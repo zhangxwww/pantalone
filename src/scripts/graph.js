@@ -1,4 +1,37 @@
-import * as echarts from "echarts";
+// import * as echarts from "echarts";
+import * as echarts from "echarts/core";
+import { LineChart, PieChart, ScatterChart } from "echarts/charts";
+import {
+    TitleComponent,
+    TooltipComponent,
+    LegendComponent,
+    GridComponent,
+    ToolboxComponent,
+    DataZoomComponent,
+    MarkPointComponent,
+    MarkLineComponent,
+    MarkAreaComponent
+} from "echarts/components";
+import { CanvasRenderer } from "echarts/renderers";
+import { LabelLayout, UniversalTransition } from "echarts/features";
+
+echarts.use([
+    TitleComponent,
+    TooltipComponent,
+    LegendComponent,
+    GridComponent,
+    ToolboxComponent,
+    DataZoomComponent,
+    MarkPointComponent,
+    MarkLineComponent,
+    MarkAreaComponent,
+    LineChart,
+    PieChart,
+    ScatterChart,
+    CanvasRenderer,
+    LabelLayout,
+    UniversalTransition
+]);
 
 function drawAssetChangeLineGraph (domId, data) {
     const chart = echarts.init(document.getElementById(domId));
