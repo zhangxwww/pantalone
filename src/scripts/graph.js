@@ -47,6 +47,29 @@ function drawAssetChangeLineGraph (domId, data) {
             textStyle: {
                 align: "left"
             },
+            formatter: params => {
+                let name = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${params[0].name}</b></td>
+                        </tr>
+                `;
+                let sum = 0;
+                for (let i = 0; i < params.length; i++) {
+                    name += `<tr>
+                        <td align="left">${params[i].marker}${params[i].seriesName}：</td>
+                        <td align="right"><b>${params[i].value.toFixed(2)}</b></td>
+                    </tr>`;
+                    sum += params[i].value;
+                }
+                name += `<tr>
+                    <td align="left"><b>总计：</b></td>
+                    <td align="right"><b>${sum.toFixed(2)}</b></td>
+                `
+                name += "</tbody></table>";
+                return name;
+            }
         },
         legend: {
             data: ["现金", "货币基金", "定期存款"],
@@ -103,7 +126,22 @@ function drawPieGraph (domId, data, title) {
             textAlign: "center"
         },
         tooltip: {
-            formatter: '{c} ({d}%)'
+            formatter: function (params) {
+                return `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left">规模</td>
+                            <td align="right"><b>${params.value.toFixed(2)}</b></td>
+                        </tr>
+                        <tr>
+                            <td align="left">占比</td>
+                            <td align="right"><b>${params.percent.toFixed(2)}%</b></td>
+                        </tr>
+                    </tbody>
+                </table>
+                `
+            }
         },
         series: [
             {
@@ -170,7 +208,7 @@ function drawLiquidityReturnPositoinScatterGraph (domId, data) {
                         </tr>
                         <tr>
                             <td align="left">收益</td>
-                            <td align="right"><b>${params.data[1].toFixed(2)}</b></td>
+                            <td align="right"><b>${(params.data[1] * 100).toFixed(2)}%</b></td>
                         </tr>
                         <tr>
                             <td align="left">规模</td>

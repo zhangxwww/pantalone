@@ -1,10 +1,17 @@
 <template>
-  <!-- <el-image :src="require('@/assets/logo.png')"
-            fit="contain"
-            style="width: 15%; margin-bottom: 50px"></el-image> -->
   <el-row style="margin-bottom: 60px; margin-top: 60px">
     <el-col :span="12">
       <div id="asset-change-line-graph"
+           style="width: 800px; height: 300px"></div>
+    </el-col>
+    <el-col :span="12">
+      <div id="average-return-line-graph"
+           style="width: 800px; height: 300px"></div>
+    </el-col>
+  </el-row>
+  <el-row>
+    <el-col :span="12">
+      <div id="liquidity-return-position-scatter-graph"
            style="width: 800px; height: 300px"></div>
     </el-col>
     <el-col :span="6">
@@ -14,16 +21,6 @@
     <el-col :span="6">
       <div id="expected-return-pie-graph"
            style="width: 400px; height: 300px"></div>
-    </el-col>
-  </el-row>
-  <el-row>
-    <el-col :span="12">
-      <div id="liquidity-return-position-scatter-graph"
-           style="width: 800px; height: 300px"></div>
-    </el-col>
-    <el-col :span="12">
-      <div id="average-return-line-graph"
-           style="width: 800px; height: 300px"></div>
     </el-col>
   </el-row>
   <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
