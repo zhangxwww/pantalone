@@ -278,7 +278,7 @@ function drawAverageReturnLineGraph (domId, data) {
             formatter: params => {
                 let name = params[0].name;
                 for (let i = 0; i < params.length; i++) {
-                    name += `<br>${params[i].marker}${params[i].seriesName}: ${params[i].value.toFixed(4) * 100}%`;
+                    name += `<br>${params[i].marker}${params[i].seriesName}: ${(params[i].value * 100).toFixed(2)}%`;
                 }
                 return name;
             }

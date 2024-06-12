@@ -1,26 +1,35 @@
 <template>
-  <el-row style="margin-bottom: 60px; margin-top: 60px">
+  <el-row style="margin-top: 60px">
     <el-col :span="12">
       <div id="asset-change-line-graph"
-           style="width: 800px; height: 300px"></div>
+           style="width: 100%; height: 300px"></div>
     </el-col>
     <el-col :span="12">
       <div id="average-return-line-graph"
-           style="width: 800px; height: 300px"></div>
+           style="width: 100%; height: 300px"></div>
     </el-col>
   </el-row>
-  <el-row>
+  <el-row justify="center">
+    <el-radio-group v-model="drawMonths"
+                    @change="draw">
+      <el-radio-button v-for="radio in drawMonthsRadio"
+                       :key="radio.value"
+                       :label="radio.label"
+                       :value="radio.value" />
+    </el-radio-group>
+  </el-row>
+  <el-row style="margin-top: 60px">
     <el-col :span="12">
       <div id="liquidity-return-position-scatter-graph"
-           style="width: 800px; height: 300px"></div>
+           style="width: 100%; height: 300px"></div>
     </el-col>
     <el-col :span="6">
       <div id="residual-maturity-pie-graph"
-           style="width: 400px; height: 300px"></div>
+           style="width: 100%00px; height: 300px"></div>
     </el-col>
     <el-col :span="6">
       <div id="expected-return-pie-graph"
-           style="width: 400px; height: 300px"></div>
+           style="width: 100%; height: 300px"></div>
     </el-col>
   </el-row>
   <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
@@ -280,6 +289,7 @@ export default {
       showAddFixedDepositDialog: false,
 
       editId: null,
+      drawMonths: 12,
 
       addCashForm: {
         name: '',
@@ -426,9 +436,7 @@ export default {
         storage.upload(file);
       },
       draw: () => {
-        const months = 24;
-
-        const assetChange = this.record.getAssetChangeData(months)
+        const assetChange = this.record.getAssetChangeData(this.drawMonths)
         this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
 
         const residualMaturaty = this.record.getResidualMaturityData()
@@ -440,7 +448,7 @@ export default {
         const liquidityReturnPosition = this.record.getLiquidityReturnPositionData()
         this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositoinScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition)
 
-        const averageReturn = this.record.getAverageReturnData(months)
+        const averageReturn = this.record.getAverageReturnData(this.drawMonths)
         this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)
       },
       headers: {
@@ -615,6 +623,20 @@ export default {
           }
         ]
       },
+      drawMonthsRadio: [
+        {
+          label: '过去12个月',
+          value: 12
+        },
+        {
+          label: '过去24个月',
+          value: 24
+        },
+        {
+          label: '过去36个月',
+          value: 36
+        }
+      ]
     }
   },
   components: {
