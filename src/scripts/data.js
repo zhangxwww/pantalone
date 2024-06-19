@@ -348,6 +348,7 @@ class Data {
         const cashData = [];
         const monetaryFundData = [];
         const fixedDepositData = [];
+        const fundData = [];
 
         for (let date of dates) {
             let cash = 0;
@@ -368,7 +369,7 @@ class Data {
                     add = first.beginningAmount;
                 }
 
-                const candidate = mData.history.filter(h => h.currentTime <= date);
+                const candidate = mData.history.filter(h => h.currentTime <= date && h.holding);
                 const d = candidate[candidate.length - 1];
                 if (d && d.currentAmount > 0) {
                     add = d.currentAmount;
@@ -386,12 +387,23 @@ class Data {
                 }
             }
             fixedDepositData.push(fixedDeposit);
+
+            let fund = 0;
+            for (let uData of this.data.fundData) {
+                const candidate = uData.history.filter(h => h.beginningTime <= date && h.holding);
+                const d = candidate[candidate.length - 1];
+                if (d && d.currentAmount > 0) {
+                    fund += d.currentAmount;
+                }
+            }
+            fundData.push(fund);
         }
         return {
             time: dates.map(t => timeFormat(t, true)),
             cashData: cashData,
             monetaryFundData: monetaryFundData,
-            fixedDepositData: fixedDepositData
+            fixedDepositData: fixedDepositData,
+            fundData: fundData
         }
     }
 

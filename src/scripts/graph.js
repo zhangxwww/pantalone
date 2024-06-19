@@ -72,7 +72,7 @@ function drawAssetChangeLineGraph (domId, data) {
             }
         },
         legend: {
-            data: ["现金", "货币基金", "定期存款"],
+            data: ["现金", "货币基金", "定期存款", "基金"],
             x: "center",
             y: "bottom"
         },
@@ -105,6 +105,14 @@ function drawAssetChangeLineGraph (domId, data) {
                 name: "定期存款",
                 type: "line",
                 data: data.fixedDepositData,
+                stack: "x",
+                areaStyle: {},
+                smooth: true
+            },
+            {
+                name: "基金",
+                type: "line",
+                data: data.fundData,
                 stack: "x",
                 areaStyle: {},
                 smooth: true
