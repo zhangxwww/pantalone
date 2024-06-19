@@ -260,6 +260,8 @@ class Data {
             this.addMonetaryFundData(data, id);
         } else if (type === 'fixedDeposit') {
             this.addFixedDepositData(data, id);
+        } else if (type === 'fund') {
+            this.addFundData(data, id);
         }
         this.data = this.prepareData();
         storage.save(this.json);
@@ -326,6 +328,30 @@ class Data {
         }
         const maxId = Math.max(...this.json.fixedDepositData.map(d => d.id), 0);
         this.json.fixedDepositData.push({
+            id: maxId + 1,
+            history: [newData]
+        });
+    }
+
+    addFundData (data, id) {
+        const newData = {
+            name: data.name,
+            beginningAmount: parseFloat(data.beginningAmount),
+            beginningTime: timeFormat(data.beginningTime),
+            currentAmount: parseFloat(data.currentAmount),
+            currentTime: timeFormat(new Date()),
+            lockupPeriod: parseInt(data.lockupPeriod),
+            holding: data.holding
+        };
+        if (id) {
+            const target = this.json.fundData.find(d => d.id === id);
+            if (target) {
+                target.history.push(newData);
+                return;
+            }
+        }
+        const maxId = Math.max(...this.json.fundData.map(d => d.id), 0);
+        this.json.fundData.push({
             id: maxId + 1,
             history: [newData]
         });

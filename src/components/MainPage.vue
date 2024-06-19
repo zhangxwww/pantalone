@@ -284,6 +284,51 @@
     </template>
   </el-dialog>
 
+  <el-dialog v-model="showAddFundDialog"
+             title="添加基金项目"
+             width="300px">
+    <el-form :model="addFundForm"
+             :rules="fundRules"
+             ref="addFundForm">
+      <el-form-item label="名称"
+                    prop="name">
+        <el-input v-model="addFundForm.name"></el-input>
+      </el-form-item>
+      <el-form-item label="期初金额"
+                    prop="beginningAmount">
+        <el-input v-model="addFundForm.beginningAmount"></el-input>
+      </el-form-item>
+      <el-form-item label="期初时间"
+                    prop="beginningTime">
+        <el-date-picker v-model="addFundForm.beginningTime"
+                        type="date"
+                        placeholder="选择日期">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="当期金额"
+                    prop="currentAmount">
+        <el-input v-model="addFundForm.currentAmount"></el-input>
+      </el-form-item>
+      <el-form-item label="锁定期"
+                    prop="lockupPeriod">
+        <el-input v-model.number="addFundForm.lockupPeriod"></el-input>
+      </el-form-item>
+      <el-form-item label="当前持有"
+                    prop="holding">
+        <el-switch v-model="addFundForm.holding"></el-switch>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="onCancelAdd('fund')">取消</el-button>
+        <el-button type="primary"
+                   @click="onConfirmAdd('fund')">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
 </template>
 
 <script>
@@ -307,6 +352,7 @@ export default {
       showAddCashDialog: false,
       showAddMonetaryFundDialog: false,
       showAddFixedDepositDialog: false,
+      showAddFundDialog: false,
 
       editId: null,
       drawMonths: 12,
@@ -329,6 +375,14 @@ export default {
         beginningTime: '',
         rate: 0,
         maturity: 0
+      },
+      addFundForm: {
+        name: '',
+        beginningAmount: 0,
+        beginningTime: '',
+        currentAmount: 0,
+        lockupPeriod: 0,
+        holding: true
       },
 
       handleEdit: (row, type) => {
@@ -353,6 +407,14 @@ export default {
           this.addFixedDepositForm.rate = row.rate
           this.addFixedDepositForm.maturity = row.maturity
           this.showAddFixedDepositDialog = true
+        } else if (type === 'fund') {
+          this.addFundForm.name = row.name
+          this.addFundForm.beginningAmount = row.beginningAmount
+          this.addFundForm.beginningTime = row.beginningTime
+          this.addFundForm.currentAmount = row.currentAmount
+          this.addFundForm.lockupPeriod = row.lockupPeriod
+          this.addFundForm.holding = row.holding
+          this.showAddFundDialog = true
         }
       },
       onAddSelect: type => {
@@ -365,6 +427,9 @@ export default {
             break
           case 'fixed-deposit':
             this.showAddFixedDepositDialog = true
+            break
+          case 'fund':
+            this.showAddFundDialog = true
             break
         }
       },
@@ -381,6 +446,10 @@ export default {
           case 'fixed-deposit':
             this.showAddFixedDepositDialog = false
             this.$refs['addFixedDepositForm'].resetFields()
+            break
+          case 'fund':
+            this.showAddFundDialog = false
+            this.$refs['addFundForm'].resetFields()
             break
         }
       },
@@ -407,6 +476,16 @@ export default {
           beginningTime: this.addFixedDepositForm.beginningTime,
           rate: this.addFixedDepositForm.rate,
           maturity: this.addFixedDepositForm.maturity
+        }, this.editId)
+      },
+      addFundData: () => {
+        this.record.addData('fund', {
+          name: this.addFundForm.name,
+          beginningAmount: this.addFundForm.beginningAmount,
+          beginningTime: this.addFundForm.beginningTime,
+          currentAmount: this.addFundForm.currentAmount,
+          lockupPeriod: this.addFundForm.lockupPeriod,
+          holding: this.addFundForm.holding
         }, this.editId)
       },
       onConfirmAdd: (type) => {
@@ -447,6 +526,17 @@ export default {
               }
             })
             break
+          case 'fund':
+            this.$refs['addFundForm'].validate((valid) => {
+              if (valid) {
+                this.showAddFundDialog = false
+                this.addFundData()
+                this.data = this.record.getData()
+                this.draw()
+                this.$refs['addFundForm'].resetFields()
+                this.editId = null
+              }
+            })
         }
       },
       onDownload: () => {
@@ -622,6 +712,10 @@ export default {
         {
           command: 'fixed-deposit',
           label: '定期存款'
+        },
+        {
+          command: 'fund',
+          label: '基金'
         }
       ],
       cashRules: {
@@ -678,6 +772,26 @@ export default {
           { required: true, message: '请输入期限', trigger: 'blur' },
           {
             message: '期限必须为数字值', trigger: 'blur', type: 'number'
+          }
+        ]
+      },
+      fundRules: {
+        name: [
+          { required: true, message: '请输入名称', trigger: 'blur' }
+        ],
+        beginningAmount: [
+          { required: true, message: '请输入期初金额', trigger: 'blur' },
+          {
+            message: '期初金额必须为数字值', trigger: 'blur', validator: isNumberValidator
+          }
+        ],
+        beginningTime: [
+          { required: true, message: '请选择期初时间', trigger: 'blur' }
+        ],
+        currentAmount: [
+          { required: true, message: '请输入当期金额', trigger: 'blur' },
+          {
+            message: '当期金额必须为数字值', trigger: 'blur', validator: isNumberValidator
           }
         ]
       },

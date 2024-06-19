@@ -207,7 +207,7 @@ function drawLiquidityReturnPositionScatterGraph (domId, data) {
             type: "value",
             axisLabel: {
                 formatter: value => {
-                    return (value * 100).toFixed(0) + "%";
+                    return (value * 100).toFixed(1) + "%";
                 }
             }
         },
@@ -272,7 +272,7 @@ function drawAverageReturnLineGraph (domId, data) {
             type: "value",
             axisLabel: {
                 formatter: value => {
-                    return (value * 100).toFixed(0) + "%";
+                    return (value * 100).toFixed(1) + "%";
                 }
             }
         },
