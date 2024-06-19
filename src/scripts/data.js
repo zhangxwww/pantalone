@@ -97,6 +97,20 @@ class Data {
 
     prepareData () {
         const data = clone(this.json);
+
+        if (!data.cashData) {
+            data.cashData = [];
+        }
+        if (!data.monetaryFundData) {
+            data.monetaryFundData = [];
+        }
+        if (!data.fixedDepositData) {
+            data.fixedDepositData = [];
+        }
+        if (!data.fundData) {
+            data.fundData = [];
+        }
+
         for (let cData of data.cashData) {
             for (let cHis of cData.history) {
                 cHis.amountFmt = cHis.amount.toFixed(2);
