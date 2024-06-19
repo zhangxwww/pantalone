@@ -204,6 +204,12 @@ function drawLiquidityReturnPositionScatterGraph (domId, data) {
         },
         yAxis: {
             name: "收益",
+            type: "value",
+            axisLabel: {
+                formatter: value => {
+                    return (value * 100).toFixed(0) + "%";
+                }
+            }
         },
         tooltip: {
             formatter: function (params) {

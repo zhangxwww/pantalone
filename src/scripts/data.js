@@ -369,9 +369,9 @@ class Data {
                     add = first.beginningAmount;
                 }
 
-                const candidate = mData.history.filter(h => h.currentTime <= date && h.holding);
+                const candidate = mData.history.filter(h => h.currentTime <= date);
                 const d = candidate[candidate.length - 1];
-                if (d && d.currentAmount > 0) {
+                if (d && d.holding && d.currentAmount > 0) {
                     add = d.currentAmount;
                 }
                 monetaryFund += add;
@@ -390,9 +390,9 @@ class Data {
 
             let fund = 0;
             for (let uData of this.data.fundData) {
-                const candidate = uData.history.filter(h => h.beginningTime <= date && h.holding);
+                const candidate = uData.history.filter(h => h.beginningTime <= date);
                 const d = candidate[candidate.length - 1];
-                if (d && d.currentAmount > 0) {
+                if (d && d.holding && d.currentAmount > 0) {
                     fund += d.currentAmount;
                 }
             }
@@ -633,7 +633,7 @@ class Data {
             for (let mData of this.data.monetaryFundData) {
                 const candidate = mData.history.filter(h => h.currentTime <= date);
                 const d = candidate[candidate.length - 1];
-                if (d && d.currentAmount > 0) {
+                if (d && d.holding && d.currentAmount > 0) {
                     weighted += d.currentAmount * d.annualizedReturnRate;
                     sum += d.currentAmount;
                 }
@@ -644,6 +644,14 @@ class Data {
                 if (d && d.beginningAmount > 0) {
                     weighted += d.beginningAmount * d.rate;
                     sum += d.beginningAmount;
+                }
+            }
+            for (let uData of this.data.fundData) {
+                const candidate = uData.history.filter(h => h.beginningTime <= date);
+                const d = candidate[candidate.length - 1];
+                if (d && d.holding && d.currentAmount > 0) {
+                    weighted += d.currentAmount * d.annualizedReturnRate;
+                    sum += d.currentAmount;
                 }
             }
             weightedReturn.push(weighted / sum);
