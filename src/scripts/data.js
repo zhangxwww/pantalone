@@ -411,6 +411,7 @@ class Data {
         const maturitiyData = [
             { name: "T+0", amount: 0 },
             { name: "T+1", amount: 0 },
+            { name: "T+2", amount: 0 },
             { name: "30日内", amount: 0 },
             { name: "90日内", amount: 0 },
             { name: "180日内", amount: 0 },
@@ -437,15 +438,36 @@ class Data {
             if (last.residualMaturaty < 0) {
                 continue;
             } else if (last.residualMaturaty <= 30) {
-                maturitiyData[2].amount += last.beginningAmount;
-            } else if (last.residualMaturaty <= 90) {
                 maturitiyData[3].amount += last.beginningAmount;
-            } else if (last.residualMaturaty <= 180) {
+            } else if (last.residualMaturaty <= 90) {
                 maturitiyData[4].amount += last.beginningAmount;
-            } else if (last.residualMaturaty <= 365) {
+            } else if (last.residualMaturaty <= 180) {
                 maturitiyData[5].amount += last.beginningAmount;
-            } else {
+            } else if (last.residualMaturaty <= 365) {
                 maturitiyData[6].amount += last.beginningAmount;
+            } else {
+                maturitiyData[7].amount += last.beginningAmount;
+            }
+        }
+        for (let uData of this.data.fundData) {
+            const last = uData.history[uData.history.length - 1];
+            if (!last.holding) {
+                continue;
+            }
+            if (last.residualLockupPeriod <= 0) {
+                continue;
+            } else if (last.residualLockupPeriod === 2) {
+                maturitiyData[2].amount += last.currentAmount;
+            } else if (last.residualLockupPeriod <= 30) {
+                maturitiyData[3].amount += last.currentAmount;
+            } else if (last.residualLockupPeriod <= 90) {
+                maturitiyData[4].amount += last.currentAmount;
+            } else if (last.residualLockupPeriod <= 180) {
+                maturitiyData[5].amount += last.currentAmount;
+            } else if (last.residualLockupPeriod <= 365) {
+                maturitiyData[6].amount += last.currentAmount;
+            } else {
+                maturitiyData[7].amount += last.currentAmount;
             }
         }
         maturitiyData.forEach(item => {
