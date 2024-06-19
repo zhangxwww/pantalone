@@ -292,7 +292,7 @@ import Data from '@/scripts/data.js'
 import { drawAssetChangeLineGraph } from '@/scripts/graph.js'
 import { drawResidualMaturityPieGraph } from '@/scripts/graph.js'
 import { drawExpectedReturnPieGraph } from '@/scripts/graph.js'
-import { drawLiquidityReturnPositoinScatterGraph } from '@/scripts/graph.js'
+import { drawLiquidityReturnPositionScatterGraph } from '@/scripts/graph.js'
 import { drawAverageReturnLineGraph } from '@/scripts/graph.js'
 import storage from '@/scripts/storage.js'
 import { isNumberValidator } from '@/scripts/validator.js'
@@ -466,7 +466,7 @@ export default {
         this.expectedReturnPieGraph = drawExpectedReturnPieGraph('expected-return-pie-graph', expectedReturn)
 
         const liquidityReturnPosition = this.record.getLiquidityReturnPositionData()
-        this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositoinScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition)
+        this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition)
 
         const averageReturn = this.record.getAverageReturnData(this.drawMonths)
         this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)

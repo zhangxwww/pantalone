@@ -180,7 +180,7 @@ function drawExpectedReturnPieGraph (domId, data) {
     return drawPieGraph(domId, data, "预期收益");
 }
 
-function drawLiquidityReturnPositoinScatterGraph (domId, data) {
+function drawLiquidityReturnPositionScatterGraph (domId, data) {
     const chart = echarts.init(document.getElementById(domId));
     let amount = [];
     amount.push(...data.amount);
@@ -300,6 +300,6 @@ export {
     drawAssetChangeLineGraph,
     drawResidualMaturityPieGraph,
     drawExpectedReturnPieGraph,
-    drawLiquidityReturnPositoinScatterGraph,
+    drawLiquidityReturnPositionScatterGraph,
     drawAverageReturnLineGraph
 }
