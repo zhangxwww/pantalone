@@ -523,6 +523,23 @@ class Data {
                 expectedReturn[4].amount += last.beginningAmount;
             }
         }
+        for (let uData of this.data.fundData) {
+            const last = uData.history[uData.history.length - 1];
+            if (!last.holding) {
+                continue;
+            }
+            if (last.annualizedReturnRate < 0.01) {
+                expectedReturn[0].amount += last.currentAmount;
+            } else if (last.annualizedReturnRate < 0.02) {
+                expectedReturn[1].amount += last.currentAmount;
+            } else if (last.annualizedReturnRate < 0.05) {
+                expectedReturn[2].amount += last.currentAmount;
+            } else if (last.annualizedReturnRate < 0.1) {
+                expectedReturn[3].amount += last.currentAmount;
+            } else {
+                expectedReturn[4].amount += last.currentAmount;
+            }
+        }
         expectedReturn.forEach(item => {
             item.value = item.amount;
         });
