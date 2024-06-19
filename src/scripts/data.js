@@ -586,6 +586,17 @@ class Data {
                 amount: last.beginningAmount
             })
         }
+        for (let uData of this.data.fundData) {
+            const last = uData.history[uData.history.length - 1];
+            if (!last.holding) {
+                continue;
+            }
+            data.push({
+                liquidity: last.residualLockupPeriod,
+                return: last.annualizedReturnRate,
+                amount: last.currentAmount
+            })
+        }
         data = data.sort((a, b) => {
             if (a.liquidity === b.liquidity) {
                 return a.return - b.return;
