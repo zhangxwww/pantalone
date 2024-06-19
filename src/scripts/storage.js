@@ -6,7 +6,8 @@ function load () {
     const empty = {
         cashData: [],
         monetaryFundData: [],
-        fixedDepositData: []
+        fixedDepositData: [],
+        fundData: []
     };
     try {
         const data = JSON.parse(localStorage.getItem("pantalone-data"));

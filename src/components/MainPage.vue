@@ -149,6 +149,26 @@
           </el-table-column>
         </el-table>
       </el-tab-pane>
+      <el-tab-pane label="基金"><el-table :data="data.fundData"
+                  table-layout="auto"
+                  style="width: 100%">
+          <el-table-column v-for="header, i in headers.fund"
+                           :key="i"
+                           :prop="header.prop"
+                           :label="header.label"
+                           :width="header.width"
+                           :sortable="header.sortable" />
+          <el-table-column label=""
+                           align="right">
+            <template #default="scope">
+              <el-button size="small"
+                         @click="handleEdit(scope.row, 'fund')">
+                编辑
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-tab-pane>
     </el-tabs>
   </el-row>
 
@@ -548,6 +568,44 @@ export default {
             prop: 'residualMaturaty',
             label: '剩余期限',
             width: '105',
+            sortable: true
+          }
+        ],
+        fund: [
+          {
+            prop: 'name',
+            label: '名称',
+            width: '240',
+            sortable: false
+          },
+          {
+            prop: 'beginningAmountFmt',
+            label: '期初金额',
+            width: '105',
+            sortable: true
+          },
+          {
+            prop: 'beginningTimeFmt',
+            label: '期初时间',
+            width: '105',
+            sortable: true
+          },
+          {
+            prop: 'currentAmountFmt',
+            label: '当期金额',
+            width: '105',
+            sortable: true
+          },
+          {
+            prop: 'annualizedReturnRateFmt',
+            label: '年化收益',
+            width: '105',
+            sortable: true
+          },
+          {
+            prop: 'residualLockupPeriod',
+            label: '剩余锁定期',
+            width: '120',
             sortable: true
           }
         ]

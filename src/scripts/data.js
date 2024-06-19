@@ -17,6 +17,78 @@ function timeFormat (t, short = false) {
     return formatted;
 }
 
+
+/*
+ * data:
+ * {
+ *   cashData:
+ *   [
+ *     {
+ *       id: int,
+ *       history:
+ *       [
+ *         {
+ *           name: string,
+ *           amount: float,
+ *           beginningTime: string,
+ *         }
+ *       ]
+ *     }
+ *   ],
+ *   monetaryFundData:
+ *   [
+ *     {
+ *       id: int,
+ *       history:
+ *       [
+ *         {
+ *           name: string,
+ *           beginningAmount: float,
+ *           beginningTime: string,
+ *           currentAmount: float,
+ *           currentTime: string,
+ *           fastRedemption: bool,
+ *           holding: bool,
+ *         }
+ *       ]
+ *     }
+ *   ],
+ *   fixedDepositData:
+ *   [
+ *     {
+ *       id: int,
+ *       history:
+ *       [
+ *         {
+ *           name: string,
+ *           beginningAmount: float,
+ *           rate: float,
+ *           maturity: int,
+ *           beginningTime: string,
+ *         }
+ *       ]
+ *     }
+ *   ],
+ *   fundData:
+ *   [
+ *     {
+ *       id: int,
+ *       history:
+ *       [
+ *         {
+ *           name: string,
+ *           beginningAmount: float,
+ *           beginningTime: string,
+ *           currentAmount: float,
+ *           currentTime: string,
+ *           holding: bool,
+ *           lockupPeriod: int,
+ *         }
+ *       ]
+ *     }
+ *   ]
+ * }
+ */
 class Data {
     constructor() {
         this.json = storage.load();
@@ -64,6 +136,24 @@ class Data {
                 fHis.rateFmt = (fHis.rate * 100).toFixed(2) + '%';
             }
         }
+        for (let uData of data.fundData) {
+            for (let uHis of uData.history) {
+                uHis.beginningTime = new Date(uHis.beginningTime);
+                uHis.currentTime = new Date(uHis.currentTime);
+                const ret = (uHis.currentAmount - uHis.beginningAmount) / uHis.beginningAmount;
+                const days = (uHis.currentTime - uHis.beginningTime) / (1000 * 3600 * 24);
+                uHis.annualizedReturnRate = ret / days * 365;
+
+                uHis.beginningTimeFmt = timeFormat(uHis.beginningTime);
+                uHis.annualizedReturnRateFmt = (uHis.annualizedReturnRate * 100).toFixed(2) + '%';
+                uHis.beginningAmountFmt = uHis.beginningAmount.toFixed(2);
+                uHis.currentAmountFmt = uHis.currentAmount.toFixed(2);
+
+                const endingTime = new Date(uHis.beginningTime);
+                endingTime.setDate(endingTime.getDate() + uHis.lockupPeriod);
+                uHis.residualLockupPeriod = Math.max(Math.ceil((endingTime - new Date()) / (1000 * 3600 * 24)), 2);
+            }
+        }
         return data;
     }
 
@@ -71,7 +161,8 @@ class Data {
         const data = {
             cashData: [],
             monetaryFundData: [],
-            fixedDepositData: []
+            fixedDepositData: [],
+            fundData: []
         };
         for (let cdata of this.data.cashData) {
             const last = cdata.history[cdata.history.length - 1];
@@ -134,6 +225,30 @@ class Data {
             };
             d.id = fdata.id;
             data.fixedDepositData.push(d);
+        }
+        for (let udata of this.data.fundData) {
+            // filter: holding === true
+            const last = udata.history[udata.history.length - 1];
+            if (last.holding !== true) {
+                continue;
+            }
+            const d = {
+                name: last.name,
+                beginningAmount: last.beginningAmount,
+                beginningAmountFmt: last.beginningAmountFmt,
+                beginningTime: last.beginningTime,
+                beginningTimeFmt: last.beginningTimeFmt,
+                currentAmount: last.currentAmount,
+                currentAmountFmt: last.currentAmountFmt,
+                currentTime: last.currentTime,
+                lockupPeriod: last.lockupPeriod,
+                residualLockupPeriod: last.residualLockupPeriod,
+                annualizedReturnRate: last.annualizedReturnRate,
+                annualizedReturnRateFmt: last.annualizedReturnRateFmt,
+                holding: last.holding
+            };
+            d.id = udata.id;
+            data.fundData.push(d);
         }
         return data;
     }
