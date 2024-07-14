@@ -340,7 +340,7 @@ import { drawExpectedReturnPieGraph } from '@/scripts/graph.js'
 import { drawLiquidityReturnPositionScatterGraph } from '@/scripts/graph.js'
 import { drawAverageReturnLineGraph } from '@/scripts/graph.js'
 import storage from '@/scripts/storage.js'
-import { isNumberValidator } from '@/scripts/validator.js'
+import { isNumberValidator, isIntegerValidator } from '@/scripts/validator.js'
 
 export default {
   name: 'MainPage',
@@ -792,6 +792,12 @@ export default {
           { required: true, message: '请输入当期金额', trigger: 'blur' },
           {
             message: '当期金额必须为数字值', trigger: 'blur', validator: isNumberValidator
+          }
+        ],
+        lockupPeriod: [
+          { required: true, message: '请输入锁定期', trigger: 'blur' },
+          {
+            message: '锁定期必须为整数值', trigger: 'blur', validator: isIntegerValidator
           }
         ]
       },

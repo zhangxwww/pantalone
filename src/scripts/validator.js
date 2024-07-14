@@ -13,4 +13,17 @@ function isNumberValidator (rule, value, callback) {
     }
 }
 
-export { isNumberValidator };
+function isIntegerValidator (rule, value, callback) {
+    if (!value) {
+        callback();
+    } else {
+        const regPositiveInt = /^(([1-9]\d*)|0)$/g;
+        if (regPositiveInt.test(value)) {
+            callback();
+        } else {
+            return callback(new Error(rule.message));
+        }
+    }
+}
+
+export { isNumberValidator, isIntegerValidator };
