@@ -447,6 +447,29 @@ class Data {
         }
     }
 
+    getAssetDeltaChangeData (assetChangeData) {
+        const cashDelta = [0];
+        const monetaryFundDelta = [0];
+        const fixedDepositDelta = [0];
+        const fundDelta = [0];
+        const totalDelta = [0];
+        for (let i = 1; i < assetChangeData.time.length; i++) {
+            cashDelta.push(assetChangeData.cashData[i] - assetChangeData.cashData[i - 1]);
+            monetaryFundDelta.push(assetChangeData.monetaryFundData[i] - assetChangeData.monetaryFundData[i - 1]);
+            fixedDepositDelta.push(assetChangeData.fixedDepositData[i] - assetChangeData.fixedDepositData[i - 1]);
+            fundDelta.push(assetChangeData.fundData[i] - assetChangeData.fundData[i - 1]);
+            totalDelta.push(cashDelta[i] + monetaryFundDelta[i] + fixedDepositDelta[i] + fundDelta[i]);
+        }
+        return {
+            time: assetChangeData.time,
+            cashDeltaData: cashDelta,
+            monetaryFundDeltaData: monetaryFundDelta,
+            fixedDepositDeltaData: fixedDepositDelta,
+            fundDeltaData: fundDelta,
+            totalDeltaData: totalDelta
+        }
+    }
+
     getResidualMaturityData () {
         const maturitiyData = [
             { name: "T+0", amount: 0 },

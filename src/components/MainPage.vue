@@ -9,6 +9,12 @@
            style="width: 100%; height: 300px"></div>
     </el-col>
   </el-row>
+  <el-row style="margin-top: 60px">
+    <el-col :span="12">
+      <div id="asset-delta-change-bar-graph"
+           style="width: 100%; height: 300px"></div>
+    </el-col>
+  </el-row>
   <el-row justify="center">
     <el-radio-group v-model="drawMonths"
                     @change="draw">
@@ -339,6 +345,7 @@ import { drawResidualMaturityPieGraph } from '@/scripts/graph.js'
 import { drawExpectedReturnPieGraph } from '@/scripts/graph.js'
 import { drawLiquidityReturnPositionScatterGraph } from '@/scripts/graph.js'
 import { drawAverageReturnLineGraph } from '@/scripts/graph.js'
+import { drawAssetDeltaChangeBarGraph } from '@/scripts/graph.js'
 import storage from '@/scripts/storage.js'
 import { isNumberValidator, isIntegerValidator } from '@/scripts/validator.js'
 
@@ -548,6 +555,9 @@ export default {
       draw: () => {
         const assetChange = this.record.getAssetChangeData(this.drawMonths)
         this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
+
+        const assetDeltaChange = this.record.getAssetDeltaChangeData(assetChange)
+        this.assetDeltaChangeBarGraph = drawAssetDeltaChangeBarGraph('asset-delta-change-bar-graph', assetDeltaChange)
 
         const residualMaturaty = this.record.getResidualMaturityData()
         this.residualMaturatyPieGraph = drawResidualMaturityPieGraph('residual-maturity-pie-graph', residualMaturaty)
@@ -837,6 +847,7 @@ export default {
     this.expectedReturnPieGraph.dispose()
     this.liquidityReturnPositionScatterGraph.dispose()
     this.averageReturnLineGraph.dispose()
+    this.assetDeltaChangeBarGraph.dispose()
   },
 
 }

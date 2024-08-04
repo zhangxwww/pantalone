@@ -1,6 +1,5 @@
-// import * as echarts from "echarts";
 import * as echarts from "echarts/core";
-import { LineChart, PieChart, ScatterChart } from "echarts/charts";
+import { LineChart, PieChart, ScatterChart, BarChart } from "echarts/charts";
 import {
     TitleComponent,
     TooltipComponent,
@@ -28,6 +27,7 @@ echarts.use([
     LineChart,
     PieChart,
     ScatterChart,
+    BarChart,
     CanvasRenderer,
     LabelLayout,
     UniversalTransition
@@ -37,7 +37,7 @@ function drawAssetChangeLineGraph (domId, data) {
     const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
-            text: "资产变化",
+            text: "资产总额",
             x: "center",
             y: "top",
             textAlign: "center"
@@ -80,9 +80,15 @@ function drawAssetChangeLineGraph (domId, data) {
             type: "category",
             boundaryGap: false,
             data: data.time,
+            axisLabel: {
+                interval: index => { return index % 2 == 1 }
+            },
         },
         yAxis: {
-            type: "value"
+            type: "value",
+            name: "资产规模",
+            position: "left",
+            boundaryGap: false
         },
         series: [
             {
@@ -91,7 +97,7 @@ function drawAssetChangeLineGraph (domId, data) {
                 data: data.cashData,
                 stack: "x",
                 areaStyle: {},
-                smooth: true
+                smooth: true,
             },
             {
                 name: "货币基金",
@@ -99,7 +105,7 @@ function drawAssetChangeLineGraph (domId, data) {
                 data: data.monetaryFundData,
                 stack: "x",
                 areaStyle: {},
-                smooth: true
+                smooth: true,
             },
             {
                 name: "定期存款",
@@ -107,7 +113,7 @@ function drawAssetChangeLineGraph (domId, data) {
                 data: data.fixedDepositData,
                 stack: "x",
                 areaStyle: {},
-                smooth: true
+                smooth: true,
             },
             {
                 name: "基金",
@@ -115,14 +121,101 @@ function drawAssetChangeLineGraph (domId, data) {
                 data: data.fundData,
                 stack: "x",
                 areaStyle: {},
-                smooth: true
-            }
+                smooth: true,
+            },
         ]
     }
     chart.setOption(option);
     return chart;
 }
 
+function drawAssetDeltaChangeBarGraph (domId, data) {
+    const chart = echarts.init(document.getElementById(domId));
+    const option = {
+        title: {
+            text: "资产变动",
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        tooltip: {
+            trigger: "axis",
+            textStyle: {
+                align: "left"
+            },
+            formatter: params => {
+                let name = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${params[0].name}</b></td>
+                        </tr>
+                `;
+                for (let i = 0; i < params.length; i++) {
+                    name += `<tr>
+                        <td align="left">${params[i].marker}${params[i].seriesName}：</td>
+                        <td align="right"><b>${params[i].value.toFixed(2)}</b></td>
+                    </tr>`;
+                }
+                name += "</tbody></table>";
+                return name;
+            }
+        },
+        legend: {
+            data: ["现金", "货币基金", "定期存款", "基金", "总资产"],
+            x: "center",
+            y: "bottom"
+        },
+        xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: data.time,
+            axisLine: {
+                onZero: true
+            },
+            axisLabel: {
+                interval: index => { return index % 2 == 1 }
+            },
+        },
+        yAxis: {
+            type: "value",
+            name: "资产变动",
+            position: "left",
+            boundaryGap: false
+        },
+        series: [
+            {
+                name: "现金",
+                type: "bar",
+                data: data.cashDeltaData,
+                barGap: '10%',
+                barCategoryGap: '60%'
+            },
+            {
+                name: "货币基金",
+                type: "bar",
+                data: data.monetaryFundDeltaData,
+            },
+            {
+                name: "定期存款",
+                type: "bar",
+                data: data.fixedDepositDeltaData,
+            },
+            {
+                name: "基金",
+                type: "bar",
+                data: data.fundDeltaData,
+            },
+            {
+                name: "总资产",
+                type: "bar",
+                data: data.totalDeltaData
+            }
+        ]
+    }
+    chart.setOption(option);
+    return chart;
+}
 
 function drawPieGraph (domId, data, title) {
     const chart = echarts.init(document.getElementById(domId));
@@ -139,11 +232,11 @@ function drawPieGraph (domId, data, title) {
                 <table>
                     <tbody>
                         <tr>
-                            <td align="left">规模</td>
+                            <td align="left">规模：</td>
                             <td align="right"><b>${params.value.toFixed(2)}</b></td>
                         </tr>
                         <tr>
-                            <td align="left">占比</td>
+                            <td align="left">占比：</td>
                             <td align="right"><b>${params.percent.toFixed(2)}%</b></td>
                         </tr>
                     </tbody>
@@ -217,15 +310,15 @@ function drawLiquidityReturnPositionScatterGraph (domId, data) {
                 <table>
                     <tbody>
                         <tr>
-                            <td align="left">流动性</td>
+                            <td align="left">流动性：</td>
                             <td align="right"><b>${params.data[0]}</b></td>
                         </tr>
                         <tr>
-                            <td align="left">收益</td>
+                            <td align="left">收益：</td>
                             <td align="right"><b>${(params.data[1] * 100).toFixed(2)}%</b></td>
                         </tr>
                         <tr>
-                            <td align="left">规模</td>
+                            <td align="left">规模：</td>
                             <td align="right"><b>${data.amount[params.dataIndex].toFixed(2)}</b></td>
                         </tr>
                     </tbody>
@@ -304,6 +397,7 @@ function drawAverageReturnLineGraph (domId, data) {
 
 export {
     drawAssetChangeLineGraph,
+    drawAssetDeltaChangeBarGraph,
     drawResidualMaturityPieGraph,
     drawExpectedReturnPieGraph,
     drawLiquidityReturnPositionScatterGraph,
