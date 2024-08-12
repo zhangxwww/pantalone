@@ -163,6 +163,7 @@ class Data {
         return data;
     }
 
+    // TODO: get data from backend
     getChinaBondYieldData () {
         const dates = this.sampleDates(12).map(t => timeFormat(t));
         console.log(dates);
@@ -173,6 +174,7 @@ class Data {
         });
     }
 
+    // TODO: get data from backend
     getData () {
         const data = {
             cashData: [],
@@ -283,6 +285,7 @@ class Data {
         storage.save(this.json);
     }
 
+    // TODO: update data in backend
     addCashData (data, id) {
         const newData = {
             name: data.name,
@@ -303,6 +306,7 @@ class Data {
         });
     }
 
+    // TODO: update data in backend
     addMonetaryFundData (data, id) {
         const newData = {
             name: data.name,
@@ -327,6 +331,7 @@ class Data {
         });
     }
 
+    // TODO: update data in backend
     addFixedDepositData (data, id) {
         const newData = {
             name: data.name,
@@ -349,6 +354,7 @@ class Data {
         });
     }
 
+    // TODO: update data in backend
     addFundData (data, id) {
         const newData = {
             name: data.name,
@@ -385,6 +391,7 @@ class Data {
         return dates;
     }
 
+    // TODO: get data from backend
     getAssetChangeData (months) {
         const dates = this.sampleDates(months);
         const cashData = [];
@@ -449,6 +456,7 @@ class Data {
         }
     }
 
+    // TODO: get data from backend
     getAssetDeltaChangeData (assetChangeData) {
         const cashDelta = [0];
         const monetaryFundDelta = [0];
@@ -472,6 +480,7 @@ class Data {
         }
     }
 
+    // TODO: get data from backend
     getResidualMaturityData () {
         const maturitiyData = [
             { name: "T+0", amount: 0 },
@@ -541,6 +550,7 @@ class Data {
         return maturitiyData;
     }
 
+    // TODO: get data from backend
     getExpectedReturnData () {
         const expectedReturn = [
             { name: "<1%", amount: 0 },
@@ -611,6 +621,7 @@ class Data {
         return expectedReturn;
     }
 
+    // TODO: get data from backend
     getLiquidityReturnPositionData () {
         let data = []
         for (let cData of this.data.cashData) {
@@ -688,6 +699,7 @@ class Data {
         };
     }
 
+    // TODO: get data from backend
     getAverageReturnData (months) {
         const dates = this.sampleDates(months);
         const weightedReturn = [];
