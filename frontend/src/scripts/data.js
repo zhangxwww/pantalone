@@ -1,20 +1,11 @@
+import axios from 'axios';
+
 import storage from './storage.js';
+import { timeFormat } from './formatter.js';
+
 
 function clone (x) {
     return JSON.parse(JSON.stringify(x));
-}
-
-function timeFormat (t, short = false) {
-    let year = t.getFullYear();
-    let month = t.getMonth() + 1;
-    let day = t.getDate();
-    let formatted;
-    if (short) {
-        formatted = `${year}/${month < 10 ? '0' + month : month}`;
-    } else {
-        formatted = `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
-    }
-    return formatted;
 }
 
 
@@ -93,6 +84,7 @@ class Data {
     constructor() {
         this.json = storage.load();
         this.data = this.prepareData();
+        this.getChinaBondYieldData();
     }
 
     prepareData () {
@@ -169,6 +161,16 @@ class Data {
             }
         }
         return data;
+    }
+
+    getChinaBondYieldData () {
+        const dates = this.sampleDates(12).map(t => timeFormat(t));
+        console.log(dates);
+        axios.post('/api/CN1YR', { 'dates': dates }).then(res => {
+            console.log(res);
+        }).catch(err => {
+            console.log(err);
+        });
     }
 
     getData () {

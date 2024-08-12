@@ -349,6 +349,8 @@ import { drawAssetDeltaChangeBarGraph } from '@/scripts/graph.js'
 import storage from '@/scripts/storage.js'
 import { isNumberValidator, isIntegerValidator } from '@/scripts/validator.js'
 
+
+
 export default {
   name: 'MainPage',
   data () {
