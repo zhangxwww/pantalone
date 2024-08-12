@@ -21,11 +21,9 @@ def getChinaBondYield(date):
         'Priority': 'u=0',
         'Content-Length': '0'
     }
-    print(date)
     response = requests.post(url, headers=header)
     series = response.json()[0]['seriesData']
     y = list(filter(lambda x: x[0] == 1, series))[0][1]
-    # print(f'{date}: {y}')
     return y
 
 
