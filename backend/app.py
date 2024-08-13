@@ -1,4 +1,3 @@
-import uvicorn
 from fastapi import FastAPI, staticfiles
 
 from data import getChinaBondYieldData
@@ -14,4 +13,5 @@ app.mount('/', staticfiles.StaticFiles(directory='../frontend/dist/', html=True)
 
 
 if __name__ == '__main__':
+    import uvicorn
     uvicorn.run('app:app', host='localhost', port=9876, reload=True)
