@@ -1,7 +1,6 @@
-import axios from 'axios';
-
 import storage from './storage.js';
 import { timeFormat } from './formatter.js';
+import { getChinaBondYieldDataRequest } from './requests.js';
 
 
 function clone (x) {
@@ -166,11 +165,8 @@ class Data {
     // TODO: get data from backend
     getChinaBondYieldData () {
         const dates = this.sampleDates(12).map(t => timeFormat(t));
-        console.log(dates);
-        axios.post('/api/CN1YR', { 'dates': dates }).then(res => {
-            console.log(res);
-        }).catch(err => {
-            console.log(err);
+        getChinaBondYieldDataRequest(dates, data => {
+            console.log(data);
         });
     }
 
@@ -269,6 +265,14 @@ class Data {
             data.fundData.push(d);
         }
         return data;
+    }
+
+    download () {
+        storage.download();
+    }
+
+    upload (file) {
+        storage.upload(file);
     }
 
     addData (type, data, id) {

@@ -346,7 +346,6 @@ import { drawExpectedReturnPieGraph } from '@/scripts/graph.js'
 import { drawLiquidityReturnPositionScatterGraph } from '@/scripts/graph.js'
 import { drawAverageReturnLineGraph } from '@/scripts/graph.js'
 import { drawAssetDeltaChangeBarGraph } from '@/scripts/graph.js'
-import storage from '@/scripts/storage.js'
 import { isNumberValidator, isIntegerValidator } from '@/scripts/validator.js'
 
 
@@ -549,10 +548,10 @@ export default {
         }
       },
       onDownload: () => {
-        storage.download();
+        this.record.download();
       },
       onUpload: (file) => {
-        storage.upload(file);
+        this.record.upload(file);
       },
       draw: () => {
         const assetChange = this.record.getAssetChangeData(this.drawMonths)
