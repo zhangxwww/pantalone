@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict, Any
 
 from sqlalchemy.orm import Session
 
@@ -181,3 +181,54 @@ def create_fund_data_history_item(
     db.commit()
     db.refresh(db_fund_data_history_item)
     return db_fund_data_history_item
+
+# ********** drop table **********
+
+def drop_all_tables(db: Session):
+    db.query(models.CashDataHistoryItem).delete()
+    db.query(models.CashDataHistory).delete()
+    db.query(models.MonetaryFundDataHistoryItem).delete()
+    db.query(models.MonetaryFundDataHistory).delete()
+    db.query(models.FixedDepositDataHistoryItem).delete()
+    db.query(models.FixedDepositDataHistory).delete()
+    db.query(models.FundDataHistoryItem).delete()
+    db.query(models.FundDataHistory).delete()
+    db.commit()
+
+# ********** create from json **********
+
+def create_table_from_json(
+    db: Session,
+    json_data: Dict[str, Any]
+):
+    drop_all_tables(db)
+
+    create_history_func = {
+        'cashData': create_cash_data_history,
+        'monetaryFundData': create_monetary_fund_data_history,
+        'fixedDepositData': create_fixed_deposit_data_history,
+        'fundData': create_fund_data_history
+    }
+    create_item_func = {
+        'cashData': create_cash_data_history_item,
+        'monetaryFundData': create_monetary_fund_data_history_item,
+        'fixedDepositData': create_fixed_deposit_data_history_item,
+        'fundData': create_fund_data_history_item
+    }
+    history_schema = {
+        'cashData': schemas.CashDataHistoryCreate,
+        'monetaryFundData': schemas.MonetaryFundDataHistoryCreate,
+        'fixedDepositData': schemas.FixedDepositDataHistoryCreate,
+        'fundData': schemas.FundDataHistoryCreate
+    }
+    item_schema = {
+        'cashData': schemas.CashDataHistoryItemCreate,
+        'monetaryFundData': schemas.MonetaryFundDataHistoryItemCreate,
+        'fixedDepositData': schemas.FixedDepositDataHistoryItemCreate,
+        'fundData': schemas.FundDataHistoryItemCreate
+    }
+
+    for table_name in json_data.keys():
+        history_id = create_history_func[table_name](db, history_schema[table_name]()).id
+        for item in json_data[table_name][str(history_id)]:
+            create_item_func[table_name](db, item_schema[table_name](**item), history_id)

@@ -1,6 +1,6 @@
 import storage from './storage.js';
 import { timeFormat } from './formatter.js';
-import { getChinaBondYieldDataRequest } from './requests.js';
+import { getChinaBondYieldDataRequest, uploadRequest } from './requests.js';
 
 
 function clone (x) {
@@ -273,6 +273,7 @@ class Data {
 
     upload (file) {
         storage.upload(file);
+        uploadRequest(file);
     }
 
     addData (type, data, id) {

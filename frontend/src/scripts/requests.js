@@ -8,6 +8,19 @@ function getChinaBondYieldDataRequest (dates, callback) {
     });
 }
 
+function uploadRequest (file) {
+    const reader = new FileReader(file);
+    reader.onload = (e) => {
+        const base64Data = e.target.result.split(',')[1];
+        axios.post('/api/upload', { 'file': base64Data }).then(res => {
+            console.log(res);
+        }).catch(err => {
+            console.log(err);
+        });
+    }
+}
+
 export {
-    getChinaBondYieldDataRequest
+    getChinaBondYieldDataRequest,
+    uploadRequest
 }
