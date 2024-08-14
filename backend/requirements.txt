@@ -1,0 +1,6 @@
+chinese_calendar==1.9.1
+fastapi==0.103.0
+pydantic==2.5.3
+Requests==2.32.3
+SQLAlchemy==2.0.30
+uvicorn==0.20.0
