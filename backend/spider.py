@@ -1,7 +1,7 @@
 import requests
 
 
-def getChinaBondYield(date):
+def get_china_bond_yield(date):
     url = f'https://yield.chinabond.com.cn/cbweb-mn/yc/searchYc?xyzSelect=txy&=&=&=&=&=&=&=&=&workTimes={date.strftime("%Y-%m-%d")}&dxbj=0&qxll=0,&yqqxN=N&yqqxK=K&ycDefIds=2c9081e50a2f9606010a3068cae70001,&wrjxCBFlag=0&locale=zh_CN'
     header = {
         'Content-Type': 'application/json',
@@ -29,4 +29,4 @@ def getChinaBondYield(date):
 
 if __name__ == '__main__':
     from datetime import datetime
-    getChinaBondYield(datetime.now())
+    get_china_bond_yield(datetime.now())
