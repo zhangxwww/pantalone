@@ -81,9 +81,28 @@ function clone (x) {
  */
 class Data {
     constructor() {
+        // const data = loadDataRequest();
+        // console.log(data);
+        // this.json = storage.load();
+        // this.data = this.prepareData();
+        // this.getChinaBondYieldData();
+    }
+
+    async load () {
+
+        function timeout (ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        async function sleep (fn, ...args) {
+            await timeout(2000);
+            return fn(...args);
+        }
+
+        await sleep(() => {
+            console.log('sleep');
+        });
         this.json = storage.load();
         this.data = this.prepareData();
-        // this.getChinaBondYieldData();
     }
 
     prepareData () {
@@ -170,7 +189,6 @@ class Data {
         });
     }
 
-    // TODO: get data from backend
     getData () {
         const data = {
             cashData: [],

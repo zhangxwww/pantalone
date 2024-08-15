@@ -355,7 +355,12 @@ export default {
   data () {
     return {
       record: null,
-      data: null,
+      data: {
+        cashData: [],
+        monetaryFundData: [],
+        fixedDepositData: [],
+        fundData: []
+      },
 
       showAddCashDialog: false,
       showAddMonetaryFundDialog: false,
@@ -554,6 +559,8 @@ export default {
         this.record.upload(file, () => { location.reload(); });
       },
       draw: () => {
+        console.log('draw')
+
         const assetChange = this.record.getAssetChangeData(this.drawMonths)
         this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
 
@@ -835,11 +842,12 @@ export default {
   },
 
   beforeMount () {
-    this.record = new Data()
-    this.data = this.record.getData()
   },
 
-  mounted () {
+  async mounted () {
+    this.record = new Data()
+    await this.record.load()
+    this.data = this.record.getData()
     this.draw();
   },
   unmounted () {

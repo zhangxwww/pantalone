@@ -24,7 +24,13 @@ function uploadRequest (file, callback) {
     reader.readAsDataURL(file.raw);
 }
 
+async function loadDataRequest () {
+    const res = await axios.get('/api/data');
+    return res;
+}
+
 export {
     getChinaBondYieldDataRequest,
-    uploadRequest
+    uploadRequest,
+    loadDataRequest
 }
