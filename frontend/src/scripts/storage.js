@@ -23,7 +23,7 @@ function upload (file) {
     const reader = new FileReader();
     reader.onload = (e) => {
         localStorage.setItem("pantalone-data", e.target.result);
-        location.reload();
+        // location.reload();
     }
     reader.readAsText(file.raw);
 }

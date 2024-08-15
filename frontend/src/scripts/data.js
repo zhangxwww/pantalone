@@ -83,7 +83,7 @@ class Data {
     constructor() {
         this.json = storage.load();
         this.data = this.prepareData();
-        this.getChinaBondYieldData();
+        // this.getChinaBondYieldData();
     }
 
     prepareData () {
@@ -271,9 +271,9 @@ class Data {
         storage.download();
     }
 
-    upload (file) {
+    upload (file, callback) {
         storage.upload(file);
-        uploadRequest(file);
+        uploadRequest(file, callback);
     }
 
     addData (type, data, id) {

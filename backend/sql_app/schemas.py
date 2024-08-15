@@ -21,7 +21,7 @@ class CashDataHistoryItem(CashDataHistoryItemBase):
     cash_data_history_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CashDataHistoryBase(BaseModel):
@@ -37,7 +37,7 @@ class CashDataHistory(CashDataHistoryBase):
     histories: List[CashDataHistoryItem] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # ********** Monetary Fund Data **********
@@ -61,7 +61,7 @@ class MonetaryFundDataHistoryItem(MonetaryFundDataHistoryItemBase):
     monetary_fund_data_history_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class MonetaryFundDataHistoryBase(BaseModel):
@@ -77,7 +77,7 @@ class MonetaryFundDataHistory(MonetaryFundDataHistoryBase):
     histories: List[MonetaryFundDataHistoryItem] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # ********** Fixed Deposit Data **********
@@ -99,7 +99,7 @@ class FixedDepositDataHistoryItem(FixedDepositDataHistoryItemBase):
     fixed_deposit_data_history_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FixedDepositDataHistoryBase(BaseModel):
@@ -115,7 +115,7 @@ class FixedDepositDataHistory(FixedDepositDataHistoryBase):
     histories: List[FixedDepositDataHistoryItem] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # ********** Fund Data **********
@@ -139,7 +139,7 @@ class FundDataHistoryItem(FundDataHistoryItemBase):
     fund_data_history_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FundDataHistoryBase(BaseModel):
@@ -155,7 +155,7 @@ class FundDataHistory(FundDataHistoryBase):
     histories: List[FundDataHistoryItem] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # ********** CN1YR Data **********

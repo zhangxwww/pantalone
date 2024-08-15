@@ -1,6 +1,7 @@
 from typing import Optional, Dict, Any
 
 from sqlalchemy.orm import Session
+from loguru import logger
 
 from . import models, schemas
 
@@ -228,7 +229,14 @@ def create_table_from_json(
         'fundData': schemas.FundDataHistoryItemCreate
     }
 
+
     for table_name in json_data.keys():
-        history_id = create_history_func[table_name](db, history_schema[table_name]()).id
-        for item in json_data[table_name][str(history_id)]:
-            create_item_func[table_name](db, item_schema[table_name](**item), history_id)
+        table_data = json_data[table_name]
+        logger.debug(f'Table name: {table_name}')
+        for item in table_data:
+            history = item['history']
+            history_id = create_history_func[table_name](db, history_schema[table_name]()).id
+            logger.debug(f'history id: {history_id}')
+
+            for his in history:
+                create_item_func[table_name](db, item_schema[table_name](**his), history_id)

@@ -551,7 +551,7 @@ export default {
         this.record.download();
       },
       onUpload: (file) => {
-        this.record.upload(file);
+        this.record.upload(file, () => { location.reload(); });
       },
       draw: () => {
         const assetChange = this.record.getAssetChangeData(this.drawMonths)
