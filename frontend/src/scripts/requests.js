@@ -14,8 +14,8 @@ function uploadRequest (file, callback) {
     reader.onload = (e) => {
         const base64Data = e.target.result.split(',')[1];
 
+        // eslint-disable-next-line no-unused-vars
         axios.post('/api/upload', { 'file': base64Data }).then(res => {
-            console.log(res);
             callback();
         }).catch(err => {
             console.error(err);
@@ -26,7 +26,7 @@ function uploadRequest (file, callback) {
 
 async function loadDataRequest () {
     const res = await axios.get('/api/data');
-    return res;
+    return res.data;
 }
 
 export {

@@ -30,7 +30,7 @@ async def upload(file: UploadData, db: Session = Depends(get_db)):
     save_base64_data(db, file.file)
     return {'success': True}
 
-@app.get('/data')
+@app.get('/api/data')
 async def get_data(db: Session = Depends(get_db)):
     return get_data_from_db(db)
 

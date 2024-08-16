@@ -1,6 +1,6 @@
 import storage from './storage.js';
 import { timeFormat } from './formatter.js';
-import { getChinaBondYieldDataRequest, uploadRequest } from './requests.js';
+import { getChinaBondYieldDataRequest, loadDataRequest, uploadRequest } from './requests.js';
 
 
 function clone (x) {
@@ -80,28 +80,8 @@ function clone (x) {
  * }
  */
 class Data {
-    constructor() {
-        // const data = loadDataRequest();
-        // console.log(data);
-        // this.json = storage.load();
-        // this.data = this.prepareData();
-        // this.getChinaBondYieldData();
-    }
-
     async load () {
-
-        function timeout (ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-        async function sleep (fn, ...args) {
-            await timeout(2000);
-            return fn(...args);
-        }
-
-        await sleep(() => {
-            console.log('sleep');
-        });
-        this.json = storage.load();
+        this.json = await loadDataRequest();
         this.data = this.prepareData();
     }
 
