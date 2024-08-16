@@ -13,77 +13,6 @@ function clone (x) {
 }
 
 
-/*
- * data:
- * {
- *   cashData:
- *   [
- *     {
- *       id: int,
- *       history:
- *       [
- *         {
- *           name: string,
- *           amount: float,
- *           beginningTime: string,
- *         }
- *       ]
- *     }
- *   ],
- *   monetaryFundData:
- *   [
- *     {
- *       id: int,
- *       history:
- *       [
- *         {
- *           name: string,
- *           beginningAmount: float,
- *           beginningTime: string,
- *           currentAmount: float,
- *           currentTime: string,
- *           fastRedemption: bool,
- *           holding: bool,
- *         }
- *       ]
- *     }
- *   ],
- *   fixedDepositData:
- *   [
- *     {
- *       id: int,
- *       history:
- *       [
- *         {
- *           name: string,
- *           beginningAmount: float,
- *           rate: float,
- *           maturity: int,
- *           beginningTime: string,
- *         }
- *       ]
- *     }
- *   ],
- *   fundData:
- *   [
- *     {
- *       id: int,
- *       history:
- *       [
- *         {
- *           name: string,
- *           beginningAmount: float,
- *           beginningTime: string,
- *           currentAmount: float,
- *           currentTime: string,
- *           holding: bool,
- *           lockupPeriod: int,
- *         }
- *       ]
- *     }
- *   ]
- * }
- */
 class Data {
     async load () {
         this.json = await loadDataRequest();
@@ -166,7 +95,6 @@ class Data {
         return data;
     }
 
-    // TODO: get data from backend
     getChinaBondYieldData () {
         const dates = this.sampleDates(12).map(t => timeFormat(t));
         getChinaBondYieldDataRequest(dates, data => {
@@ -286,111 +214,6 @@ class Data {
         await addDataRequest(type, data, id)
         await this.load()
         this.data = this.prepareData()
-        // if (type === 'cash') {
-        //     this.addCashData(data, id);
-        // } else if (type === 'monetaryFund') {
-        //     this.addMonetaryFundData(data, id);
-        // } else if (type === 'fixedDeposit') {
-        //     this.addFixedDepositData(data, id);
-        // } else if (type === 'fund') {
-        //     this.addFundData(data, id);
-        // }
-        // this.data = this.prepareData();
-        // storage.save(this.json);
-    }
-
-    // TODO: update data in backend
-    addCashData (data, id) {
-        const newData = {
-            name: data.name,
-            amount: parseFloat(data.amount),
-            beginningTime: timeFormat(new Date())
-        };
-        if (id) {
-            const target = this.json.cashData.find(d => d.id === id);
-            if (target) {
-                target.history.push(newData);
-                return;
-            }
-        }
-        const maxId = Math.max(...this.json.cashData.map(d => d.id), 0);
-        this.json.cashData.push({
-            id: maxId + 1,
-            history: [newData]
-        });
-    }
-
-    // TODO: update data in backend
-    addMonetaryFundData (data, id) {
-        const newData = {
-            name: data.name,
-            beginningAmount: parseFloat(data.beginningAmount),
-            beginningTime: timeFormat(data.beginningTime),
-            currentAmount: parseFloat(data.currentAmount),
-            currentTime: timeFormat(new Date()),
-            fastRedemption: data.fastRedemption,
-            holding: data.holding
-        };
-        if (id) {
-            const target = this.json.monetaryFundData.find(d => d.id === id);
-            if (target) {
-                target.history.push(newData);
-                return;
-            }
-        }
-        const maxId = Math.max(...this.json.monetaryFundData.map(d => d.id), 0);
-        this.json.monetaryFundData.push({
-            id: maxId + 1,
-            history: [newData]
-        });
-    }
-
-    // TODO: update data in backend
-    addFixedDepositData (data, id) {
-        const newData = {
-            name: data.name,
-            beginningAmount: parseFloat(data.beginningAmount),
-            rate: parseFloat(data.rate),
-            maturity: parseInt(data.maturity),
-            beginningTime: timeFormat(data.beginningTime)
-        };
-        if (id) {
-            const target = this.json.fixedDepositData.find(d => d.id === id);
-            if (target) {
-                target.history.push(newData);
-                return;
-            }
-        }
-        const maxId = Math.max(...this.json.fixedDepositData.map(d => d.id), 0);
-        this.json.fixedDepositData.push({
-            id: maxId + 1,
-            history: [newData]
-        });
-    }
-
-    // TODO: update data in backend
-    addFundData (data, id) {
-        const newData = {
-            name: data.name,
-            beginningAmount: parseFloat(data.beginningAmount),
-            beginningTime: timeFormat(data.beginningTime),
-            currentAmount: parseFloat(data.currentAmount),
-            currentTime: timeFormat(new Date()),
-            lockupPeriod: parseInt(data.lockupPeriod),
-            holding: data.holding
-        };
-        if (id) {
-            const target = this.json.fundData.find(d => d.id === id);
-            if (target) {
-                target.history.push(newData);
-                return;
-            }
-        }
-        const maxId = Math.max(...this.json.fundData.map(d => d.id), 0);
-        this.json.fundData.push({
-            id: maxId + 1,
-            history: [newData]
-        });
     }
 
     sampleDates (months) {
@@ -405,7 +228,6 @@ class Data {
         return dates;
     }
 
-    // TODO: get data from backend
     getAssetChangeData (months) {
         const dates = this.sampleDates(months);
         const cashData = [];
@@ -470,7 +292,6 @@ class Data {
         }
     }
 
-    // TODO: get data from backend
     getAssetDeltaChangeData (assetChangeData) {
         const cashDelta = [0];
         const monetaryFundDelta = [0];
@@ -494,7 +315,6 @@ class Data {
         }
     }
 
-    // TODO: get data from backend
     getResidualMaturityData () {
         const maturitiyData = [
             { name: "T+0", amount: 0 },
@@ -564,7 +384,6 @@ class Data {
         return maturitiyData;
     }
 
-    // TODO: get data from backend
     getExpectedReturnData () {
         const expectedReturn = [
             { name: "<1%", amount: 0 },
@@ -635,7 +454,6 @@ class Data {
         return expectedReturn;
     }
 
-    // TODO: get data from backend
     getLiquidityReturnPositionData () {
         let data = []
         for (let cData of this.data.cashData) {
@@ -713,7 +531,6 @@ class Data {
         };
     }
 
-    // TODO: get data from backend
     getAverageReturnData (months) {
         const dates = this.sampleDates(months);
         const weightedReturn = [];

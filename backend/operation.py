@@ -142,3 +142,32 @@ def get_data_from_db(db):
 def add_cash_history(db, data):
     item = schemas.CashDataHistoryItemCreate(**data.content.model_dump(), beginningTime=datetime.now().date())
     crud.create_cash_data_history_item(db, item, data.id)
+
+
+def add_monetary_fund_history(db, data):
+    content = data.content.model_dump()
+
+    logger.debug(content)
+
+    bg_time = content['beginningTime']
+    content['beginningTime'] = datetime.strptime(bg_time, '%Y-%m-%d').date()
+    content['currentTime'] = datetime.now().date()
+    item = schemas.MonetaryFundDataHistoryItemCreate(**content)
+    crud.create_monetary_fund_data_history_item(db, item, data.id)
+
+
+def add_fixed_deposit_history(db, data):
+    content = data.content.model_dump()
+    bg_time = content['beginningTime']
+    content['beginningTime'] = datetime.strptime(bg_time, '%Y-%m-%d').date()
+    item = schemas.FixedDepositDataHistoryItemCreate(**content)
+    crud.create_fixed_deposit_data_history_item(db, item, data.id)
+
+
+def add_fund_history(db, data):
+    content = data.content.model_dump()
+    bg_time = content['beginningTime']
+    content['beginningTime'] = datetime.strptime(bg_time, '%Y-%m-%d').date()
+    content['currentTime'] = datetime.now().date()
+    item = schemas.FundDataHistoryItemCreate(**content)
+    crud.create_fund_data_history_item(db, item, data.id)

@@ -1,251 +1,141 @@
 <template>
-    <el-row style="margin-top: 60px">
-        <el-col :span="12">
-            <div id="asset-change-line-graph" style="width: 100%; height: 300px"></div>
-        </el-col>
-        <el-col :span="12">
-            <div id="average-return-line-graph" style="width: 100%; height: 300px"></div>
-        </el-col>
-    </el-row>
-    <el-row style="margin-top: 60px">
-        <el-col :span="12">
-            <div id="asset-delta-change-bar-graph" style="width: 100%; height: 300px"></div>
-        </el-col>
-    </el-row>
-    <el-row justify="center">
-        <el-radio-group v-model="drawMonths" @change="draw">
-            <el-radio-button v-for="radio in drawMonthsRadio" :key="radio.value" :label="radio.label"
-                :value="radio.value" />
-        </el-radio-group>
-    </el-row>
-    <el-row style="margin-top: 60px">
-        <el-col :span="12">
-            <div id="liquidity-return-position-scatter-graph" style="width: 100%; height: 300px"></div>
-        </el-col>
-        <el-col :span="6">
-            <div id="residual-maturity-pie-graph" style="width: 100%00px; height: 300px"></div>
-        </el-col>
-        <el-col :span="6">
-            <div id="expected-return-pie-graph" style="width: 100%; height: 300px"></div>
-        </el-col>
-    </el-row>
-    <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
-        <el-col :span="6" :offset="9">
-            <span style="font-size: var(--el-font-size-large); font-weight: bold">项目明细</span>
-        </el-col>
-        <el-col :span="1" :offset="5">
-            <el-dropdown trigger="hover" v-on:command="onAddSelect">
-                <el-button type="primary">
-                    <el-icon>
-                        <plus />
-                    </el-icon>
-                </el-button>
-                <template #dropdown>
-                    <el-dropdown-menu>
-                        <el-dropdown-item v-for="menu in dropdownMenus" :key="menu.command" :command="menu.command">
-                            {{ menu.label }}
-                        </el-dropdown-item>
-                    </el-dropdown-menu>
-                </template>
-            </el-dropdown>
-        </el-col>
-
-        <el-col :span="1" style="margin-left: 10px">
-            <el-button @click="onDownload">
-                <el-icon>
-                    <download />
-                </el-icon>
-            </el-button>
-        </el-col>
-
-        <el-col :span="1" style="margin-left: 10px">
-            <el-upload ref="upload" :on-change="onUpload" :auto-upload="false" :show-file-list="false" :limit="1">
-                <template #trigger>
-                    <el-button>
+    <div>
+        <el-row style="margin-top: 60px">
+            <el-col :span="12">
+                <div id="asset-change-line-graph" style="width: 100%; height: 300px"></div>
+            </el-col>
+            <el-col :span="12">
+                <div id="average-return-line-graph" style="width: 100%; height: 300px"></div>
+            </el-col>
+        </el-row>
+        <el-row style="margin-top: 60px">
+            <el-col :span="12">
+                <div id="asset-delta-change-bar-graph" style="width: 100%; height: 300px"></div>
+            </el-col>
+        </el-row>
+        <el-row justify="center">
+            <el-radio-group v-model="drawMonths" @change="draw">
+                <el-radio-button v-for="radio in drawMonthsRadio" :key="radio.value" :label="radio.label"
+                    :value="radio.value" />
+            </el-radio-group>
+        </el-row>
+        <el-row style="margin-top: 60px">
+            <el-col :span="12">
+                <div id="liquidity-return-position-scatter-graph" style="width: 100%; height: 300px"></div>
+            </el-col>
+            <el-col :span="6">
+                <div id="residual-maturity-pie-graph" style="width: 100%00px; height: 300px"></div>
+            </el-col>
+            <el-col :span="6">
+                <div id="expected-return-pie-graph" style="width: 100%; height: 300px"></div>
+            </el-col>
+        </el-row>
+        <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
+            <el-col :span="6" :offset="9">
+                <span style="font-size: var(--el-font-size-large); font-weight: bold">项目明细</span>
+            </el-col>
+            <el-col :span="1" :offset="5">
+                <el-dropdown trigger="hover" v-on:command="onAddSelect">
+                    <el-button type="primary">
                         <el-icon>
-                            <upload />
+                            <plus />
                         </el-icon>
                     </el-button>
-                </template>
-            </el-upload>
-        </el-col>
-    </el-row>
-    <el-row>
-        <el-tabs type="border-card" style="width: 70%; margin-left: 15%; margin-bottom: 5%">
-            <el-tab-pane label="现金">
-                <el-table :data="data.cashData" table-layout="auto" style="width: 100%">
-                    <el-table-column v-for="header, i in headers.cash" :key="i" :prop="header.prop"
-                        :label="header.label" :width="header.width" :sortable="header.sortable" />
-                    <el-table-column label="" align="right">
-                        <template #default="scope">
-                            <el-button size="small" @click="handleEdit(scope.row, 'cash')">
-                                编辑
-                            </el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-tab-pane>
-            <el-tab-pane label="货币基金"><el-table :data="data.monetaryFundData" table-layout="auto" style="width: 100%">
-                    <el-table-column v-for="header, i in headers.monetaryFund" :key="i" :prop="header.prop"
-                        :label="header.label" :width="header.width" :sortable="header.sortable" />
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item v-for="menu in dropdownMenus" :key="menu.command" :command="menu.command">
+                                {{ menu.label }}
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+            </el-col>
 
-                    <el-table-column label="" align="right">
-                        <template #default="scope">
-                            <el-button size="small" @click="handleEdit(scope.row, 'monetary-fund')">
-                                编辑
-                            </el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-tab-pane>
-            <el-tab-pane label="定期存款"><el-table :data="data.fixedDepositData" table-layout="auto" style="width: 100%">
-                    <el-table-column v-for="header, i in headers.fixedDeposit" :key="i" :prop="header.prop"
-                        :label="header.label" :width="header.width" :sortable="header.sortable" />
-                    <el-table-column label="" align="right">
-                        <template #default="scope">
-                            <el-button size="small" @click="handleEdit(scope.row, 'fixed-deposit')">
-                                编辑
-                            </el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-tab-pane>
-            <el-tab-pane label="基金"><el-table :data="data.fundData" table-layout="auto" style="width: 100%">
-                    <el-table-column v-for="header, i in headers.fund" :key="i" :prop="header.prop"
-                        :label="header.label" :width="header.width" :sortable="header.sortable" />
-                    <el-table-column label="" align="right">
-                        <template #default="scope">
-                            <el-button size="small" @click="handleEdit(scope.row, 'fund')">
-                                编辑
-                            </el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-tab-pane>
-        </el-tabs>
-    </el-row>
-
-    <add-cash-dialog ref="addCashDialog" @add="onAddData"></add-cash-dialog>
-
-    <!-- <el-dialog v-model="showAddCashDialog"
-             title="添加现金项目"
-             width="300px">
-    <el-form :model="addCashForm"
-             ref="addCashForm"
-             :rules="cashRules">
-      <el-form-item label="账户"
-                    prop="name">
-        <el-input v-model="addCashForm.name"></el-input>
-      </el-form-item>
-      <el-form-item label="金额"
-                    prop="amount">
-        <el-input v-model="addCashForm.amount"></el-input>
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="onCancelAdd('cash')">取消</el-button>
-        <el-button type="primary"
-                   @click="onConfirmAdd('cash')">
-          确认
-        </el-button>
-      </div>
-    </template>
-  </el-dialog> -->
-
-    <el-dialog v-model="showAddMonetaryFundDialog" title="添加货币基金项目" width="300px">
-        <el-form :model="addMonetaryFundForm" ref="addMonetaryFundForm" :rules="monetaryFundRules">
-            <el-form-item label="名称" prop="name">
-                <el-input v-model="addMonetaryFundForm.name"></el-input>
-            </el-form-item>
-            <el-form-item label="期初金额" prop="beginningAmount">
-                <el-input v-model="addMonetaryFundForm.beginningAmount"></el-input>
-            </el-form-item>
-            <el-form-item label="期初时间" prop="beginningTime">
-                <el-date-picker v-model="addMonetaryFundForm.beginningTime" type="date" placeholder="选择日期">
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item label="当期金额" prop="currentAmount">
-                <el-input v-model="addMonetaryFundForm.currentAmount"></el-input>
-            </el-form-item>
-            <el-form-item label="快速赎回" prop="fastRedemption">
-                <el-switch v-model="addMonetaryFundForm.fastRedemption"></el-switch>
-            </el-form-item>
-            <el-form-item label="当前持有" prop="holding">
-                <el-switch v-model="addMonetaryFundForm.holding"></el-switch>
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="onCancelAdd('monetary-fund')">取消</el-button>
-                <el-button type="primary" @click="onConfirmAdd('monetary-fund')">
-                    确认
+            <el-col :span="1" style="margin-left: 10px">
+                <el-button @click="onDownload">
+                    <el-icon>
+                        <download />
+                    </el-icon>
                 </el-button>
-            </div>
-        </template>
-    </el-dialog>
+            </el-col>
 
-    <el-dialog v-model="showAddFixedDepositDialog" title="添加定期存款项目" width="300px">
-        <el-form :model="addFixedDepositForm" :rules="fixedDepositRules" ref="addFixedDepositForm">
-            <el-form-item label="名称" prop="name">
-                <el-input v-model="addFixedDepositForm.name"></el-input>
-            </el-form-item>
-            <el-form-item label="期初金额" prop="beginningAmount">
-                <el-input v-model="addFixedDepositForm.beginningAmount"></el-input>
-            </el-form-item>
-            <el-form-item label="期初时间" prop="beginningTime">
-                <el-date-picker v-model="addFixedDepositForm.beginningTime" type="date" placeholder="选择日期">
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item label="利率" prop="rate">
-                <el-input v-model="addFixedDepositForm.rate"></el-input>
-            </el-form-item>
-            <el-form-item label="期限" prop="maturity">
-                <el-input v-model.number="addFixedDepositForm.maturity"></el-input>
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="onCancelAdd('fixed-deposit')">取消</el-button>
-                <el-button type="primary" @click="onConfirmAdd('fixed-deposit')">
-                    确认
-                </el-button>
-            </div>
-        </template>
-    </el-dialog>
+            <el-col :span="1" style="margin-left: 10px">
+                <el-upload ref="upload" :on-change="onUpload" :auto-upload="false" :show-file-list="false" :limit="1">
+                    <template #trigger>
+                        <el-button>
+                            <el-icon>
+                                <upload />
+                            </el-icon>
+                        </el-button>
+                    </template>
+                </el-upload>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-tabs type="border-card" style="width: 70%; margin-left: 15%; margin-bottom: 5%">
+                <el-tab-pane label="现金">
+                    <el-table :data="data.cashData" table-layout="auto" style="width: 100%">
+                        <el-table-column v-for="header, i in headers.cash" :key="i" :prop="header.prop"
+                            :label="header.label" :width="header.width" :sortable="header.sortable" />
+                        <el-table-column label="" align="right">
+                            <template #default="scope">
+                                <el-button size="small" @click="handleEdit(scope.row, 'cash')">
+                                    编辑
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="货币基金"><el-table :data="data.monetaryFundData" table-layout="auto"
+                        style="width: 100%">
+                        <el-table-column v-for="header, i in headers.monetaryFund" :key="i" :prop="header.prop"
+                            :label="header.label" :width="header.width" :sortable="header.sortable" />
 
-    <el-dialog v-model="showAddFundDialog" title="添加基金项目" width="300px">
-        <el-form :model="addFundForm" :rules="fundRules" ref="addFundForm">
-            <el-form-item label="名称" prop="name">
-                <el-input v-model="addFundForm.name"></el-input>
-            </el-form-item>
-            <el-form-item label="期初金额" prop="beginningAmount">
-                <el-input v-model="addFundForm.beginningAmount"></el-input>
-            </el-form-item>
-            <el-form-item label="期初时间" prop="beginningTime">
-                <el-date-picker v-model="addFundForm.beginningTime" type="date" placeholder="选择日期">
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item label="当期金额" prop="currentAmount">
-                <el-input v-model="addFundForm.currentAmount"></el-input>
-            </el-form-item>
-            <el-form-item label="锁定期" prop="lockupPeriod">
-                <el-input v-model.number="addFundForm.lockupPeriod"></el-input>
-            </el-form-item>
-            <el-form-item label="当前持有" prop="holding">
-                <el-switch v-model="addFundForm.holding"></el-switch>
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="onCancelAdd('fund')">取消</el-button>
-                <el-button type="primary" @click="onConfirmAdd('fund')">
-                    确认
-                </el-button>
-            </div>
-        </template>
-    </el-dialog>
+                        <el-table-column label="" align="right">
+                            <template #default="scope">
+                                <el-button size="small" @click="handleEdit(scope.row, 'monetary-fund')">
+                                    编辑
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="定期存款"><el-table :data="data.fixedDepositData" table-layout="auto"
+                        style="width: 100%">
+                        <el-table-column v-for="header, i in headers.fixedDeposit" :key="i" :prop="header.prop"
+                            :label="header.label" :width="header.width" :sortable="header.sortable" />
+                        <el-table-column label="" align="right">
+                            <template #default="scope">
+                                <el-button size="small" @click="handleEdit(scope.row, 'fixed-deposit')">
+                                    编辑
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="基金"><el-table :data="data.fundData" table-layout="auto" style="width: 100%">
+                        <el-table-column v-for="header, i in headers.fund" :key="i" :prop="header.prop"
+                            :label="header.label" :width="header.width" :sortable="header.sortable" />
+                        <el-table-column label="" align="right">
+                            <template #default="scope">
+                                <el-button size="small" @click="handleEdit(scope.row, 'fund')">
+                                    编辑
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+            </el-tabs>
+        </el-row>
 
+        <add-cash-dialog ref="addCashDialog" @add="onAddData"></add-cash-dialog>
+
+        <add-monetary-dialog ref="addMonetaryDialog" @add="onAddData"></add-monetary-dialog>
+
+        <add-fixed-dialog ref="addFixedDialog" @add="onAddData"></add-fixed-dialog>
+
+        <add-fund-dialog ref="addFundDialog" @add="onAddData"></add-fund-dialog>
+    </div>
 </template>
 
 <script>
@@ -257,11 +147,11 @@ import { drawExpectedReturnPieGraph } from '@/scripts/graph.js'
 import { drawLiquidityReturnPositionScatterGraph } from '@/scripts/graph.js'
 import { drawAverageReturnLineGraph } from '@/scripts/graph.js'
 import { drawAssetDeltaChangeBarGraph } from '@/scripts/graph.js'
-import { isNumberValidator, isIntegerValidator } from '@/scripts/validator.js'
 
-// import { AddCashDialog } from '@/components/dialogs/addCashDialog'
 import AddCashDialog from '@/components/dialogs/AddCashDialog'
-
+import AddMonetaryDialog from '@/components/dialogs/AddMonetaryDialog'
+import AddFixedDialog from '@/components/dialogs/AddFixedDialog.vue'
+import AddFundDialog from '@/components/dialogs/AddFundDialog.vue'
 
 
 export default {
@@ -276,109 +166,35 @@ export default {
                 fundData: []
             },
 
-            //   showAddCashDialog: false,
-            showAddMonetaryFundDialog: false,
-            showAddFixedDepositDialog: false,
-            showAddFundDialog: false,
-
             editId: null,
             drawMonths: 12,
-
-            //   addCashForm: {
-            //     name: '',
-            //     amount: 0
-            //   },
-            addMonetaryFundForm: {
-                name: '',
-                beginningAmount: 0,
-                beginningTime: '',
-                currentAmount: 0,
-                fastRedemption: false,
-                holding: true
-            },
-            addFixedDepositForm: {
-                name: '',
-                beginningAmount: 0,
-                beginningTime: '',
-                rate: 0,
-                maturity: 0
-            },
-            addFundForm: {
-                name: '',
-                beginningAmount: 0,
-                beginningTime: '',
-                currentAmount: 0,
-                lockupPeriod: 0,
-                holding: true
-            },
 
             handleEdit: (row, type) => {
                 this.editId = row.id
 
                 if (type === 'cash') {
                     this.$refs.addCashDialog.edit(row)
-                    //   this.addCashForm.name = row.name
-                    //   this.addCashForm.amount = row.amount
-                    //   this.showAddCashDialog = true
                 } else if (type === 'monetary-fund') {
-                    this.addMonetaryFundForm.name = row.name
-                    this.addMonetaryFundForm.beginningAmount = row.beginningAmount
-                    this.addMonetaryFundForm.beginningTime = row.beginningTime
-                    this.addMonetaryFundForm.currentAmount = row.currentAmount
-                    this.addMonetaryFundForm.fastRedemption = row.fastRedemption
-                    this.addMonetaryFundForm.holding = row.holding
-                    this.showAddMonetaryFundDialog = true
+                    this.$refs.addMonetaryDialog.edit(row)
                 } else if (type === 'fixed-deposit') {
-                    this.addFixedDepositForm.name = row.name
-                    this.addFixedDepositForm.beginningAmount = row.beginningAmount
-                    this.addFixedDepositForm.beginningTime = row.beginningTime
-                    this.addFixedDepositForm.rate = row.rate
-                    this.addFixedDepositForm.maturity = row.maturity
-                    this.showAddFixedDepositDialog = true
+                    this.$refs.addFixedDialog.edit(row)
                 } else if (type === 'fund') {
-                    this.addFundForm.name = row.name
-                    this.addFundForm.beginningAmount = row.beginningAmount
-                    this.addFundForm.beginningTime = row.beginningTime
-                    this.addFundForm.currentAmount = row.currentAmount
-                    this.addFundForm.lockupPeriod = row.lockupPeriod
-                    this.addFundForm.holding = row.holding
-                    this.showAddFundDialog = true
+                    this.$refs.addFundDialog.edit(row)
                 }
             },
             onAddSelect: type => {
                 switch (type) {
                     case 'cash':
-                        // this.showAddCashDialog = true
                         this.$refs.addCashDialog.show()
                         break
                     case 'monetary-fund':
-                        this.showAddMonetaryFundDialog = true
+                        this.$refs.addMonetaryDialog.show()
                         break
                     case 'fixed-deposit':
-                        this.showAddFixedDepositDialog = true
+                        this.$refs.addFixedDialog.show()
                         break
                     case 'fund':
-                        this.showAddFundDialog = true
-                        break
-                }
-            },
-            onCancelAdd: (type) => {
-                switch (type) {
-                    case 'cash':
-                        // this.showAddCashDialog = false
-                        // this.$refs['addCashForm'].resetFields()
-                        break
-                    case 'monetary-fund':
-                        this.showAddMonetaryFundDialog = false
-                        this.$refs['addMonetaryFundForm'].resetFields()
-                        break
-                    case 'fixed-deposit':
-                        this.showAddFixedDepositDialog = false
-                        this.$refs['addFixedDepositForm'].resetFields()
-                        break
-                    case 'fund':
-                        this.showAddFundDialog = false
-                        this.$refs['addFundForm'].resetFields()
+                        this.$refs.addFundDialog.show()
                         break
                 }
             },
@@ -388,33 +204,33 @@ export default {
                     amount: form.amount
                 }, this.editId)
             },
-            addMonetaryFundData: () => {
-                this.record.addData('monetaryFund', {
-                    name: this.addMonetaryFundForm.name,
-                    beginningAmount: this.addMonetaryFundForm.beginningAmount,
-                    beginningTime: this.addMonetaryFundForm.beginningTime,
-                    currentAmount: this.addMonetaryFundForm.currentAmount,
-                    fastRedemption: this.addMonetaryFundForm.fastRedemption,
-                    holding: this.addMonetaryFundForm.holding
+            addMonetaryFundData: async (form) => {
+                await this.record.addData('monetary-fund', {
+                    name: form.name,
+                    beginningAmount: form.beginningAmount,
+                    beginningTime: form.beginningTime,
+                    currentAmount: form.currentAmount,
+                    fastRedemption: form.fastRedemption,
+                    holding: form.holding
                 }, this.editId)
             },
-            addFixedDepositData: () => {
-                this.record.addData('fixedDeposit', {
-                    name: this.addFixedDepositForm.name,
-                    beginningAmount: this.addFixedDepositForm.beginningAmount,
-                    beginningTime: this.addFixedDepositForm.beginningTime,
-                    rate: this.addFixedDepositForm.rate,
-                    maturity: this.addFixedDepositForm.maturity
+            addFixedDepositData: async (form) => {
+                await this.record.addData('fixed-deposit', {
+                    name: form.name,
+                    beginningAmount: form.beginningAmount,
+                    beginningTime: form.beginningTime,
+                    rate: form.rate,
+                    maturity: form.maturity
                 }, this.editId)
             },
-            addFundData: () => {
-                this.record.addData('fund', {
-                    name: this.addFundForm.name,
-                    beginningAmount: this.addFundForm.beginningAmount,
-                    beginningTime: this.addFundForm.beginningTime,
-                    currentAmount: this.addFundForm.currentAmount,
-                    lockupPeriod: this.addFundForm.lockupPeriod,
-                    holding: this.addFundForm.holding
+            addFundData: async (form) => {
+                await this.record.addData('fund', {
+                    name: form.name,
+                    beginningAmount: form.beginningAmount,
+                    beginningTime: form.beginningTime,
+                    currentAmount: form.currentAmount,
+                    lockupPeriod: form.lockupPeriod,
+                    holding: form.holding
                 }, this.editId)
             },
             onAddData: async (form, type) => {
@@ -423,13 +239,13 @@ export default {
                         await this.addCashData(form)
                         break
                     case 'monetary-fund':
-                        this.addMonetaryFundData()
+                        await this.addMonetaryFundData(form)
                         break
                     case 'fixed-deposit':
-                        this.addFixedDepositData()
+                        await this.addFixedDepositData(form)
                         break
                     case 'fund':
-                        this.addFundData()
+                        await this.addFundData(form)
                         break
                 }
                 this.data = this.record.getData()
@@ -437,57 +253,6 @@ export default {
                 this.editId = null
             },
 
-            onConfirmAdd: (type) => {
-                switch (type) {
-                    case 'cash':
-                        // this.$refs['addCashForm'].validate((valid) => {
-                        //   if (valid) {
-                        //     this.showAddCashDialog = false
-                        //     this.addCashData()
-                        //     this.data = this.record.getData()
-                        //     this.draw()
-                        //     this.$refs['addCashForm'].resetFields()
-                        //     this.editId = null
-                        //   }
-                        // })
-                        break
-                    case 'monetary-fund':
-                        this.$refs['addMonetaryFundForm'].validate((valid) => {
-                            if (valid) {
-                                this.showAddMonetaryFundDialog = false
-                                this.addMonetaryFundData()
-                                this.data = this.record.getData()
-                                this.draw()
-                                this.$refs['addMonetaryFundForm'].resetFields()
-                                this.editId = null
-                            }
-                        })
-                        break
-                    case 'fixed-deposit':
-                        this.$refs['addFixedDepositForm'].validate((valid) => {
-                            if (valid) {
-                                this.showAddFixedDepositDialog = false
-                                this.addFixedDepositData()
-                                this.data = this.record.getData()
-                                this.draw()
-                                this.$refs['addFixedDepositForm'].resetFields()
-                                this.editId = null
-                            }
-                        })
-                        break
-                    case 'fund':
-                        this.$refs['addFundForm'].validate((valid) => {
-                            if (valid) {
-                                this.showAddFundDialog = false
-                                this.addFundData()
-                                this.data = this.record.getData()
-                                this.draw()
-                                this.$refs['addFundForm'].resetFields()
-                                this.editId = null
-                            }
-                        })
-                }
-            },
             onDownload: () => {
                 this.record.download();
             },
@@ -670,89 +435,7 @@ export default {
                     label: '基金'
                 }
             ],
-            //   cashRules: {
-            //     name: [
-            //       { required: true, message: '请输入账户名称', trigger: 'blur' }
-            //     ],
-            //     amount: [
-            //       { required: true, message: '请输入金额', trigger: 'blur' },
-            //       {
-            //         message: '金额必须为数字值', trigger: 'blur', validator: isNumberValidator
-            //       }
-            //     ]
-            //   },
-            monetaryFundRules: {
-                name: [
-                    { required: true, message: '请输入名称', trigger: 'blur' }
-                ],
-                beginningAmount: [
-                    { required: true, message: '请输入期初金额', trigger: 'blur' },
-                    {
-                        message: '期初金额必须为数字值', trigger: 'blur', validator: isNumberValidator
-                    }
-                ],
-                beginningTime: [
-                    { required: true, message: '请选择期初时间', trigger: 'blur' }
-                ],
-                currentAmount: [
-                    { required: true, message: '请输入当期金额', trigger: 'blur' },
-                    {
-                        message: '当期金额必须为数字值', trigger: 'blur', validator: isNumberValidator
-                    }
-                ]
-            },
-            fixedDepositRules: {
-                name: [
-                    { required: true, message: '请输入名称', trigger: 'blur' }
-                ],
-                beginningAmount: [
-                    { required: true, message: '请输入期初金额', trigger: 'blur' },
-                    {
-                        message: '期初金额必须为数字值', trigger: 'blur', validator: isNumberValidator
-                    }
-                ],
-                beginningTime: [
-                    { required: true, message: '请选择期初时间', trigger: 'blur' }
-                ],
-                rate: [
-                    { required: true, message: '请输入利率', trigger: 'blur' },
-                    {
-                        message: '利率必须为数字值', trigger: 'blur', validator: isNumberValidator
-                    }
-                ],
-                maturity: [
-                    { required: true, message: '请输入期限', trigger: 'blur' },
-                    {
-                        message: '期限必须为数字值', trigger: 'blur', type: 'number'
-                    }
-                ]
-            },
-            fundRules: {
-                name: [
-                    { required: true, message: '请输入名称', trigger: 'blur' }
-                ],
-                beginningAmount: [
-                    { required: true, message: '请输入期初金额', trigger: 'blur' },
-                    {
-                        message: '期初金额必须为数字值', trigger: 'blur', validator: isNumberValidator
-                    }
-                ],
-                beginningTime: [
-                    { required: true, message: '请选择期初时间', trigger: 'blur' }
-                ],
-                currentAmount: [
-                    { required: true, message: '请输入当期金额', trigger: 'blur' },
-                    {
-                        message: '当期金额必须为数字值', trigger: 'blur', validator: isNumberValidator
-                    }
-                ],
-                lockupPeriod: [
-                    { required: true, message: '请输入锁定期', trigger: 'blur' },
-                    {
-                        message: '锁定期必须为整数值', trigger: 'blur', validator: isIntegerValidator
-                    }
-                ]
-            },
+
             drawMonthsRadio: [
                 {
                     label: '过去12个月',
@@ -773,10 +456,10 @@ export default {
         Plus,
         Download,
         Upload,
-        AddCashDialog
-    },
-
-    beforeMount () {
+        AddCashDialog,
+        AddMonetaryDialog,
+        AddFixedDialog,
+        AddFundDialog,
     },
 
     async mounted () {
