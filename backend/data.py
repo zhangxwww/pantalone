@@ -6,6 +6,7 @@ from chinese_calendar import is_workday
 from loguru import logger
 
 from spider import get_china_bond_yield
+import sql_app.schemas as schemas
 import sql_app.crud as crud
 
 
@@ -136,3 +137,8 @@ def get_data_from_db(db):
         'fixedDepositData': _get_fixed_deposit_data_from_db(db),
         'fundData': _get_fund_data_from_db(db)
     }
+
+
+def add_cash_history(db, data):
+    item = schemas.CashDataHistoryItemCreate(**data.content.model_dump(), beginningTime=datetime.now().date())
+    crud.create_cash_data_history_item(db, item, data.id)

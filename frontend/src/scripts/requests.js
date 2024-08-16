@@ -29,8 +29,18 @@ async function loadDataRequest () {
     return res.data;
 }
 
+
+async function addDataRequest (type, data, id) {
+    await axios.post(`/api/data/${type}`, {
+        id: id,
+        content: data
+    })
+}
+
+
 export {
     getChinaBondYieldDataRequest,
     uploadRequest,
-    loadDataRequest
+    loadDataRequest,
+    addDataRequest
 }

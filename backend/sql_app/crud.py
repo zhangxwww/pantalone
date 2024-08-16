@@ -128,6 +128,8 @@ def create_cash_data_history_item(
         history = create_cash_data_history(db, schemas.CashDataHistoryCreate())
         cash_data_history_id = history.id
 
+        logger.debug(f'create history {cash_data_history_id}')
+
     db_cash_data_history_item = models.CashDataHistoryItem(**cash_data_history_item.model_dump())
     db_cash_data_history_item.cash_data_history_id = cash_data_history_id
     db.add(db_cash_data_history_item)

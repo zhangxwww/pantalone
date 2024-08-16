@@ -1,6 +1,11 @@
 import storage from './storage.js';
 import { timeFormat } from './formatter.js';
-import { getChinaBondYieldDataRequest, loadDataRequest, uploadRequest } from './requests.js';
+import {
+    getChinaBondYieldDataRequest,
+    loadDataRequest,
+    uploadRequest,
+    addDataRequest
+} from './requests.js';
 
 
 function clone (x) {
@@ -274,18 +279,24 @@ class Data {
         uploadRequest(file, callback);
     }
 
-    addData (type, data, id) {
-        if (type === 'cash') {
-            this.addCashData(data, id);
-        } else if (type === 'monetaryFund') {
-            this.addMonetaryFundData(data, id);
-        } else if (type === 'fixedDeposit') {
-            this.addFixedDepositData(data, id);
-        } else if (type === 'fund') {
-            this.addFundData(data, id);
-        }
-        this.data = this.prepareData();
-        storage.save(this.json);
+    async addData (type, data, id) {
+        console.log(type)
+        console.log(data)
+        console.log(id)
+        await addDataRequest(type, data, id)
+        await this.load()
+        this.data = this.prepareData()
+        // if (type === 'cash') {
+        //     this.addCashData(data, id);
+        // } else if (type === 'monetaryFund') {
+        //     this.addMonetaryFundData(data, id);
+        // } else if (type === 'fixedDeposit') {
+        //     this.addFixedDepositData(data, id);
+        // } else if (type === 'fund') {
+        //     this.addFundData(data, id);
+        // }
+        // this.data = this.prepareData();
+        // storage.save(this.json);
     }
 
     // TODO: update data in backend
