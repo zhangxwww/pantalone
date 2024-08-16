@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="showDialog" title="添加基金项目" width="300px">
+    <el-dialog v-model="showDialog" title="添加基金项目" @closed="reset" width="300px">
         <el-form :model="form" :rules="rules" ref="form">
             <el-form-item label="名称" prop="name">
                 <el-input v-model="form.name"></el-input>
@@ -23,7 +23,7 @@
         </el-form>
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="onCancelAdd">取消</el-button>
+                <el-button @click="onCancel">取消</el-button>
                 <el-button type="primary" @click="onConfirmAdd">
                     确认
                 </el-button>
@@ -76,9 +76,8 @@ export default {
                 ]
             },
 
-            onCancelAdd: () => {
+            onCancel: () => {
                 this.showDialog = false;
-                this.$refs.form.resetFields();
             },
 
             onConfirmAdd: () => {
@@ -87,7 +86,6 @@ export default {
                         this.form.beginningTime = timeFormat(this.form.beginningTime);
                         this.$emit('add', this.form, 'fund');
                         this.showDialog = false;
-                        this.$refs.form.resetFields();
                     }
                 });
             },
@@ -105,6 +103,15 @@ export default {
 
             show: () => {
                 this.showDialog = true;
+            },
+
+            reset: () => {
+                this.form.name = '';
+                this.form.beginningAmount = 0;
+                this.form.beginningTime = '';
+                this.form.currentAmount = 0;
+                this.form.lockupPeriod = 0;
+                this.form.holding = true;
             }
         }
     },

@@ -131,6 +131,8 @@ export default {
                 }
             },
             onAddSelect: type => {
+                this.editId = null
+
                 switch (type) {
                     case 'cash':
                         this.$refs.addCashDialog.show()
