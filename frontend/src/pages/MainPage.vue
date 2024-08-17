@@ -88,12 +88,21 @@
 <script>
 import { Plus, Download, Upload } from '@element-plus/icons-vue'
 import Data from '@/scripts/data.js'
-import { drawAssetChangeLineGraph } from '@/scripts/graph.js'
-import { drawResidualMaturityPieGraph } from '@/scripts/graph.js'
-import { drawExpectedReturnPieGraph } from '@/scripts/graph.js'
-import { drawLiquidityReturnPositionScatterGraph } from '@/scripts/graph.js'
-import { drawAverageReturnLineGraph } from '@/scripts/graph.js'
-import { drawAssetDeltaChangeBarGraph } from '@/scripts/graph.js'
+import {
+    drawAssetChangeLineGraph,
+    drawResidualMaturityPieGraph,
+    drawExpectedReturnPieGraph,
+    drawLiquidityReturnPositionScatterGraph,
+    drawAverageReturnLineGraph,
+    drawAssetDeltaChangeBarGraph,
+
+    drawEmptyAssetChangeLineGraph,
+    drawEmptyAssetDeltaChangeBarGraph,
+    drawEmptyResidualMaturityPieGraph,
+    drawEmptyExpectedReturnPieGraph,
+    drawEmptyLiquidityReturnPositionScatterGraph,
+    drawEmptyAverageReturnLineGraph
+} from '@/scripts/graph.js'
 
 import AddCashDialog from '@/components/dialogs/AddCashDialog'
 import AddMonetaryDialog from '@/components/dialogs/AddMonetaryDialog'
@@ -209,6 +218,15 @@ export default {
             onUpload: (file) => {
                 this.record.upload(file, () => { location.reload(); });
             },
+            drawEmpty: () => {
+                const dates = this.record.sampleDates(this.drawMonths);
+                this.assetChangeLineGraph = drawEmptyAssetChangeLineGraph('asset-change-line-graph', dates);
+                this.assetDeltaChangeBarGraph = drawEmptyAssetDeltaChangeBarGraph('asset-delta-change-bar-graph', dates);
+                this.residualMaturatyPieGraph = drawEmptyResidualMaturityPieGraph('residual-maturity-pie-graph');
+                this.expectedReturnPieGraph = drawEmptyExpectedReturnPieGraph('expected-return-pie-graph');
+                this.liquidityReturnPositionScatterGraph = drawEmptyLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph');
+                this.averageReturnLineGraph = drawEmptyAverageReturnLineGraph('average-return-line-graph', dates);
+            },
             draw: () => {
                 const assetChange = this.record.getAssetChangeData(this.drawMonths)
                 this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
@@ -277,9 +295,10 @@ export default {
 
     async mounted () {
         this.record = new Data()
+        this.drawEmpty()
         await this.record.load()
         this.data = this.record.getData()
-        this.draw();
+        // this.draw();
     },
     unmounted () {
         this.assetChangeLineGraph.dispose()

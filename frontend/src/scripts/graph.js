@@ -14,6 +14,8 @@ import {
 import { CanvasRenderer } from "echarts/renderers";
 import { LabelLayout, UniversalTransition } from "echarts/features";
 
+import { timeFormat } from "@/scripts/formatter";
+
 echarts.use([
     TitleComponent,
     TooltipComponent,
@@ -34,6 +36,7 @@ echarts.use([
 ]);
 
 function drawAssetChangeLineGraph (domId, data) {
+    console.log(data);
     const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
@@ -130,6 +133,7 @@ function drawAssetChangeLineGraph (domId, data) {
 }
 
 function drawAssetDeltaChangeBarGraph (domId, data) {
+    console.log(data);
     const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
@@ -218,6 +222,7 @@ function drawAssetDeltaChangeBarGraph (domId, data) {
 }
 
 function drawPieGraph (domId, data, title) {
+    console.log(data);
     const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
@@ -274,6 +279,7 @@ function drawExpectedReturnPieGraph (domId, data) {
 }
 
 function drawLiquidityReturnPositionScatterGraph (domId, data) {
+    console.log(data);
     const chart = echarts.init(document.getElementById(domId));
     let amount = [];
     amount.push(...data.amount);
@@ -348,6 +354,7 @@ function drawLiquidityReturnPositionScatterGraph (domId, data) {
 }
 
 function drawAverageReturnLineGraph (domId, data) {
+    console.log(data);
     const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
@@ -395,11 +402,83 @@ function drawAverageReturnLineGraph (domId, data) {
     return chart;
 }
 
+function drawEmptyAssetChangeLineGraph (domId, dates) {
+    const data = {
+        time: dates.map(date => timeFormat(date, true)),
+        cashData: Array(dates.length).fill(Number.NaN),
+        monetaryFundData: Array(dates.length).fill(Number.NaN),
+        fixedDepositData: Array(dates.length).fill(Number.NaN),
+        fundData: Array(dates.length).fill(Number.NaN),
+    }
+    drawAssetChangeLineGraph(domId, data);
+}
+
+function drawEmptyAssetDeltaChangeBarGraph (domId, dates) {
+    const data = {
+        time: dates.map(date => timeFormat(date, true)),
+        cashDeltaData: Array(dates.length).fill(Number.NaN),
+        monetaryFundDeltaData: Array(dates.length).fill(Number.NaN),
+        fixedDepositDeltaData: Array(dates.length).fill(Number.NaN),
+        fundDeltaData: Array(dates.length).fill(Number.NaN),
+        totalDeltaData: Array(dates.length).fill(Number.NaN),
+    }
+    drawAssetDeltaChangeBarGraph(domId, data);
+}
+
+function drawEmptyResidualMaturityPieGraph (domId) {
+    const data = [
+        { value: 0, name: "T+0" },
+        { value: 0, name: "T+1" },
+        { value: 0, name: "T+2" },
+        { value: 0, name: "30日内" },
+        { value: 0, name: "90日内" },
+        { value: 0, name: "180日内" },
+        { value: 0, name: "365日内" },
+        { value: 0, name: "365日以上" },
+    ]
+    drawResidualMaturityPieGraph(domId, data);
+}
+
+function drawEmptyExpectedReturnPieGraph (domId) {
+    const data = [
+        { value: 0, name: "<1%" },
+        { value: 0, name: "1%-2%" },
+        { value: 0, name: "2%-5%" },
+        { value: 0, name: "5%-10%" },
+        { value: 0, name: ">10%" },
+    ]
+    drawExpectedReturnPieGraph(domId, data);
+}
+
+function drawEmptyLiquidityReturnPositionScatterGraph (domId) {
+    const data = {
+        data: [],
+        amount: []
+    }
+    drawLiquidityReturnPositionScatterGraph(domId, data);
+}
+
+function drawEmptyAverageReturnLineGraph (domId, dates) {
+    const data = {
+        time: dates.map(date => timeFormat(date, true)),
+        data: Array(dates.length).fill(Number.NaN),
+    }
+    drawAverageReturnLineGraph(domId, data);
+}
+
+
 export {
     drawAssetChangeLineGraph,
     drawAssetDeltaChangeBarGraph,
     drawResidualMaturityPieGraph,
     drawExpectedReturnPieGraph,
     drawLiquidityReturnPositionScatterGraph,
-    drawAverageReturnLineGraph
+    drawAverageReturnLineGraph,
+
+    drawEmptyAssetChangeLineGraph,
+    drawEmptyAssetDeltaChangeBarGraph,
+    drawEmptyResidualMaturityPieGraph,
+    drawEmptyExpectedReturnPieGraph,
+    drawEmptyLiquidityReturnPositionScatterGraph,
+    drawEmptyAverageReturnLineGraph
 }
