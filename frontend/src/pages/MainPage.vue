@@ -298,7 +298,7 @@ export default {
         this.drawEmpty()
         await this.record.load()
         this.data = this.record.getData()
-        // this.draw();
+        this.draw();
     },
     unmounted () {
         this.assetChangeLineGraph.dispose()

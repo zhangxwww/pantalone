@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, staticfiles, Depends
 from sqlalchemy.orm import Session
 from loguru import logger
@@ -6,7 +8,10 @@ import operation
 import api_model
 from sql_app import models
 from sql_app.database import SessionLocal, engine
+from utils import get_log_file_path
 
+
+logger.add(os.path.join(get_log_file_path(), '{time}.log'), level='DEBUG', rotation='1 day', retention='1 week', compression='zip')
 
 models.Base.metadata.create_all(bind=engine)
 
