@@ -16,6 +16,8 @@ class Data {
     async load () {
         this.json = await loadDataRequest();
         this.data = this.prepareData();
+        await this.getChinaBondYieldData(12);
+        await this.getChinaBondYieldData(24);
     }
 
     prepareData () {
@@ -94,11 +96,11 @@ class Data {
         return data;
     }
 
-    getChinaBondYieldData () {
-        const dates = this.sampleDates(12).map(t => timeFormat(t));
-        getChinaBondYieldDataRequest(dates, data => {
-            console.log(data);
-        });
+    async getChinaBondYieldData (months) {
+        console.log(months);
+        const dates = this.sampleDates(months).map(t => timeFormat(t));
+        const data = await getChinaBondYieldDataRequest(dates);
+        console.log(data);
     }
 
     getData () {

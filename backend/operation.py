@@ -10,12 +10,12 @@ import sql_app.schemas as schemas
 import sql_app.crud as crud
 
 
-def is_trade_day(date):
+def _is_trade_day(date):
     return is_workday(date) and date.isoweekday() < 6
 
 
-def get_china_bond_bield_data(dates):
-    data = []
+def get_china_bond_yield_data(db, dates):
+    query_dates = []
     for date in dates:
         date = datetime.strptime(date, '%Y-%m-%d').date()
         now = datetime.now()
@@ -23,9 +23,43 @@ def get_china_bond_bield_data(dates):
             date = now.date()
             if now.hour < 18:
                 date = date.replace(day=date.day - 1)
-        while not is_trade_day(date):
+        while not _is_trade_day(date):
             date = date.replace(day=date.day - 1)
-        data.append(get_china_bond_yield(date))
+        query_dates.append(date)
+
+    logger.debug('Query dates: ')
+    logger.debug(query_dates)
+
+    db_data = crud.get_CN1YR_data(db, query_dates)
+
+    db_data_list = [{'date': d.date, 'yield': d.yield_1yr} for d in db_data]
+
+    logger.debug('DB data: ')
+    logger.debug(db_data_list)
+
+    not_found_dates = list(set(query_dates) - set(d.date for d in db_data))
+
+    logger.debug('Not found dates: ')
+    logger.debug(not_found_dates)
+
+    not_found_dates_yield = []
+    for date in not_found_dates:
+        yield_1yr = get_china_bond_yield(date)
+        item = schemas.CN1YRDataCreate(date=date, yield_1yr=yield_1yr)
+        not_found_dates_yield.append(item)
+    crud.create_CN1YR_data_from_list(db, not_found_dates_yield)
+
+    spider_data = [{'date': d.date, 'yield': d.yield_1yr} for d in not_found_dates_yield]
+
+    logger.debug('Spider data: ')
+    logger.debug(spider_data)
+
+    data = db_data_list + spider_data
+    data = sorted(data, key=lambda x: x['date'])
+
+    logger.debug('Final data: ')
+    logger.debug(data)
+
     return data
 
 

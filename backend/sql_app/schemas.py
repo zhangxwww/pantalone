@@ -159,4 +159,18 @@ class FundDataHistory(FundDataHistoryBase):
 
 
 # ********** CN1YR Data **********
-# TODO
+
+class CN1YRDataBase(BaseModel):
+    yield_1yr: float
+    date: date
+
+
+class CN1YRDataCreate(CN1YRDataBase):
+    pass
+
+
+class CN1YRData(CN1YRDataBase):
+    id: int
+
+    class Config:
+        from_attributes = True

@@ -1,11 +1,8 @@
 import axios from 'axios';
 
-function getChinaBondYieldDataRequest (dates, callback) {
-    axios.post('/api/CN1YR', { 'dates': dates }).then(res => {
-        callback(res.data);
-    }).catch(err => {
-        console.log(err);
-    });
+async function getChinaBondYieldDataRequest (dates) {
+    const res = await axios.post('/api/CN1YR', { 'dates': dates });
+    return res.data;
 }
 
 function uploadRequest (file, callback) {

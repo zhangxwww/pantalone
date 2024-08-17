@@ -1,4 +1,5 @@
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
+from datetime import date
 
 from sqlalchemy.orm import Session
 from loguru import logger
@@ -242,3 +243,33 @@ def create_table_from_json(
 
             for his in history:
                 create_item_func[table_name](db, item_schema[table_name](**his), history_id)
+
+
+# ********** add CN1YR data **********
+
+def create_CN1YR_data(
+    db: Session,
+    data: schemas.CN1YRDataCreate
+):
+    db_CN1YR_data = models.ChinaBondYield(**data.model_dump())
+    db.add(db_CN1YR_data)
+    db.commit()
+    db.refresh(db_CN1YR_data)
+    return db_CN1YR_data
+
+
+def create_CN1YR_data_from_list(
+    db: Session,
+    data: List[schemas.CN1YRDataCreate]
+):
+    for item in data:
+        create_CN1YR_data(db, item)
+
+
+# ********** get CN1YR data **********
+
+def get_CN1YR_data(
+    db: Session,
+    dates: List[date]
+):
+    return db.query(models.ChinaBondYield).filter(models.ChinaBondYield.date.in_(dates)).all()

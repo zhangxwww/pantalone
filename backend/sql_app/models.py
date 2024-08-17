@@ -92,3 +92,11 @@ class FundDataHistory(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     histories = relationship('FundDataHistoryItem', back_populates='fund_data_history')
+
+
+class ChinaBondYield(Base):
+    __tablename__ = 'china_bond_yield'
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date)
+    yield_1yr = Column(Float)

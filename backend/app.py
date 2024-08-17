@@ -21,9 +21,9 @@ def get_db():
 
 
 @app.post('/api/CN1YR')
-async def get_CN1YR(data: api_model.CN1YRDateData):
+async def get_CN1YR(data: api_model.CN1YRDateData, db: Session = Depends(get_db)):
     logger.debug(data.dates)
-    return {'yield': data.get_china_bond_bield_data(data.dates)}
+    return {'yield': operation.get_china_bond_yield_data(db, data.dates)}
 
 
 @app.post('/api/upload')
