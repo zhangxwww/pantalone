@@ -1,4 +1,3 @@
-// import storage from './storage.js';
 import { timeFormat } from './formatter.js';
 import {
     getChinaBondYieldDataRequest,
@@ -199,7 +198,6 @@ class Data {
     }
 
     download () {
-        // storage.download();
         const json = JSON.stringify(this.json);
         const blob = new Blob([json], { type: 'text/plain' });
         const url = window.URL.createObjectURL(blob);
@@ -211,7 +209,6 @@ class Data {
     }
 
     upload (file, callback) {
-        // storage.upload(file);
         uploadRequest(file, callback);
     }
 
