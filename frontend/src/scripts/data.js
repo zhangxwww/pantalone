@@ -589,15 +589,15 @@ class Data {
 
         const meanReturn = statistic.rolling(excessReturn, period, statistic.nanmean);
         const stdReturn = statistic.rolling(excessReturn, period, statistic.nanstd);
-        const sharpRatio = meanReturn.map((m, i) => m / stdReturn[i]);
+        const sharpeRatio = meanReturn.map((m, i) => m / stdReturn[i]);
 
         console.log(excessReturn);
         console.log(meanReturn);
         console.log(stdReturn);
-        console.log(sharpRatio);
+        console.log(sharpeRatio);
         return {
             time: averageReturn.time,
-            sharpRatio: sharpRatio
+            sharpeRatio: sharpeRatio
         }
     }
 }

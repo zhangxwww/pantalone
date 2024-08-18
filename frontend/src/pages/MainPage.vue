@@ -12,6 +12,9 @@
             <el-col :span="12">
                 <div id="asset-delta-change-bar-graph" style="width: 100%; height: 300px"></div>
             </el-col>
+            <el-col :span="12">
+                <div id="rick-indicator-line-graph" style="width: 100%; height: 300px"></div>
+            </el-col>
         </el-row>
         <el-row justify="center">
             <el-radio-group v-model="drawMonths" @change="draw">
@@ -95,13 +98,15 @@ import {
     drawLiquidityReturnPositionScatterGraph,
     drawAverageReturnLineGraph,
     drawAssetDeltaChangeBarGraph,
+    drawRiskIndicatorLineGraph,
 
     drawEmptyAssetChangeLineGraph,
     drawEmptyAssetDeltaChangeBarGraph,
     drawEmptyResidualMaturityPieGraph,
     drawEmptyExpectedReturnPieGraph,
     drawEmptyLiquidityReturnPositionScatterGraph,
-    drawEmptyAverageReturnLineGraph
+    drawEmptyAverageReturnLineGraph,
+    drawEmptyRiskIndicatorLineGraph
 } from '@/scripts/graph.js'
 
 import AddCashDialog from '@/components/dialogs/AddCashDialog'
@@ -226,6 +231,7 @@ export default {
                 this.expectedReturnPieGraph = drawEmptyExpectedReturnPieGraph('expected-return-pie-graph');
                 this.liquidityReturnPositionScatterGraph = drawEmptyLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph');
                 this.averageReturnLineGraph = drawEmptyAverageReturnLineGraph('average-return-line-graph', dates);
+                this.riskIndicatorLineGraph = drawEmptyRiskIndicatorLineGraph('rick-indicator-line-graph', dates);
             },
             draw: async () => {
                 const assetChange = this.record.getAssetChangeData(this.drawMonths)
@@ -247,8 +253,8 @@ export default {
                 const averageReturn = this.record.getAverageReturnData(this.drawMonths, chinaBondYield)
                 this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)
 
-                // eslint-disable-next-line no-unused-vars
                 const riskIndicator = this.record.getRiskIndicatorData(averageReturn)
+                this.riskIndicatorLineGraph = drawRiskIndicatorLineGraph('rick-indicator-line-graph', riskIndicator)
             },
 
             dropdownMenus: [
@@ -311,6 +317,7 @@ export default {
         this.liquidityReturnPositionScatterGraph.dispose()
         this.averageReturnLineGraph.dispose()
         this.assetDeltaChangeBarGraph.dispose()
+        this.riskIndicatorLineGraph.dispose()
     },
 
 }

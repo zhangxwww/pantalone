@@ -416,12 +416,70 @@ function drawAverageReturnLineGraph (domId, data) {
                 }
                 name += "</tbody></table>";
                 return name;
+            }
+        },
+    }
+    chart.setOption(option);
+    return chart;
+}
 
-                // let name = params[0].name;
-                // for (let i = 0; i < params.length; i++) {
-                //     name += `<br>${params[i].marker}${params[i].seriesName}: ${(params[i].value * 100).toFixed(2)}%`;
-                // }
-                // return name;
+function drawRiskIndicatorLineGraph (domId, data) {
+    console.log(data);
+    const chart = echarts.init(document.getElementById(domId));
+    const option = {
+        title: {
+            text: "风险指标",
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: data.time,
+        },
+        yAxis: {
+            type: "value",
+            // axisLabel: {
+            //     formatter: value => {
+            //         return (value * 100).toFixed(1) + "%";
+            //     }
+            // }
+        },
+        legend: {
+            data: ["夏普率"],
+            x: "center",
+            y: "bottom"
+        },
+        series: [
+            {
+                name: "夏普率",
+                type: "line",
+                data: data.sharpeRatio,
+                smooth: true
+            },
+        ],
+        tooltip: {
+            trigger: "axis",
+            textStyle: {
+                align: "left"
+            },
+            formatter: params => {
+                let name = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${params[0].name}</b></td>
+                        </tr>
+                `;
+                for (let i = 0; i < params.length; i++) {
+                    name += `<tr>
+                        <td align="left">${params[i].marker}${params[i].seriesName}：</td>
+                        <td align="right"><b>${params[i].value}</b></td>
+                    </tr>`;
+                }
+                name += "</tbody></table>";
+                return name;
             }
         },
     }
@@ -494,6 +552,14 @@ function drawEmptyAverageReturnLineGraph (domId, dates) {
     drawAverageReturnLineGraph(domId, data);
 }
 
+function drawEmptyRiskIndicatorLineGraph (domId, dates) {
+    const data = {
+        time: dates.map(date => timeFormat(date, true)),
+        sharpeRatio: Array(dates.length).fill(Number.NaN),
+    }
+    drawRiskIndicatorLineGraph(domId, data);
+}
+
 
 export {
     drawAssetChangeLineGraph,
@@ -502,11 +568,13 @@ export {
     drawExpectedReturnPieGraph,
     drawLiquidityReturnPositionScatterGraph,
     drawAverageReturnLineGraph,
+    drawRiskIndicatorLineGraph,
 
     drawEmptyAssetChangeLineGraph,
     drawEmptyAssetDeltaChangeBarGraph,
     drawEmptyResidualMaturityPieGraph,
     drawEmptyExpectedReturnPieGraph,
     drawEmptyLiquidityReturnPositionScatterGraph,
-    drawEmptyAverageReturnLineGraph
+    drawEmptyAverageReturnLineGraph,
+    drawEmptyRiskIndicatorLineGraph
 }
