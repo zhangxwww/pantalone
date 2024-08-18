@@ -425,6 +425,28 @@ function drawAverageReturnLineGraph (domId, data) {
 
 function drawRiskIndicatorLineGraph (domId, data) {
     console.log(data);
+
+    const help = {
+        sharpeRatio: [],
+    }
+    for (let i = 0; i < data.sharpeRatio.length; i++) {
+        if (isNaN(data.sharpeRatio[i])) {
+            help.sharpeRatio.push(Number.NaN);
+        } else {
+            help.sharpeRatio.push(data.sharpeRatio[i] - 3);
+        }
+    }
+    const interval = {
+        sharpeRatio: [],
+    }
+    for (let i = 0; i < data.sharpeRatio.length; i++) {
+        if (isNaN(data.sharpeRatio[i])) {
+            interval.sharpeRatio.push(Number.NaN);
+        } else {
+            interval.sharpeRatio.push(6);
+        }
+    }
+
     const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
@@ -440,11 +462,6 @@ function drawRiskIndicatorLineGraph (domId, data) {
         },
         yAxis: {
             type: "value",
-            // axisLabel: {
-            //     formatter: value => {
-            //         return (value * 100).toFixed(1) + "%";
-            //     }
-            // }
         },
         legend: {
             data: ["夏普率"],
@@ -456,8 +473,33 @@ function drawRiskIndicatorLineGraph (domId, data) {
                 name: "夏普率",
                 type: "line",
                 data: data.sharpeRatio,
-                smooth: true
+                smooth: true,
             },
+            {
+                type: "bar",
+                data: help.sharpeRatio,
+                barWidth: 3,
+                itemStyle: {
+                    normal: {
+                        barBorderColor: 'rgba(0,0,0,0)',
+                        color: 'rgba(0,0,0,0)'
+                    },
+                    emphasis: {
+                        barBorderColor: 'rgba(0,0,0,0)',
+                        color: 'rgba(0,0,0,0)'
+                    }
+                },
+                stack: "confidence-sharpe",
+            },
+            {
+                type: "bar",
+                data: interval.sharpeRatio,
+                barWidth: 3,
+                itemStyle: {
+                    color: 'rgba(220,220,220,0.8)'
+                },
+                stack: "confidence-sharpe",
+            }
         ],
         tooltip: {
             trigger: "axis",
@@ -473,6 +515,9 @@ function drawRiskIndicatorLineGraph (domId, data) {
                         </tr>
                 `;
                 for (let i = 0; i < params.length; i++) {
+                    if (params[i].seriesName.indexOf('series') >= 0) {
+                        continue;
+                    }
                     name += `<tr>
                         <td align="left">${params[i].marker}${params[i].seriesName}：</td>
                         <td align="right"><b>${params[i].value}</b></td>
