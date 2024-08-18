@@ -367,6 +367,9 @@ function drawAverageReturnLineGraph (domId, data) {
             type: "category",
             boundaryGap: false,
             data: data.time,
+            axisLabel: {
+                interval: index => { return index % 2 == 1 }
+            },
         },
         yAxis: {
             type: "value",
@@ -455,6 +458,9 @@ function drawRiskIndicatorLineGraph (domId, data) {
             type: "category",
             boundaryGap: false,
             data: data.time,
+            axisLabel: {
+                interval: index => { return index % 2 == 1 }
+            },
         },
         yAxis: {
             type: "value",
