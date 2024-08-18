@@ -1,6 +1,6 @@
 import os
 
-from scipy.stats import chi2
+from scipy.stats import chi2, t, norm
 from fastapi import FastAPI, staticfiles, Depends
 from sqlalchemy.orm import Session
 from loguru import logger
@@ -76,13 +76,34 @@ async def get_data(db: Session = Depends(get_db)):
     return operation.get_data_from_db(db)
 
 
-@app.get('/api/statistics/chi2')
-async def get_ppf_isf(q: float, df: int):
+@app.get('/api/statistics/chi2/interval')
+async def get_chi2_interval(p: float, df: int):
+    logger.debug(f'chi2 p: {p}, df: {df}')
     # https://blog.csdn.net/u012958850/article/details/116565996
-    left, right = chi2.interval(q, df)
+    lower, upper = chi2.interval(p, df)
     return {
-        'left': left,
-        'right': right
+        'lower': lower,
+        'upper': upper
+    }
+
+
+@app.get('/api/statistics/t/interval')
+async def get_t_interval(p: float, df: int):
+    logger.debug(f't: p: {p}, df: {df}')
+    lower, upper = t.interval(p, df)
+    return {
+        'lower': lower,
+        'upper': upper
+    }
+
+
+@app.get('/api/statistics/normal/interval')
+async def get_normal_interval(p: float):
+    logger.debug(f'normal: p: {p}')
+    lower, upper = norm.interval(p)
+    return {
+        'lower': lower,
+        'upper': upper
     }
 
 

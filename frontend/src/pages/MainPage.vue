@@ -234,6 +234,9 @@ export default {
                 this.riskIndicatorLineGraph = drawEmptyRiskIndicatorLineGraph('rick-indicator-line-graph', dates);
             },
             draw: async () => {
+                const period = 12
+                const p = 0.95
+
                 const assetChange = this.record.getAssetChangeData(this.drawMonths)
                 this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
 
@@ -253,7 +256,7 @@ export default {
                 const averageReturn = this.record.getAverageReturnData(this.drawMonths, chinaBondYield)
                 this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)
 
-                const riskIndicator = this.record.getRiskIndicatorData(averageReturn)
+                const riskIndicator = await this.record.getRiskIndicatorData(averageReturn, period, p)
                 this.riskIndicatorLineGraph = drawRiskIndicatorLineGraph('rick-indicator-line-graph', riskIndicator)
             },
 

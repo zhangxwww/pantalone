@@ -429,21 +429,17 @@ function drawRiskIndicatorLineGraph (domId, data) {
     const help = {
         sharpeRatio: [],
     }
-    for (let i = 0; i < data.sharpeRatio.length; i++) {
-        if (isNaN(data.sharpeRatio[i])) {
-            help.sharpeRatio.push(Number.NaN);
-        } else {
-            help.sharpeRatio.push(data.sharpeRatio[i] - 3);
-        }
-    }
     const interval = {
         sharpeRatio: [],
     }
     for (let i = 0; i < data.sharpeRatio.length; i++) {
         if (isNaN(data.sharpeRatio[i])) {
+            help.sharpeRatio.push(Number.NaN);
             interval.sharpeRatio.push(Number.NaN);
         } else {
-            interval.sharpeRatio.push(6);
+            const int = data.sharpeConfidence[i];
+            help.sharpeRatio.push(data.sharpeRatio[i] + int.lower);
+            interval.sharpeRatio.push(int.upper - int.lower);
         }
     }
 

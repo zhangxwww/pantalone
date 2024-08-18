@@ -4,7 +4,8 @@ import {
     getChinaBondYieldDataRequest,
     loadDataRequest,
     uploadRequest,
-    addDataRequest
+    addDataRequest,
+    getNormalIntervalRequest,
 } from './requests.js';
 
 
@@ -580,8 +581,7 @@ class Data {
         }
     }
 
-    getRiskIndicatorData (averageReturn) {
-        const period = 6;
+    async getRiskIndicatorData (averageReturn, period, p) {
         const ret = averageReturn.data;
         const yields = averageReturn.yields;
 
@@ -590,14 +590,32 @@ class Data {
         const meanReturn = statistic.rolling(excessReturn, period, statistic.nanmean);
         const stdReturn = statistic.rolling(excessReturn, period, statistic.nanstd);
         const sharpeRatio = meanReturn.map((m, i) => m / stdReturn[i]);
+        const n = statistic.rolling(excessReturn, period, statistic.countNotNaN);
 
         console.log(excessReturn);
         console.log(meanReturn);
         console.log(stdReturn);
         console.log(sharpeRatio);
+        console.log(n)
+
+        // https://traders.studentorg.berkeley.edu/papers/The-Statistics-of-Sharpe-Ratios.pdf
+        const interval = await getNormalIntervalRequest(p);
+        console.log(interval);
+
+        const confidence = sharpeRatio.map((v, i) => {
+            const right = Math.sqrt((1 + 0.5 * v ** 2) / n[i]);
+            return {
+                lower: interval.lower * right,
+                upper: interval.upper * right
+            }
+        })
+
+        console.log(confidence);
+
         return {
             time: averageReturn.time,
-            sharpeRatio: sharpeRatio
+            sharpeRatio: sharpeRatio,
+            sharpeConfidence: confidence
         }
     }
 }

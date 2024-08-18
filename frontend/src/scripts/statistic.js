@@ -26,6 +26,11 @@ function nanstd (array) {
     return std(filtered);
 }
 
+function countNotNaN (array) {
+    const filtered = array.filter((a) => !isNaN(a));
+    return filtered.length;
+}
+
 function rolling (array, windowSize, func) {
     const result = [];
     for (let end = 1; end < array.length + 1; end++) {
@@ -35,4 +40,4 @@ function rolling (array, windowSize, func) {
     return result;
 }
 
-export default { mean, std, rolling, nanmean, nanstd };
+export default { mean, std, rolling, nanmean, nanstd, countNotNaN };

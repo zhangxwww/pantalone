@@ -31,7 +31,28 @@ async function addDataRequest (type, data, id) {
     await axios.post(`/api/data/${type}`, {
         id: id,
         content: data
-    })
+    });
+}
+
+
+async function getTIntervalRequest (p, df) {
+    const res = await axios.get('/api/statistics/t/interval', {
+        params: {
+            p: p,
+            df: df
+        }
+    });
+    return res.data;
+}
+
+
+async function getNormalIntervalRequest (p) {
+    const res = await axios.get('/api/statistics/normal/interval', {
+        params: {
+            p: p
+        }
+    });
+    return res.data;
 }
 
 
@@ -39,5 +60,7 @@ export {
     getChinaBondYieldDataRequest,
     uploadRequest,
     loadDataRequest,
-    addDataRequest
+    addDataRequest,
+    getTIntervalRequest,
+    getNormalIntervalRequest
 }
