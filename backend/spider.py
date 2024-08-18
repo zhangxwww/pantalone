@@ -24,7 +24,7 @@ def get_china_bond_yield(date):
     response = requests.post(url, headers=header)
     series = response.json()[0]['seriesData']
     y = list(filter(lambda x: x[0] == 1, series))[0][1]
-    return y
+    return y / 100
 
 
 if __name__ == '__main__':

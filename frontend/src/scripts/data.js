@@ -16,8 +16,6 @@ class Data {
     async load () {
         this.json = await loadDataRequest();
         this.data = this.prepareData();
-        await this.getChinaBondYieldData(12);
-        await this.getChinaBondYieldData(24);
     }
 
     prepareData () {
@@ -101,6 +99,7 @@ class Data {
         const dates = this.sampleDates(months).map(t => timeFormat(t));
         const data = await getChinaBondYieldDataRequest(dates);
         console.log(data);
+        return data.yields;
     }
 
     getData () {
@@ -538,7 +537,9 @@ class Data {
         };
     }
 
-    getAverageReturnData (months) {
+    getAverageReturnData (months, yields) {
+        console.log(yields);
+
         const dates = this.sampleDates(months);
         const weightedReturn = [];
 
@@ -573,7 +574,8 @@ class Data {
         }
         return {
             time: dates.map(t => timeFormat(t, true)),
-            data: weightedReturn
+            data: weightedReturn,
+            yields: yields.map(y => y.yield)
         }
     }
 }

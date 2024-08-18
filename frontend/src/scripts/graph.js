@@ -376,11 +376,22 @@ function drawAverageReturnLineGraph (domId, data) {
                 }
             }
         },
+        legend: {
+            data: ["平均收益", "1年期国债利率"],
+            x: "center",
+            y: "bottom"
+        },
         series: [
             {
                 name: "平均收益",
                 type: "line",
                 data: data.data,
+                smooth: true
+            },
+            {
+                name: "1年期国债利率",
+                type: "line",
+                data: data.yields,
                 smooth: true
             }
         ],
@@ -390,11 +401,27 @@ function drawAverageReturnLineGraph (domId, data) {
                 align: "left"
             },
             formatter: params => {
-                let name = params[0].name;
+                let name = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${params[0].name}</b></td>
+                        </tr>
+                `;
                 for (let i = 0; i < params.length; i++) {
-                    name += `<br>${params[i].marker}${params[i].seriesName}: ${(params[i].value * 100).toFixed(2)}%`;
+                    name += `<tr>
+                        <td align="left">${params[i].marker}${params[i].seriesName}：</td>
+                        <td align="right"><b>${(params[i].value * 100).toFixed(2)}%</b></td>
+                    </tr>`;
                 }
+                name += "</tbody></table>";
                 return name;
+
+                // let name = params[0].name;
+                // for (let i = 0; i < params.length; i++) {
+                //     name += `<br>${params[i].marker}${params[i].seriesName}: ${(params[i].value * 100).toFixed(2)}%`;
+                // }
+                // return name;
             }
         },
     }
@@ -462,6 +489,7 @@ function drawEmptyAverageReturnLineGraph (domId, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         data: Array(dates.length).fill(Number.NaN),
+        yields: Array(dates.length).fill(Number.NaN),
     }
     drawAverageReturnLineGraph(domId, data);
 }

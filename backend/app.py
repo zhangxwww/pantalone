@@ -11,7 +11,12 @@ from sql_app.database import SessionLocal, engine
 from utils import get_log_file_path
 
 
-logger.add(os.path.join(get_log_file_path(), '{time}.log'), level='DEBUG', rotation='1 day', retention='1 week', compression='zip')
+logger.add(
+    os.path.join(get_log_file_path(), '{time}.log'),
+    level='DEBUG',
+    rotation='1 day',
+    retention='1 week',
+    compression='zip')
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -28,7 +33,7 @@ def get_db():
 @app.post('/api/CN1YR')
 async def get_CN1YR(data: api_model.CN1YRDateData, db: Session = Depends(get_db)):
     logger.debug(data.dates)
-    return {'yield': operation.get_china_bond_yield_data(db, data.dates)}
+    return {'yields': operation.get_china_bond_yield_data(db, data.dates)}
 
 
 @app.post('/api/upload')

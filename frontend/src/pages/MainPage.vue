@@ -208,7 +208,7 @@ export default {
                         break
                 }
                 this.data = this.record.getData()
-                this.draw()
+                await this.draw()
                 this.editId = null
             },
 
@@ -227,7 +227,7 @@ export default {
                 this.liquidityReturnPositionScatterGraph = drawEmptyLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph');
                 this.averageReturnLineGraph = drawEmptyAverageReturnLineGraph('average-return-line-graph', dates);
             },
-            draw: () => {
+            draw: async () => {
                 const assetChange = this.record.getAssetChangeData(this.drawMonths)
                 this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
 
@@ -243,7 +243,8 @@ export default {
                 const liquidityReturnPosition = this.record.getLiquidityReturnPositionData()
                 this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition)
 
-                const averageReturn = this.record.getAverageReturnData(this.drawMonths)
+                const chinaBondYield = await this.record.getChinaBondYieldData(this.drawMonths)
+                const averageReturn = this.record.getAverageReturnData(this.drawMonths, chinaBondYield)
                 this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)
             },
 
@@ -298,7 +299,7 @@ export default {
         this.drawEmpty()
         await this.record.load()
         this.data = this.record.getData()
-        this.draw();
+        await this.draw();
     },
     unmounted () {
         this.assetChangeLineGraph.dispose()
