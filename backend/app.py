@@ -1,5 +1,6 @@
 import os
 
+from scipy.stats import chi2
 from fastapi import FastAPI, staticfiles, Depends
 from sqlalchemy.orm import Session
 from loguru import logger
@@ -73,6 +74,16 @@ async def add_fund(data: api_model.AddFundHistoryData, db: Session = Depends(get
 @app.get('/api/data')
 async def get_data(db: Session = Depends(get_db)):
     return operation.get_data_from_db(db)
+
+
+@app.get('/api/statistics/chi2')
+async def get_ppf_isf(q: float, df: int):
+    # https://blog.csdn.net/u012958850/article/details/116565996
+    left, right = chi2.interval(q, df)
+    return {
+        'left': left,
+        'right': right
+    }
 
 
 app.mount('/', staticfiles.StaticFiles(directory='../frontend/dist/', html=True), name='static')
