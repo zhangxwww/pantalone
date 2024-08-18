@@ -1,3 +1,4 @@
+import statistic from './statistic.js';
 import { timeFormat } from './formatter.js';
 import {
     getChinaBondYieldDataRequest,
@@ -576,6 +577,27 @@ class Data {
             time: dates.map(t => timeFormat(t, true)),
             data: weightedReturn,
             yields: yields.map(y => y.yield)
+        }
+    }
+
+    getRiskIndicatorData (averageReturn) {
+        const period = 6;
+        const ret = averageReturn.data;
+        const yields = averageReturn.yields;
+
+        const excessReturn = ret.map((r, i) => r - yields[i]);
+
+        const meanReturn = statistic.rolling(excessReturn, period, statistic.nanmean);
+        const stdReturn = statistic.rolling(excessReturn, period, statistic.nanstd);
+        const sharpRatio = meanReturn.map((m, i) => m / stdReturn[i]);
+
+        console.log(excessReturn);
+        console.log(meanReturn);
+        console.log(stdReturn);
+        console.log(sharpRatio);
+        return {
+            time: averageReturn.time,
+            sharpRatio: sharpRatio
         }
     }
 }

@@ -246,6 +246,9 @@ export default {
                 const chinaBondYield = await this.record.getChinaBondYieldData(this.drawMonths)
                 const averageReturn = this.record.getAverageReturnData(this.drawMonths, chinaBondYield)
                 this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)
+
+                // eslint-disable-next-line no-unused-vars
+                const riskIndicator = this.record.getRiskIndicatorData(averageReturn)
             },
 
             dropdownMenus: [
