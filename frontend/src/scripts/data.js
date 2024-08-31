@@ -51,10 +51,13 @@ class Data {
                 const ret = (mHis.currentNetValue - mHis.beginningNetValue) / mHis.beginningNetValue;
                 const days = (mHis.currentTime - mHis.beginningTime) / (1000 * 3600 * 24);
                 mHis.annualizedReturnRate = ret / days * 365;
+                mHis.cumReturn = mHis.currentAmount - mHis.currentShares;
 
                 mHis.beginningTimeFmt = timeFormat(mHis.beginningTime);
                 mHis.annualizedReturnRateFmt = (mHis.annualizedReturnRate * 100).toFixed(2) + '%';
                 mHis.currentAmountFmt = mHis.currentAmount.toFixed(2);
+                mHis.currentSharesFmt = mHis.currentShares.toFixed(2);
+                mHis.cumReturnFmt = mHis.cumReturn.toFixed(2);
                 mHis.fastRedemptionFmt = mHis.fastRedemption ? '是' : '否';
             }
         }
@@ -135,15 +138,20 @@ class Data {
             const d = {
                 name: last.name,
                 beginningAmount: last.beginningAmount,
+                beginningShares: last.beginningShares,
                 beginningTime: last.beginningTime,
                 beginningTimeFmt: last.beginningTimeFmt,
                 currentAmount: last.currentAmount,
                 currentAmountFmt: last.currentAmountFmt,
+                currentShares: last.currentShares,
+                currentSharesFmt: last.currentSharesFmt,
                 currentTime: last.currentTime,
                 fastRedemption: last.fastRedemption,
                 fastRedemptionFmt: last.fastRedemptionFmt,
                 annualizedReturnRate: last.annualizedReturnRate,
                 annualizedReturnRateFmt: last.annualizedReturnRateFmt,
+                cumReturn: last.cumReturn,
+                cumReturnFmt: last.cumReturnFmt,
                 holding: last.holding
             };
             d.id = mdata.id;

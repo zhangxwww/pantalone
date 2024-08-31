@@ -174,6 +174,7 @@ export default {
                     beginningAmount: form.beginningAmount,
                     beginningTime: form.beginningTime,
                     currentAmount: form.currentAmount,
+                    currentShares: form.currentShares,
                     fastRedemption: form.fastRedemption,
                     holding: form.holding
                 }, this.editId)

@@ -14,6 +14,9 @@
             <el-form-item label="当期金额" prop="currentAmount">
                 <el-input v-model="form.currentAmount"></el-input>
             </el-form-item>
+            <el-form-item label="累计投入金额" prop="currentShares">
+                <el-input v-model="form.currentShares"></el-input>
+            </el-form-item>
             <el-form-item label="快速赎回" prop="fastRedemption">
                 <el-switch v-model="form.fastRedemption"></el-switch>
             </el-form-item>
@@ -46,6 +49,7 @@ export default {
                 beginningAmount: 0,
                 beginningTime: '',
                 currentAmount: 0,
+                currentShares: 0,
                 fastRedemption: false,
                 holding: true
             },
@@ -64,6 +68,12 @@ export default {
                 ],
                 currentAmount: [
                     { required: true, message: '请输入当期金额', trigger: 'blur' },
+                    {
+                        message: '当期金额必须为数字值', trigger: 'blur', validator: isNumberValidator
+                    }
+                ],
+                currentShares: [
+                    { required: true, message: '请输入累计投入金额', trigger: 'blur' },
                     {
                         message: '当期金额必须为数字值', trigger: 'blur', validator: isNumberValidator
                     }
@@ -90,6 +100,7 @@ export default {
                 this.form.beginningAmount = row.beginningAmount;
                 this.form.beginningTime = row.beginningTime;
                 this.form.currentAmount = row.currentAmount;
+                this.form.currentShares = row.currentShares;
                 this.form.fastRedemption = row.fastRedemption;
                 this.form.holding = row.holding;
                 this.showDialog = true;
@@ -104,6 +115,7 @@ export default {
                 this.form.beginningAmount = 0;
                 this.form.beginningTime = '';
                 this.form.currentAmount = 0;
+                this.form.currentShares = 0;
                 this.form.fastRedemption = false;
                 this.form.holding = true;
             }

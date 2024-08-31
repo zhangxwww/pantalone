@@ -188,6 +188,7 @@ def add_monetary_fund_history(db, data):
     bg_time = content['beginningTime']
     content['beginningTime'] = datetime.strptime(bg_time, '%Y-%m-%d').date()
     content['currentTime'] = datetime.now().date()
+    content['beginningShares'] = content['beginningAmount']
     item = schemas.MonetaryFundDataHistoryItemCreate(**content)
     crud.create_monetary_fund_data_history_item(db, item, data.id)
 

@@ -26,6 +26,7 @@ class _AddMonetaryFundData(BaseModel):
     beginningAmount: float
     beginningTime: str
     currentAmount: float
+    currentShares: float
     fastRedemption: bool
     holding: bool
 

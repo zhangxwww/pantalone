@@ -1,5 +1,5 @@
 <template>
-    <el-tabs type="border-card" style="width: 70%; margin-left: 15%; margin-bottom: 5%">
+    <el-tabs type="border-card" style="width: 80%; margin-left: 10%; margin-bottom: 5%">
         <el-tab-pane label="现金">
             <el-table :data="data.cashData" table-layout="auto" style="width: 100%">
                 <el-table-column v-for="header, i in headers.cash" :key="i" :prop="header.prop" :label="header.label"
@@ -92,6 +92,18 @@ export default {
                     {
                         prop: 'currentAmountFmt',
                         label: '当期金额',
+                        width: '105',
+                        sortable: true
+                    },
+                    {
+                        prop: 'currentSharesFmt',
+                        label: '累计投入',
+                        width: '105',
+                        sortable: true
+                    },
+                    {
+                        prop: 'cumReturnFmt',
+                        label: '累计收益',
                         width: '105',
                         sortable: true
                     },
