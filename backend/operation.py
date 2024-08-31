@@ -1,6 +1,6 @@
 import json
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from chinese_calendar import is_workday
 from loguru import logger
@@ -22,9 +22,9 @@ def get_china_bond_yield_data(db, dates):
         if date > now.date():
             date = now.date()
             if now.hour < 18:
-                date = date.replace(day=date.day - 1)
+                date = date - timedelta(days=1)
         while not _is_trade_day(date):
-            date = date.replace(day=date.day - 1)
+            date = date - timedelta(days=1)
         query_dates.append(date)
 
     logger.debug('Query dates: ')
