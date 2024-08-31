@@ -114,6 +114,12 @@ export default {
                         sortable: true
                     },
                     {
+                        prop: 'latestReturnRateFmt',
+                        label: '最近收益',
+                        width: '105',
+                        sortable: true
+                    },
+                    {
                         prop: 'fastRedemptionFmt',
                         label: '快速赎回',
                         width: '105',

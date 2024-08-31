@@ -57,6 +57,7 @@ class Data {
                     const days = (mHis.currentTime - mHis.beginningTime) / (1000 * 3600 * 24);
 
                     mHis.annualizedReturnRate = ret / days * 365;
+                    mHis.latestReturnRate = mHis.annualizedReturnRate;
                 } else {
                     const latest = mData.history[i - 1];
                     const latestSpan = (latest.currentTime - latest.beginningTime) / (1000 * 3600 * 24);
@@ -65,17 +66,18 @@ class Data {
 
                     console.log(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan);
 
-                    if (currentSpan === 0) {
+                    if (currentSpan < 1) {
                         mHis.annualizedReturnRate = latest.annualizedReturnRate;
                     } else {
                         mHis.annualizedReturnRate = statistic.averageReturn(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan);
                     }
-
+                    mHis.latestReturnRate = currentRet / currentSpan * 365;
                 }
                 mHis.cumReturn = mHis.currentAmount - mHis.currentShares;
 
                 mHis.beginningTimeFmt = timeFormat(mHis.beginningTime);
                 mHis.annualizedReturnRateFmt = (mHis.annualizedReturnRate * 100).toFixed(2) + '%';
+                mHis.latestReturnRateFmt = (mHis.latestReturnRate * 100).toFixed(2) + '%';
                 mHis.currentAmountFmt = mHis.currentAmount.toFixed(2);
                 mHis.currentSharesFmt = mHis.currentShares.toFixed(2);
                 mHis.cumReturnFmt = mHis.cumReturn.toFixed(2);
@@ -171,6 +173,8 @@ class Data {
                 fastRedemptionFmt: last.fastRedemptionFmt,
                 annualizedReturnRate: last.annualizedReturnRate,
                 annualizedReturnRateFmt: last.annualizedReturnRateFmt,
+                latestReturnRate: last.latestReturnRate,
+                latestReturnRateFmt: last.latestReturnRateFmt,
                 cumReturn: last.cumReturn,
                 cumReturnFmt: last.cumReturnFmt,
                 holding: last.holding
