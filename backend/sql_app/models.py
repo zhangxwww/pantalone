@@ -23,9 +23,10 @@ class MonetaryFundDataHistoryItem(Base):
     name = Column(String)
     beginningAmount = Column(Float)
     beginningTime = Column(Date)
+    beginningShares = Column(Float)
     currentAmount = Column(Float)
     currentTime = Column(Date)
-    shares = Column(Float)
+    currentShares = Column(Float)
     fastRedemption = Column(Boolean)
     holding = Column(Boolean)
 

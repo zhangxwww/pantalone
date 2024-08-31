@@ -46,7 +46,9 @@ class Data {
             for (let mHis of mData.history) {
                 mHis.beginningTime = new Date(mHis.beginningTime);
                 mHis.currentTime = new Date(mHis.currentTime);
-                const ret = (mHis.currentAmount - mHis.beginningAmount) / mHis.beginningAmount;
+                mHis.beginningNetValue = mHis.beginningAmount / mHis.beginningShares;
+                mHis.currentNetValue = mHis.currentAmount / mHis.currentShares;
+                const ret = (mHis.currentNetValue - mHis.beginningNetValue) / mHis.beginningNetValue;
                 const days = (mHis.currentTime - mHis.beginningTime) / (1000 * 3600 * 24);
                 mHis.annualizedReturnRate = ret / days * 365;
 
