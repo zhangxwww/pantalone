@@ -577,15 +577,18 @@ class Data {
 
         const dates = this.sampleDates(months);
         const weightedReturn = [];
+        const latestReturn = [];
 
         for (let date of dates) {
             let weighted = 0;
+            let latest = 0;
             let sum = 0;
             for (let mData of this.data.monetaryFundData) {
                 const candidate = mData.history.filter(h => h.currentTime <= date);
                 const d = candidate[candidate.length - 1];
                 if (d && d.holding && d.currentAmount > 0) {
                     weighted += d.currentAmount * d.annualizedReturnRate;
+                    latest += d.currentAmount * d.latestReturnRate;
                     sum += d.currentAmount;
                 }
             }
@@ -594,6 +597,7 @@ class Data {
                 const d = candidate[candidate.length - 1];
                 if (d && d.beginningAmount > 0) {
                     weighted += d.beginningAmount * d.rate;
+                    latest += d.beginningAmount * d.rate;
                     sum += d.beginningAmount;
                 }
             }
@@ -602,20 +606,26 @@ class Data {
                 const d = candidate[candidate.length - 1];
                 if (d && d.holding && d.currentAmount > 0) {
                     weighted += d.currentAmount * d.annualizedReturnRate;
+                    // TODO latest return
+                    latest += d.currentAmount * d.annualizedReturnRate;
                     sum += d.currentAmount;
                 }
             }
             weightedReturn.push(weighted / sum);
+            latestReturn.push(latest / sum);
         }
         return {
             time: dates.map(t => timeFormat(t, true)),
-            data: weightedReturn,
+            data: {
+                holding: weightedReturn,
+                latest: latestReturn
+            },
             yields: yields.map(y => y.yield)
         }
     }
 
     async getRiskIndicatorData (averageReturn, period, p) {
-        const ret = averageReturn.data;
+        const ret = averageReturn.data.holding;
         const yields = averageReturn.yields;
 
         const excessReturn = ret.map((r, i) => r - yields[i]);

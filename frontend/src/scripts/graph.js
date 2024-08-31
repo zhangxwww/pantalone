@@ -380,15 +380,21 @@ function drawAverageReturnLineGraph (domId, data) {
             }
         },
         legend: {
-            data: ["平均收益", "1年期国债利率"],
+            data: ["持有收益", "最新收益", "1年期国债利率"],
             x: "center",
             y: "bottom"
         },
         series: [
             {
-                name: "平均收益",
+                name: "持有收益",
                 type: "line",
-                data: data.data,
+                data: data.data.holding,
+                smooth: true
+            },
+            {
+                name: "最新收益",
+                type: "line",
+                data: data.data.latest,
                 smooth: true
             },
             {

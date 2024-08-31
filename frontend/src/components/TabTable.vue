@@ -115,7 +115,7 @@ export default {
                     },
                     {
                         prop: 'latestReturnRateFmt',
-                        label: '最近收益',
+                        label: '最新收益',
                         width: '105',
                         sortable: true
                     },
