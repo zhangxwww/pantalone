@@ -48,6 +48,7 @@ class MonetaryFundDataHistoryItemBase(BaseModel):
     beginningTime: date
     currentAmount: float
     currentTime: date
+    shares: float
     fastRedemption: bool
     holding: bool
 

@@ -25,6 +25,7 @@ class MonetaryFundDataHistoryItem(Base):
     beginningTime = Column(Date)
     currentAmount = Column(Float)
     currentTime = Column(Date)
+    shares = Column(Float)
     fastRedemption = Column(Boolean)
     holding = Column(Boolean)
 
