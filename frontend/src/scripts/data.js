@@ -43,14 +43,35 @@ class Data {
             }
         }
         for (let mData of data.monetaryFundData) {
-            for (let mHis of mData.history) {
+            for (let [i, mHis] of mData.history.entries()) {
                 mHis.beginningTime = new Date(mHis.beginningTime);
                 mHis.currentTime = new Date(mHis.currentTime);
                 mHis.beginningNetValue = mHis.beginningAmount / mHis.beginningShares;
                 mHis.currentNetValue = mHis.currentAmount / mHis.currentShares;
-                const ret = (mHis.currentNetValue - mHis.beginningNetValue) / mHis.beginningNetValue;
-                const days = (mHis.currentTime - mHis.beginningTime) / (1000 * 3600 * 24);
-                mHis.annualizedReturnRate = ret / days * 365;
+
+                // TODO lastest return rate
+
+
+                if (i === 0) {
+                    const ret = (mHis.currentNetValue - mHis.beginningNetValue) / mHis.beginningNetValue;
+                    const days = (mHis.currentTime - mHis.beginningTime) / (1000 * 3600 * 24);
+
+                    mHis.annualizedReturnRate = ret / days * 365;
+                } else {
+                    const latest = mData.history[i - 1];
+                    const latestSpan = (latest.currentTime - latest.beginningTime) / (1000 * 3600 * 24);
+                    const currentRet = (mHis.currentNetValue - latest.currentNetValue) / latest.currentNetValue;
+                    const currentSpan = (mHis.currentTime - latest.currentTime) / (1000 * 3600 * 24);
+
+                    console.log(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan);
+
+                    if (currentSpan === 0) {
+                        mHis.annualizedReturnRate = latest.annualizedReturnRate;
+                    } else {
+                        mHis.annualizedReturnRate = statistic.averageReturn(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan);
+                    }
+
+                }
                 mHis.cumReturn = mHis.currentAmount - mHis.currentShares;
 
                 mHis.beginningTimeFmt = timeFormat(mHis.beginningTime);

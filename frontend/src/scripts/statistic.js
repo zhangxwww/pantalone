@@ -40,4 +40,18 @@ function rolling (array, windowSize, func) {
     return result;
 }
 
-export default { mean, std, rolling, nanmean, nanstd, countNotNaN };
+function averageReturn (ret1, ret2, span1, span2, method = 'arithmetic') {
+    if (method === 'arithmetic') {
+        return (ret1 * span1 + ret2 * span2) / (span1 + span2);
+    } else if (method === 'geometric') {
+        return Math.pow(
+            Math.pow(ret1 + 1, span1 / 365) *
+            Math.pow(ret2 + 1, span2 / 365),
+            365 / (span1 + span2))
+            - 1;
+    } else {
+        throw new Error(`Invalid method ${method}`);
+    }
+}
+
+export default { mean, std, rolling, nanmean, nanstd, countNotNaN, averageReturn };
