@@ -7,7 +7,7 @@
                 <el-table-column label="" align="right">
                     <template #default="scope">
                         <el-button size="small" @click="edit(scope.row, 'cash')">
-                            编辑
+                            更新
                         </el-button>
                     </template>
                 </el-table-column>
@@ -20,7 +20,7 @@
                 <el-table-column label="" align="right">
                     <template #default="scope">
                         <el-button size="small" @click="edit(scope.row, 'monetary-fund')">
-                            编辑
+                            更新
                         </el-button>
                     </template>
                 </el-table-column>
@@ -32,7 +32,7 @@
                 <el-table-column label="" align="right">
                     <template #default="scope">
                         <el-button size="small" @click="edit(scope.row, 'fixed-deposit')">
-                            编辑
+                            更新
                         </el-button>
                     </template>
                 </el-table-column>
@@ -44,7 +44,7 @@
                 <el-table-column label="" align="right">
                     <template #default="scope">
                         <el-button size="small" @click="edit(scope.row, 'fund')">
-                            编辑
+                            更新
                         </el-button>
                     </template>
                 </el-table-column>
