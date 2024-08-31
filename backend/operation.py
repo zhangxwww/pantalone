@@ -103,8 +103,10 @@ def _get_monetary_fund_data_from_db(db):
                 'name': his.name,
                 'beginningAmount': his.beginningAmount,
                 'beginningTime': his.beginningTime,
+                'beginningShares': his.beginningShares,
                 'currentAmount': his.currentAmount,
                 'currentTime': his.currentTime,
+                'currentShares': his.currentShares,
                 'fastRedemption': his.fastRedemption,
                 'holding': his.holding
             }
