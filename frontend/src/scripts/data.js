@@ -54,7 +54,6 @@ class Data {
 
                 mHis.beginningTimeFmt = timeFormat(mHis.beginningTime);
                 mHis.annualizedReturnRateFmt = (mHis.annualizedReturnRate * 100).toFixed(2) + '%';
-                mHis.beginningAmountFmt = mHis.beginningAmount.toFixed(2);
                 mHis.currentAmountFmt = mHis.currentAmount.toFixed(2);
                 mHis.fastRedemptionFmt = mHis.fastRedemption ? '是' : '否';
             }
@@ -136,7 +135,6 @@ class Data {
             const d = {
                 name: last.name,
                 beginningAmount: last.beginningAmount,
-                beginningAmountFmt: last.beginningAmountFmt,
                 beginningTime: last.beginningTime,
                 beginningTimeFmt: last.beginningTimeFmt,
                 currentAmount: last.currentAmount,

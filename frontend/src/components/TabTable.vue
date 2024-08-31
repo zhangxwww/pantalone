@@ -84,12 +84,6 @@ export default {
                         sortable: false
                     },
                     {
-                        prop: 'beginningAmountFmt',
-                        label: '期初金额',
-                        width: '105',
-                        sortable: true
-                    },
-                    {
                         prop: 'beginningTimeFmt',
                         label: '期初时间',
                         width: '105',
