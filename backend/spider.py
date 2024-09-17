@@ -1,4 +1,6 @@
+import datetime
 import requests
+from bs4 import BeautifulSoup
 
 
 def get_china_bond_yield(date):
@@ -27,6 +29,22 @@ def get_china_bond_yield(date):
     return y / 100
 
 
+def get_lpr():
+    res = requests.get('https://www.boc.cn/fimarkets/lilv/fd32/201310/t20131031_2591219.html')
+    html = res.text
+    soup = BeautifulSoup(html, 'html.parser')
+    trs = soup.find_all('tr')
+    lpr = []
+    for tr in trs[1:]:
+        tds = tr.find_all('td')
+        date = tds[0].text
+        date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+        rate = tds[1].text[:-1]
+        rate = float(rate) / 100
+        lpr.append({'date': date, 'rate': rate})
+    return lpr
+
+
 if __name__ == '__main__':
-    from datetime import datetime
-    get_china_bond_yield(datetime.now())
+    # get_china_bond_yield(datetime.datetime.now())
+    print(get_lpr())

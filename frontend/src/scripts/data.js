@@ -2,6 +2,7 @@ import statistic from './statistic.js';
 import { timeFormat } from './formatter.js';
 import {
     getChinaBondYieldDataRequest,
+    getLPRDataRequest,
     loadDataRequest,
     uploadRequest,
     addDataRequest,
@@ -147,6 +148,13 @@ class Data {
         const data = await getChinaBondYieldDataRequest(dates);
         console.log(data);
         return data.yields;
+    }
+
+    async getLPRData (months) {
+        const dates = this.sampleDates(months).map(t => timeFormat(t));
+        const data = await getLPRDataRequest(dates);
+        console.log(data);
+        return data.lpr;
     }
 
     getData () {
@@ -600,8 +608,9 @@ class Data {
         };
     }
 
-    getAverageReturnData (months, yields) {
+    getAverageReturnData (months, yields, lpr) {
         console.log(yields);
+        console.log(lpr);
 
         const dates = this.sampleDates(months);
         const weightedReturn = [];
@@ -647,7 +656,8 @@ class Data {
                 holding: weightedReturn,
                 latest: latestReturn
             },
-            yields: yields.map(y => y.yield)
+            yields: yields.map(y => y.yield),
+            lpr: lpr.map(y => y.rate)
         }
     }
 

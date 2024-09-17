@@ -37,6 +37,12 @@ async def get_CN1YR(data: api_model.CN1YRDateData, db: Session = Depends(get_db)
     return {'yields': operation.get_china_bond_yield_data(db, data.dates)}
 
 
+@app.post('/api/lpr')
+async def get_lpr(data: api_model.LPRDateData):
+    logger.debug(data.dates)
+    return {'lpr': operation.get_lpr_data(data.dates)}
+
+
 @app.post('/api/upload')
 async def upload(file: api_model.UploadData, db: Session = Depends(get_db)):
     operation.save_base64_data(db, file.file)

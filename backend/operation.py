@@ -1,31 +1,17 @@
 import json
 import base64
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from chinese_calendar import is_workday
 from loguru import logger
 
-from spider import get_china_bond_yield
+from spider import get_china_bond_yield, get_lpr
 import sql_app.schemas as schemas
 import sql_app.crud as crud
-
-
-def _is_trade_day(date):
-    return is_workday(date) and date.isoweekday() < 6
+from utils import trans_str_date_to_trade_date
 
 
 def get_china_bond_yield_data(db, dates):
-    query_dates = []
-    for date in dates:
-        date = datetime.strptime(date, '%Y-%m-%d').date()
-        now = datetime.now()
-        if date > now.date():
-            date = now.date()
-            if now.hour < 18:
-                date = date - timedelta(days=1)
-        while not _is_trade_day(date):
-            date = date - timedelta(days=1)
-        query_dates.append(date)
+    query_dates = [trans_str_date_to_trade_date(d) for d in dates]
 
     logger.debug('Query dates: ')
     logger.debug(query_dates)
@@ -61,6 +47,47 @@ def get_china_bond_yield_data(db, dates):
     logger.debug(data)
 
     return data
+
+
+def _align_lpr_date(lpr_list, query_dates):
+    lpr_list = sorted(lpr_list, key=lambda x: x['date'])
+    query_dates = sorted(query_dates)
+
+    res = []
+    lpr_index = 0
+    for qd in query_dates:
+        l = float('nan')
+        while True:
+            lpr = lpr_list[lpr_index]
+            lpr_date = lpr['date']
+            if qd > lpr_date:
+                l = lpr['rate']
+                lpr_index += 1
+                if lpr_index >= len(lpr_list):
+                    break
+            else:
+                break
+        res.append({'date': qd, 'rate': l})
+    return res
+
+
+def get_lpr_data(dates):
+    query_dates = [trans_str_date_to_trade_date(d) for d in dates]
+
+    logger.debug('Query dates: ')
+    logger.debug(query_dates)
+
+    spider_data = get_lpr()
+
+    logger.debug('Spider data:')
+    logger.debug(spider_data)
+
+    aligned = _align_lpr_date(spider_data, query_dates)
+
+    logger.debug('Aligned data:')
+    logger.debug(aligned)
+
+    return aligned
 
 
 def save_base64_data(db, data):

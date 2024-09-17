@@ -385,7 +385,7 @@ function drawAverageReturnLineGraph (domId, data) {
             }
         },
         legend: {
-            data: ["持有收益", "最新收益", "1年期国债收益率"],
+            data: ["持有收益", "最新收益", "1年期国债收益率", "1年期LPR利率"],
             x: "center",
             y: "bottom"
         },
@@ -406,6 +406,12 @@ function drawAverageReturnLineGraph (domId, data) {
                 name: "1年期国债利率",
                 type: "line",
                 data: data.yields,
+                smooth: true
+            },
+            {
+                name: "1年期LPR利率",
+                type: "line",
+                data: data.lpr,
                 smooth: true
             }
         ],

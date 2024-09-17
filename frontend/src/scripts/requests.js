@@ -5,6 +5,11 @@ async function getChinaBondYieldDataRequest (dates) {
     return res.data;
 }
 
+async function getLPRDataRequest (dates) {
+    const res = await axios.post('/api/lpr', { 'dates': dates })
+    return res.data;
+}
+
 function uploadRequest (file, callback) {
 
     const reader = new FileReader();
@@ -58,6 +63,7 @@ async function getNormalIntervalRequest (p) {
 
 export {
     getChinaBondYieldDataRequest,
+    getLPRDataRequest,
     uploadRequest,
     loadDataRequest,
     addDataRequest,

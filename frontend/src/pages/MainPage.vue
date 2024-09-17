@@ -252,8 +252,12 @@ export default {
                 const liquidityReturnPosition = this.record.getLiquidityReturnPositionData()
                 this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition)
 
-                const chinaBondYield = await this.record.getChinaBondYieldData(this.drawMonths)
-                const averageReturn = this.record.getAverageReturnData(this.drawMonths, chinaBondYield)
+                const chinaBondYieldFuture = this.record.getChinaBondYieldData(this.drawMonths)
+                const lprFuture = this.record.getLPRData(this.drawMonths)
+                const chinaBondYield = await chinaBondYieldFuture
+                const lpr = await lprFuture
+
+                const averageReturn = this.record.getAverageReturnData(this.drawMonths, chinaBondYield, lpr)
                 this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)
 
                 const riskIndicator = await this.record.getRiskIndicatorData(averageReturn, period, p)

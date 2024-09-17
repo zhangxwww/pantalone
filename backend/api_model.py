@@ -7,6 +7,10 @@ class CN1YRDateData(BaseModel):
     dates: List[str]
 
 
+class LPRDateData(BaseModel):
+    dates: List[str]
+
+
 class UploadData(BaseModel):
     file: str
 
