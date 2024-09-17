@@ -51,9 +51,8 @@ class AddFixedDepositHistoryData(BaseModel):
 
 class _AddFundData(BaseModel):
     name: str
-    beginningAmount: float
-    beginningTime: str
-    currentAmount: float
+    currentNetValue: float
+    currentShares: float
     holding: bool
     lockupPeriod: int
 

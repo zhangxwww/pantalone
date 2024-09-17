@@ -53,9 +53,8 @@ class FundDataHistoryItem(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
-    beginningAmount = Column(Float)
-    beginningTime = Column(Date)
-    currentAmount = Column(Float)
+    currentNetValue = Column(Float)
+    currentShares = Column(Float)
     currentTime = Column(Date)
     holding = Column(Boolean)
     lockupPeriod = Column(Integer)

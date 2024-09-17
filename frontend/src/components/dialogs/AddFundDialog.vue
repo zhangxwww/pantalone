@@ -4,15 +4,11 @@
             <el-form-item label="名称" prop="name">
                 <el-input v-model="form.name"></el-input>
             </el-form-item>
-            <el-form-item label="期初金额" prop="beginningAmount">
-                <el-input v-model="form.beginningAmount"></el-input>
+            <el-form-item label="当期份额" prop="currentShares">
+                <el-input v-model="form.currentShares"></el-input>
             </el-form-item>
-            <el-form-item label="期初时间" prop="beginningTime">
-                <el-date-picker v-model="form.beginningTime" type="date" placeholder="选择日期">
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item label="当期金额" prop="currentAmount">
-                <el-input v-model="form.currentAmount"></el-input>
+            <el-form-item label="当期净值" prop="currentNetValue">
+                <el-input v-model="form.currentNetValue"></el-input>
             </el-form-item>
             <el-form-item label="锁定期" prop="lockupPeriod">
                 <el-input v-model.number="form.lockupPeriod"></el-input>
@@ -34,7 +30,6 @@
 
 <script>
 import { isNumberValidator, isIntegerValidator } from '@/scripts/validator.js'
-import { timeFormat } from '@/scripts/formatter';
 
 export default {
     name: "AddFundDialog",
@@ -43,29 +38,25 @@ export default {
             showDialog: false,
             form: {
                 name: '',
-                beginningAmount: 0,
-                beginningTime: '',
-                currentAmount: 0,
-                lockupPeriod: 0,
+                currentShares: 0,
+                currentNetValue: 0,
+                lockupPeriod: 180,
                 holding: true
             },
             rules: {
                 name: [
                     { required: true, message: '请输入名称', trigger: 'blur' }
                 ],
-                beginningAmount: [
-                    { required: true, message: '请输入期初金额', trigger: 'blur' },
+                currentShares: [
+                    { required: true, message: '请输入当期份额', trigger: 'blur' },
                     {
-                        message: '期初金额必须为数字值', trigger: 'blur', validator: isNumberValidator
+                        message: '当期份额必须为数字值', trigger: 'blur', validator: isNumberValidator
                     }
                 ],
-                beginningTime: [
-                    { required: true, message: '请选择期初时间', trigger: 'blur' }
-                ],
-                currentAmount: [
-                    { required: true, message: '请输入当期金额', trigger: 'blur' },
+                currentNetValue: [
+                    { required: true, message: '请输入当期净值', trigger: 'blur' },
                     {
-                        message: '当期金额必须为数字值', trigger: 'blur', validator: isNumberValidator
+                        message: '当期净值必须为数字值', trigger: 'blur', validator: isNumberValidator
                     }
                 ],
                 lockupPeriod: [
@@ -83,7 +74,6 @@ export default {
             onConfirmAdd: () => {
                 this.$refs.form.validate((valid) => {
                     if (valid) {
-                        this.form.beginningTime = timeFormat(this.form.beginningTime);
                         this.$emit('add', this.form, 'fund');
                         this.showDialog = false;
                     }
@@ -93,10 +83,9 @@ export default {
             edit: (row) => {
                 console.log(row);
                 this.form.name = row.name;
-                this.form.beginningAmount = row.beginningAmount;
-                this.form.beginningTime = row.beginningTime;
-                this.form.currentAmount = row.currentAmount;
-                this.form.lockupPeriod = row.lockupPeriod;
+                this.form.currentShares = row.currentShares;
+                this.form.currentNetValue = row.currentNetValue;
+                this.form.lockupPeriod = row.residualLockupPeriod;
                 this.form.holding = row.holding;
                 this.showDialog = true;
             },
@@ -107,10 +96,9 @@ export default {
 
             reset: () => {
                 this.form.name = '';
-                this.form.beginningAmount = 0;
-                this.form.beginningTime = '';
-                this.form.currentAmount = 0;
-                this.form.lockupPeriod = 0;
+                this.form.currentNetValue = 0;
+                this.form.currentShares = 0;
+                this.form.lockupPeriod = 180;
                 this.form.holding = true;
             }
         }

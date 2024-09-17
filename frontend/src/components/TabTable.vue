@@ -181,26 +181,44 @@ export default {
                         sortable: false
                     },
                     {
-                        prop: 'beginningAmountFmt',
-                        label: '期初金额',
-                        width: '105',
-                        sortable: true
-                    },
-                    {
-                        prop: 'beginningTimeFmt',
-                        label: '期初时间',
-                        width: '105',
-                        sortable: true
-                    },
-                    {
                         prop: 'currentAmountFmt',
                         label: '当期金额',
                         width: '105',
                         sortable: true
                     },
                     {
+                        prop: 'currentSharesFmt',
+                        label: '当期份额',
+                        width: '105',
+                        sortable: true
+                    },
+                    {
+                        prop: 'currentNetValueFmt',
+                        label: '当前净值',
+                        width: '105',
+                        sortable: true
+                    },
+                    {
+                        prop: 'cumInvestFmt',
+                        label: '累计投入',
+                        width: '105',
+                        sortable: true
+                    },
+                    {
+                        prop: 'cumReturnFmt',
+                        label: '累计收益',
+                        width: '105',
+                        sortable: true
+                    },
+                    {
                         prop: 'annualizedReturnRateFmt',
                         label: '年化收益',
+                        width: '105',
+                        sortable: true
+                    },
+                    {
+                        prop: 'latestReturnRateFmt',
+                        label: '最新收益',
                         width: '105',
                         sortable: true
                     },

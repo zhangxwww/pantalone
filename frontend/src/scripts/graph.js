@@ -282,13 +282,18 @@ function drawLiquidityReturnPositionScatterGraph (domId, data) {
     console.log(data);
     const chart = echarts.init(document.getElementById(domId));
     let amount = [];
-    amount.push(...data.amount);
-    const maxAmount = Math.max(...amount);
-    const minAmount = Math.min(...amount);
-    const diffAmount = maxAmount - minAmount;
-    amount = amount.map((value) => {
-        return (value - minAmount) / diffAmount * 25 + 25;
-    });
+    if (data.amount.length === 1) {
+        amount.push(25);
+    } else {
+        amount.push(...data.amount);
+        const maxAmount = Math.max(...amount);
+        const minAmount = Math.min(...amount);
+        const diffAmount = maxAmount - minAmount;
+        amount = amount.map((value) => {
+            return (value - minAmount) / diffAmount * 25 + 25;
+        });
+    }
+    console.log(amount);
     const option = {
         title: {
             text: "流动性-收益-规模",
@@ -380,7 +385,7 @@ function drawAverageReturnLineGraph (domId, data) {
             }
         },
         legend: {
-            data: ["持有收益", "最新收益", "1年期国债利率"],
+            data: ["持有收益", "最新收益", "1年期国债收益率"],
             x: "center",
             y: "bottom"
         },

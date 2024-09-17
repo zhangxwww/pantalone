@@ -151,9 +151,8 @@ def _get_fund_data_from_db(db):
         for his in history_data:
             h = {
                 'name': his.name,
-                'beginningAmount': his.beginningAmount,
-                'beginningTime': his.beginningTime,
-                'currentAmount': his.currentAmount,
+                'currentNetValue': his.currentNetValue,
+                'currentShares': his.currentShares,
                 'currentTime': his.currentTime,
                 'holding': his.holding,
                 'lockupPeriod': his.lockupPeriod
@@ -203,8 +202,6 @@ def add_fixed_deposit_history(db, data):
 
 def add_fund_history(db, data):
     content = data.content.model_dump()
-    bg_time = content['beginningTime']
-    content['beginningTime'] = datetime.strptime(bg_time, '%Y-%m-%d').date()
     content['currentTime'] = datetime.now().date()
     item = schemas.FundDataHistoryItemCreate(**content)
     crud.create_fund_data_history_item(db, item, data.id)

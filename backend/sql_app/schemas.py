@@ -124,9 +124,8 @@ class FixedDepositDataHistory(FixedDepositDataHistoryBase):
 
 class FundDataHistoryItemBase(BaseModel):
     name: str
-    beginningAmount: float
-    beginningTime: date
-    currentAmount: float
+    currentNetValue: float
+    currentShares: float
     currentTime: date
     holding: bool
     lockupPeriod: int

@@ -49,9 +49,6 @@ class Data {
                 mHis.beginningNetValue = mHis.beginningAmount / mHis.beginningShares;
                 mHis.currentNetValue = mHis.currentAmount / mHis.currentShares;
 
-                // TODO lastest return rate
-
-
                 if (i === 0) {
                     const ret = (mHis.currentNetValue - mHis.beginningNetValue) / mHis.beginningNetValue;
                     const days = (mHis.currentTime - mHis.beginningTime) / (1000 * 3600 * 24);
@@ -103,23 +100,44 @@ class Data {
             }
         }
         for (let uData of data.fundData) {
-            for (let uHis of uData.history) {
-                uHis.beginningTime = new Date(uHis.beginningTime);
+            for (let [i, uHis] of uData.history.entries()) {
                 uHis.currentTime = new Date(uHis.currentTime);
-                const ret = (uHis.currentAmount - uHis.beginningAmount) / uHis.beginningAmount;
-                const days = (uHis.currentTime - uHis.beginningTime) / (1000 * 3600 * 24);
-                uHis.annualizedReturnRate = ret / days * 365;
+                uHis.currentAmount = uHis.currentShares * uHis.currentNetValue;
+                if (i === 0) {
+                    uHis.annualizedReturnRate = 0;
+                    uHis.cumInvest = uHis.currentAmount;
+                    uHis.cumReturn = 0;
+                    uHis.latestReturnRate = 0;
+                } else {
+                    const first = uData.history[0];
+                    const latest = uData.history[i - 1];
+                    const latestSpan = (latest.currentTime - first.currentTime) / (1000 * 3600 * 24);
+                    const currentRet = (uHis.currentNetValue - latest.currentNetValue) / latest.currentNetValue;
+                    const currentSpan = (uHis.currentTime - latest.currentTime) / (1000 * 3600 * 24);
 
-                uHis.beginningTimeFmt = timeFormat(uHis.beginningTime);
-                uHis.annualizedReturnRateFmt = (uHis.annualizedReturnRate * 100).toFixed(2) + '%';
-                uHis.beginningAmountFmt = uHis.beginningAmount.toFixed(2);
+                    uHis.annualizedReturnRate = statistic.averageReturn(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan);
+
+                    uHis.cumInvest = latest.cumInvest + (uHis.currentShares - latest.currentShares) * uHis.currentNetValue;
+                    uHis.cumReturn = uHis.currentAmount - uHis.cumInvest;
+
+                    uHis.latestReturnRate = currentRet / currentSpan * 365;
+                }
                 uHis.currentAmountFmt = uHis.currentAmount.toFixed(2);
+                uHis.currentSharesFmt = uHis.currentShares.toFixed(2);
+                uHis.currentNetValueFmt = uHis.currentNetValue.toFixed(2);
 
-                const endingTime = new Date(uHis.beginningTime);
+                uHis.cumInvestFmt = uHis.cumInvest.toFixed(2);
+                uHis.cumReturnFmt = uHis.cumReturn.toFixed(2);
+                uHis.latestReturnRateFmt = (uHis.latestReturnRate * 100).toFixed(2) + '%';
+
+                const endingTime = new Date(uHis.currentTime);
                 endingTime.setDate(endingTime.getDate() + uHis.lockupPeriod);
                 uHis.residualLockupPeriod = Math.max(Math.ceil((endingTime - new Date()) / (1000 * 3600 * 24)), 2);
+
+                uHis.annualizedReturnRateFmt = (uHis.annualizedReturnRate * 100).toFixed(2) + '%';
             }
         }
+        console.log(data);
         return data;
     }
 
@@ -214,17 +232,27 @@ class Data {
             }
             const d = {
                 name: last.name,
-                beginningAmount: last.beginningAmount,
-                beginningAmountFmt: last.beginningAmountFmt,
-                beginningTime: last.beginningTime,
-                beginningTimeFmt: last.beginningTimeFmt,
+                // beginningAmount: last.beginningAmount,
+                // beginningAmountFmt: last.beginningAmountFmt,
+                // beginningTime: last.beginningTime,
+                // beginningTimeFmt: last.beginningTimeFmt,
                 currentAmount: last.currentAmount,
                 currentAmountFmt: last.currentAmountFmt,
+                currentShares: last.currentShares,
+                currentSharesFmt: last.currentSharesFmt,
+                currentNetValue: last.currentNetValue,
+                currentNetValueFmt: last.currentNetValueFmt,
                 currentTime: last.currentTime,
+                cumInvest: last.cumInvest,
+                cumInvestFmt: last.cumInvestFmt,
+                cumReturn: last.cumReturn,
+                cumReturnFmt: last.cumReturnFmt,
                 lockupPeriod: last.lockupPeriod,
                 residualLockupPeriod: last.residualLockupPeriod,
                 annualizedReturnRate: last.annualizedReturnRate,
                 annualizedReturnRateFmt: last.annualizedReturnRateFmt,
+                latestReturnRate: last.latestReturnRate,
+                latestReturnRateFmt: last.latestReturnRateFmt,
                 holding: last.holding
             };
             d.id = udata.id;
@@ -316,7 +344,7 @@ class Data {
 
             let fund = 0;
             for (let uData of this.data.fundData) {
-                const candidate = uData.history.filter(h => h.beginningTime <= date);
+                const candidate = uData.history.filter(h => h.currentTime <= date);
                 const d = candidate[candidate.length - 1];
                 if (d && d.holding && d.currentAmount > 0) {
                     fund += d.currentAmount;
@@ -602,12 +630,11 @@ class Data {
                 }
             }
             for (let uData of this.data.fundData) {
-                const candidate = uData.history.filter(h => h.beginningTime <= date);
+                const candidate = uData.history.filter(h => h.currentTime <= date);
                 const d = candidate[candidate.length - 1];
                 if (d && d.holding && d.currentAmount > 0) {
                     weighted += d.currentAmount * d.annualizedReturnRate;
-                    // TODO latest return
-                    latest += d.currentAmount * d.annualizedReturnRate;
+                    latest += d.currentAmount * d.latestReturnRate;
                     sum += d.currentAmount;
                 }
             }
