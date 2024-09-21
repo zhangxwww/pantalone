@@ -1,6 +1,7 @@
 import json
 import base64
 from datetime import datetime
+import time
 
 from loguru import logger
 
@@ -103,25 +104,24 @@ def get_lpr_data(db, dates):
         logger.debug('Spider data:')
         logger.debug(spider_data)
 
-        data = spider_data
+        aligned = _align_lpr_date(spider_data, query_dates)
+
+        logger.debug('Aligned data:')
+        logger.debug(aligned)
 
         add_to_db_data = [schemas.LPRDataCreate(date=d['date'], lpr=d['rate'])
-                          for d in spider_data if d['date'] in not_found_dates]
+                          for d in aligned if d['date'] in not_found_dates]
 
         logger.debug('Add to db: ')
         logger.debug(add_to_db_data)
 
         crud.create_lpr_data_from_list(db, add_to_db_data)
 
+        data = aligned
     else:
         data = db_data
 
-    aligned = _align_lpr_date(data, query_dates)
-
-    logger.debug('Aligned data:')
-    logger.debug(aligned)
-
-    return aligned
+    return data
 
 
 def save_base64_data(db, data):

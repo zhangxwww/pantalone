@@ -1,7 +1,22 @@
 import os
 from datetime import datetime, timedelta
+import functools
+import time
 
+from loguru import logger
 from chinese_calendar import is_workday
+
+
+def timeit(func):
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = await func(*args, **kwargs)
+        end_time = time.perf_counter()
+        elapsed_time = end_time - start_time
+        logger.info(f"Function {func.__name__} took {elapsed_time:.8f} seconds")
+        return result
+    return wrapper
 
 
 def get_log_file_path():

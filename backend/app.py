@@ -9,12 +9,12 @@ import operation
 import api_model
 from sql_app import models
 from sql_app.database import SessionLocal, engine
-from utils import get_log_file_path
+from utils import get_log_file_path, timeit
 
 
 logger.add(
     os.path.join(get_log_file_path(), '{time}.log'),
-    level='DEBUG',
+    level='INFO',
     rotation='1 day',
     retention='1 week',
     compression='zip')
@@ -32,24 +32,28 @@ def get_db():
 
 
 @app.post('/api/CN1YR')
+@timeit
 async def get_CN1YR(data: api_model.CN1YRDateData, db: Session = Depends(get_db)):
     logger.debug(data.dates)
     return {'yields': operation.get_china_bond_yield_data(db, data.dates)}
 
 
 @app.post('/api/lpr')
+@timeit
 async def get_lpr(data: api_model.LPRDateData, db: Session = Depends(get_db)):
     logger.debug(data.dates)
     return {'lpr': operation.get_lpr_data(db, data.dates)}
 
 
 @app.post('/api/upload')
+@timeit
 async def upload(file: api_model.UploadData, db: Session = Depends(get_db)):
     operation.save_base64_data(db, file.file)
     return {'success': True}
 
 
 @app.post('/api/data/cash')
+@timeit
 async def add_cash(data: api_model.AddCashHistoryData, db: Session = Depends(get_db)):
     logger.debug(data)
     operation.add_cash_history(db, data)
@@ -57,6 +61,7 @@ async def add_cash(data: api_model.AddCashHistoryData, db: Session = Depends(get
 
 
 @app.post('/api/data/monetary-fund')
+@timeit
 async def add_monetary(data: api_model.AddMonetaryFundHistoryData, db: Session = Depends(get_db)):
     logger.debug(data)
     operation.add_monetary_fund_history(db, data)
@@ -64,6 +69,7 @@ async def add_monetary(data: api_model.AddMonetaryFundHistoryData, db: Session =
 
 
 @app.post('/api/data/fixed-deposit')
+@timeit
 async def add_fixed(data: api_model.AddFixedDepositHistoryData, db: Session = Depends(get_db)):
     logger.debug(data)
     operation.add_fixed_deposit_history(db, data)
@@ -71,6 +77,7 @@ async def add_fixed(data: api_model.AddFixedDepositHistoryData, db: Session = De
 
 
 @app.post('/api/data/fund')
+@timeit
 async def add_fund(data: api_model.AddFundHistoryData, db: Session = Depends(get_db)):
     logger.debug(data)
     operation.add_fund_history(db, data)
@@ -78,11 +85,13 @@ async def add_fund(data: api_model.AddFundHistoryData, db: Session = Depends(get
 
 
 @app.get('/api/data')
+@timeit
 async def get_data(db: Session = Depends(get_db)):
     return operation.get_data_from_db(db)
 
 
 @app.get('/api/statistics/chi2/interval')
+@timeit
 async def get_chi2_interval(p: float, df: int):
     logger.debug(f'chi2 p: {p}, df: {df}')
     # https://blog.csdn.net/u012958850/article/details/116565996
@@ -94,6 +103,7 @@ async def get_chi2_interval(p: float, df: int):
 
 
 @app.get('/api/statistics/t/interval')
+@timeit
 async def get_t_interval(p: float, df: int):
     logger.debug(f't: p: {p}, df: {df}')
     lower, upper = t.interval(p, df)
@@ -104,6 +114,7 @@ async def get_t_interval(p: float, df: int):
 
 
 @app.get('/api/statistics/normal/interval')
+@timeit
 async def get_normal_interval(p: float):
     logger.debug(f'normal: p: {p}')
     lower, upper = norm.interval(p)
