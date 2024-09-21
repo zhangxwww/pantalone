@@ -193,3 +193,21 @@ class LPRData(LPRDataBase):
 
     class Config:
         from_attributes = True
+
+
+# ********** SH000001 Close Data **********
+
+class SH000001CloseDataBase(BaseModel):
+    close: float
+    date: date
+
+
+class SH000001CloseDataCreate(SH000001CloseDataBase):
+    pass
+
+
+class SH000001CloseData(SH000001CloseDataBase):
+    id: int
+
+    class Config:
+        from_attributes = True

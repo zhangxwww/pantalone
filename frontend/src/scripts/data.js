@@ -7,6 +7,7 @@ import {
     uploadRequest,
     addDataRequest,
     getNormalIntervalRequest,
+    getSHCloseRequest
 } from './requests.js';
 
 
@@ -159,6 +160,13 @@ class Data {
         const data = await getLPRDataRequest(dates);
         console.log(data);
         return data.lpr;
+    }
+
+    async getSHCloseData (months) {
+        const dates = this.sampleDates(months).map(t => timeFormat(t));
+        const data = await getSHCloseRequest(dates);
+        console.log(data);
+        return data.close;
     }
 
     getData () {
@@ -703,7 +711,7 @@ class Data {
         }
     }
 
-    async getCumulativeReturnData (months) {
+    async getCumulativeReturnData (months, shClose) {
         const dates = this.sampleDates(months);
         const cumReturn = [];
 
@@ -736,14 +744,27 @@ class Data {
             }
             cumReturn.push(weighted / sum);
         }
+
+        const first_not_nan_index = cumReturn.findIndex(x => !isNaN(x));
+
+        let shCloseCumReturn = Array(first_not_nan_index).fill(Number.NaN);
+        shCloseCumReturn.push(0);
+        for (let i = first_not_nan_index + 1; i < shClose.length; i++) {
+            shCloseCumReturn.push(shClose[i].close / shClose[0].close - 1);
+        }
+        console.log(shCloseCumReturn);
+
         return {
             time: dates.map(t => timeFormat(t, true)),
-            cumReturn: cumReturn
+            cumReturn: {
+                holding: cumReturn,
+                sh000001: shCloseCumReturn
+            }
         }
     }
 
-    getDrawdownData (cumReturn) {
-        const cum = cumReturn.cumReturn;
+    getDrawdownData (cumReturnData) {
+        const cum = cumReturnData.cumReturn.holding;
         let peak = cum[0];
         const drawdown = [0];
         for (let i = 1; i < cum.length; i++) {
@@ -751,9 +772,10 @@ class Data {
                 peak = cum[i];
             }
             drawdown.push((peak - cum[i]) / peak);
+            console.log(peak, cum[i], drawdown[i]);
         }
         return {
-            time: cumReturn.time,
+            time: cumReturnData.time,
             drawdown: drawdown
         }
     }

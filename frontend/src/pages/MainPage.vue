@@ -266,15 +266,16 @@ export default {
                 const liquidityReturnPosition = this.record.getLiquidityReturnPositionData()
                 this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition)
 
-                const chinaBondYieldFuture = this.record.getChinaBondYieldData(this.drawMonths)
-                const lprFuture = this.record.getLPRData(this.drawMonths)
-                const chinaBondYield = await chinaBondYieldFuture
-                const lpr = await lprFuture
+                const chinaBondYieldPromise = this.record.getChinaBondYieldData(this.drawMonths)
+                const lprPromise = this.record.getLPRData(this.drawMonths)
+                const shClosePromise = this.record.getSHCloseData(this.drawMonths)
+
+                const [chinaBondYield, lpr, shClose] = await Promise.all([chinaBondYieldPromise, lprPromise, shClosePromise])
 
                 const averageReturn = this.record.getAverageReturnData(this.drawMonths, chinaBondYield, lpr)
                 this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)
 
-                const cumulativeReturn = await this.record.getCumulativeReturnData(this.drawMonths)
+                const cumulativeReturn = await this.record.getCumulativeReturnData(this.drawMonths, shClose)
                 this.cumulativeReturnLineGraph = drawCumulativeReturnLineGraph('cumulative-return-line-graph', cumulativeReturn)
 
                 const riskIndicator = await this.record.getRiskIndicatorData(averageReturn, period, p)

@@ -1,6 +1,7 @@
 import datetime
 import requests
 from bs4 import BeautifulSoup
+import akshare as ak
 
 
 def get_china_bond_yield(date):
@@ -45,6 +46,13 @@ def get_lpr():
     return lpr
 
 
+def get_sh000001_close(date):
+    date = date.strftime('%Y%m%d')
+    df = ak.index_zh_a_hist(symbol='000001', period='daily', start_date=date, end_date=date)
+    return df['收盘'][0]
+
+
 if __name__ == '__main__':
     # get_china_bond_yield(datetime.datetime.now())
-    print(get_lpr())
+    # print(get_lpr())
+    print(get_sh000001_close(datetime.datetime.strptime('2024-09-20', '%Y-%m-%d')))

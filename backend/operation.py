@@ -1,11 +1,11 @@
 import json
 import base64
 from datetime import datetime
-import time
+from joblib import Parallel, delayed
 
 from loguru import logger
 
-from spider import get_china_bond_yield, get_lpr
+from spider import get_china_bond_yield, get_lpr, get_sh000001_close
 import sql_app.schemas as schemas
 import sql_app.crud as crud
 from utils import trans_str_date_to_trade_date
@@ -120,6 +120,45 @@ def get_lpr_data(db, dates):
         data = aligned
     else:
         data = db_data_list
+
+    return data
+
+
+def get_sh000001_close_data(db, dates):
+    query_dates = [trans_str_date_to_trade_date(d) for d in dates]
+
+    logger.debug('Query dates: ')
+    logger.debug(query_dates)
+
+    db_data = crud.get_sh000001_close_data(db, query_dates)
+    db_data_list = [{'date': d.date, 'close': d.close} for d in db_data]
+
+    logger.debug('DB data: ')
+    logger.debug(db_data_list)
+
+    not_found_dates = list(set(query_dates) - set(d.date for d in db_data))
+
+    logger.debug('Not found dates: ')
+    logger.debug(not_found_dates)
+
+    def _f(date):
+        close = get_sh000001_close(date)
+        return schemas.SH000001CloseDataCreate(date=date, close=close)
+
+    not_found_dates_close = Parallel(n_jobs=-1)(delayed(_f)(date) for date in not_found_dates)
+
+    crud.create_sh000001_close_data_from_list(db, not_found_dates_close)
+
+    spider_data = [{'date': d.date, 'close': d.close} for d in not_found_dates_close]
+
+    logger.debug('Spider data: ')
+    logger.debug(spider_data)
+
+    data = db_data_list + spider_data
+    data = sorted(data, key=lambda x: x['date'])
+
+    logger.debug('Final data: ')
+    logger.debug(data)
 
     return data
 

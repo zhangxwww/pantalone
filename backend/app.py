@@ -45,6 +45,13 @@ async def get_lpr(data: api_model.LPRDateData, db: Session = Depends(get_db)):
     return {'lpr': operation.get_lpr_data(db, data.dates)}
 
 
+@app.post('/api/sh-close')
+@timeit
+async def get_sh_close(data: api_model.SH000001DateData, db: Session = Depends(get_db)):
+    logger.debug(data.dates)
+    return {'close': operation.get_sh000001_close_data(db, data.dates)}
+
+
 @app.post('/api/upload')
 @timeit
 async def upload(file: api_model.UploadData, db: Session = Depends(get_db)):

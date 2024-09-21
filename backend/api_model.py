@@ -11,6 +11,10 @@ class LPRDateData(BaseModel):
     dates: List[str]
 
 
+class SH000001DateData(BaseModel):
+    dates: List[str]
+
+
 class UploadData(BaseModel):
     file: str
 

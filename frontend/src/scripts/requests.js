@@ -10,6 +10,11 @@ async function getLPRDataRequest (dates) {
     return res.data;
 }
 
+async function getSHCloseRequest (dates) {
+    const res = await axios.post('/api/sh-close', { 'dates': dates });
+    return res.data;
+}
+
 function uploadRequest (file, callback) {
 
     const reader = new FileReader();
@@ -68,5 +73,6 @@ export {
     loadDataRequest,
     addDataRequest,
     getTIntervalRequest,
-    getNormalIntervalRequest
+    getNormalIntervalRequest,
+    getSHCloseRequest
 }

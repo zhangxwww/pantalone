@@ -474,9 +474,15 @@ function drawCumulativeReturnLineGraph (domId, data) {
             {
                 name: "累计收益",
                 type: "line",
-                data: data.cumReturn,
+                data: data.cumReturn.holding,
                 smooth: true
-            }
+            },
+            {
+                name: "上证指数",
+                type: "line",
+                data: data.cumReturn.sh000001,
+                smooth: true
+            },
         ],
         tooltip: {
             trigger: "axis",
@@ -746,7 +752,10 @@ function drawEmptyAverageReturnLineGraph (domId, dates) {
 function drawEmptyCumulativeReturnLineGraph (domId, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
-        cumReturn: Array(dates.length).fill(Number.NaN),
+        cumReturn: {
+            holding: Array(dates.length).fill(Number.NaN),
+            sh000001: Array(dates.length).fill(Number.NaN),
+        }
     }
     drawCumulativeReturnLineGraph(domId, data);
 }

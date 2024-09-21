@@ -109,3 +109,11 @@ class LPR(Base):
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date)
     lpr = Column(Float)
+
+
+class SH000001Close(Base):
+    __tablename__ = 'sh000001_close'
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date)
+    close = Column(Float)
