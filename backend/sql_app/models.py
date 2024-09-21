@@ -101,3 +101,11 @@ class ChinaBondYield(Base):
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date)
     yield_1yr = Column(Float)
+
+
+class LPR(Base):
+    __tablename__ = 'lpr'
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date)
+    lpr = Column(Float)

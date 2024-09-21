@@ -38,9 +38,9 @@ async def get_CN1YR(data: api_model.CN1YRDateData, db: Session = Depends(get_db)
 
 
 @app.post('/api/lpr')
-async def get_lpr(data: api_model.LPRDateData):
+async def get_lpr(data: api_model.LPRDateData, db: Session = Depends(get_db)):
     logger.debug(data.dates)
-    return {'lpr': operation.get_lpr_data(data.dates)}
+    return {'lpr': operation.get_lpr_data(db, data.dates)}
 
 
 @app.post('/api/upload')

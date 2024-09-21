@@ -175,3 +175,21 @@ class CN1YRData(CN1YRDataBase):
 
     class Config:
         from_attributes = True
+
+
+# ********** LPR Data **********
+
+class LPRDataBase(BaseModel):
+    lpr: float
+    date: date
+
+
+class LPRDataCreate(LPRDataBase):
+    pass
+
+
+class LPRData(LPRDataBase):
+    id: int
+
+    class Config:
+        from_attributes = True

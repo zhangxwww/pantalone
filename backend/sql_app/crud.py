@@ -273,3 +273,33 @@ def get_CN1YR_data(
     dates: List[date]
 ):
     return db.query(models.ChinaBondYield).filter(models.ChinaBondYield.date.in_(dates)).all()
+
+
+# ********** add lpr data **********
+
+def create_lpr_data(
+    db: Session,
+    data: schemas.LPRDataCreate
+):
+    db_lpr_data = models.LPR(**data.model_dump())
+    db.add(db_lpr_data)
+    db.commit()
+    db.refresh(db_lpr_data)
+    return db_lpr_data
+
+
+def create_lpr_data_from_list(
+    db: Session,
+    data: List[schemas.LPRDataCreate]
+):
+    for item in data:
+        create_lpr_data(db, item)
+
+
+# ********** get lpr data **********
+
+def get_lpr_data(
+    db: Session,
+    dates: List[date]
+):
+    return db.query(models.LPR).filter(models.LPR.date.in_(dates)).all()

@@ -79,18 +79,44 @@ def _align_lpr_date(lpr_list, query_dates):
     return res
 
 
-def get_lpr_data(dates):
+def get_lpr_data(db, dates):
     query_dates = [trans_str_date_to_trade_date(d) for d in dates]
 
     logger.debug('Query dates: ')
     logger.debug(query_dates)
 
-    spider_data = get_lpr()
+    db_data = crud.get_lpr_data(db, query_dates)
+    db_data_list = [{'date': d.date, 'rate': d.lpr} for d in db_data]
 
-    logger.debug('Spider data:')
-    logger.debug(spider_data)
+    logger.debug('DB data: ')
+    logger.debug(db_data_list)
 
-    aligned = _align_lpr_date(spider_data, query_dates)
+    not_found_dates = list(set(query_dates) - set(d.date for d in db_data))
+
+    logger.debug('Not found dates: ')
+    logger.debug(not_found_dates)
+
+    if len(not_found_dates) > 0:
+
+        spider_data = get_lpr()
+
+        logger.debug('Spider data:')
+        logger.debug(spider_data)
+
+        data = spider_data
+
+        add_to_db_data = [schemas.LPRDataCreate(date=d['date'], lpr=d['rate'])
+                          for d in spider_data if d['date'] in not_found_dates]
+
+        logger.debug('Add to db: ')
+        logger.debug(add_to_db_data)
+
+        crud.create_lpr_data_from_list(db, add_to_db_data)
+
+    else:
+        data = db_data
+
+    aligned = _align_lpr_date(data, query_dates)
 
     logger.debug('Aligned data:')
     logger.debug(aligned)
