@@ -506,6 +506,69 @@ function drawCumulativeReturnLineGraph (domId, data) {
     return chart;
 }
 
+
+function drawDrawdownLineGraph (domId, data) {
+    console.log(data);
+    const chart = echarts.init(document.getElementById(domId));
+    const option = {
+        title: {
+            text: "历史回撤",
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: data.time,
+            axisLabel: {
+                interval: index => { return index % 2 == 1 }
+            },
+        },
+        yAxis: {
+            type: "value",
+            axisLabel: {
+                formatter: value => {
+                    return (value * 100).toFixed(1) + "%";
+                }
+            }
+        },
+        series: [
+            {
+                name: "回撤",
+                type: "line",
+                data: data.drawdown,
+                smooth: true
+            }
+        ],
+        tooltip: {
+            trigger: "axis",
+            textStyle: {
+                align: "left"
+            },
+            formatter: params => {
+                let name = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${params[0].name}</b></td>
+                        </tr>
+                `;
+                for (let i = 0; i < params.length; i++) {
+                    name += `<tr>
+                        <td align="left">${params[i].marker}${params[i].seriesName}：</td>
+                        <td align="right"><b>${(params[i].value * 100).toFixed(2)}%</b></td>
+                    </tr>`;
+                }
+                name += "</tbody></table>";
+                return name;
+            }
+        },
+    }
+    chart.setOption(option);
+    return chart;
+}
+
 function drawRiskIndicatorLineGraph (domId, data) {
     console.log(data);
 
@@ -688,6 +751,14 @@ function drawEmptyCumulativeReturnLineGraph (domId, dates) {
     drawCumulativeReturnLineGraph(domId, data);
 }
 
+function drawEmptyDrawdownLineGraph (domId, dates) {
+    const data = {
+        time: dates.map(date => timeFormat(date, true)),
+        drawdown: Array(dates.length).fill(Number.NaN),
+    }
+    drawDrawdownLineGraph(domId, data);
+}
+
 function drawEmptyRiskIndicatorLineGraph (domId, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
@@ -705,6 +776,7 @@ export {
     drawLiquidityReturnPositionScatterGraph,
     drawAverageReturnLineGraph,
     drawCumulativeReturnLineGraph,
+    drawDrawdownLineGraph,
     drawRiskIndicatorLineGraph,
 
     drawEmptyAssetChangeLineGraph,
@@ -714,5 +786,6 @@ export {
     drawEmptyLiquidityReturnPositionScatterGraph,
     drawEmptyAverageReturnLineGraph,
     drawEmptyCumulativeReturnLineGraph,
+    drawEmptyDrawdownLineGraph,
     drawEmptyRiskIndicatorLineGraph
 }

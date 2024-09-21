@@ -716,7 +716,6 @@ class Data {
                 if (d && d.holding && d.currentAmount > 0) {
                     weighted += d.currentAmount * (d.cumReturnRate - 1);
                     sum += d.currentAmount;
-                    console.log(d.cumReturnRate);
                 }
             }
             for (let fData of this.data.fixedDepositData) {
@@ -740,6 +739,22 @@ class Data {
         return {
             time: dates.map(t => timeFormat(t, true)),
             cumReturn: cumReturn
+        }
+    }
+
+    getDrawdownData (cumReturn) {
+        const cum = cumReturn.cumReturn;
+        let peak = cum[0];
+        const drawdown = [0];
+        for (let i = 1; i < cum.length; i++) {
+            if (isNaN(peak) || cum[i] > peak) {
+                peak = cum[i];
+            }
+            drawdown.push((peak - cum[i]) / peak);
+        }
+        return {
+            time: cumReturn.time,
+            drawdown: drawdown
         }
     }
 }

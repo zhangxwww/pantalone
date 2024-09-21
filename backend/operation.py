@@ -119,7 +119,7 @@ def get_lpr_data(db, dates):
 
         data = aligned
     else:
-        data = db_data
+        data = db_data_list
 
     return data
 

@@ -21,6 +21,7 @@
                 <div id="cumulative-return-line-graph" style="width: 100%; height: 300px"></div>
             </el-col>
             <el-col :span="12">
+                <div id="drawdown-line-graph" style="width: 100%; height: 300px"></div>
             </el-col>
         </el-row>
         <el-row justify="center">
@@ -107,6 +108,7 @@ import {
     drawCumulativeReturnLineGraph,
     drawAssetDeltaChangeBarGraph,
     drawRiskIndicatorLineGraph,
+    drawDrawdownLineGraph,
 
     drawEmptyAssetChangeLineGraph,
     drawEmptyAssetDeltaChangeBarGraph,
@@ -115,7 +117,8 @@ import {
     drawEmptyLiquidityReturnPositionScatterGraph,
     drawEmptyAverageReturnLineGraph,
     drawEmptyCumulativeReturnLineGraph,
-    drawEmptyRiskIndicatorLineGraph
+    drawEmptyRiskIndicatorLineGraph,
+    drawEmptyDrawdownLineGraph
 } from '@/scripts/graph.js'
 
 import AddCashDialog from '@/components/dialogs/AddCashDialog'
@@ -242,6 +245,7 @@ export default {
                 this.averageReturnLineGraph = drawEmptyAverageReturnLineGraph('average-return-line-graph', dates);
                 this.cumulativeReturnLineGraph = drawEmptyCumulativeReturnLineGraph('cumulative-return-line-graph', dates);
                 this.riskIndicatorLineGraph = drawEmptyRiskIndicatorLineGraph('rick-indicator-line-graph', dates);
+                this.drawdownLineGraph = drawEmptyDrawdownLineGraph('drawdown-line-graph', dates);
             },
             draw: async () => {
                 const period = 12
@@ -275,6 +279,9 @@ export default {
 
                 const riskIndicator = await this.record.getRiskIndicatorData(averageReturn, period, p)
                 this.riskIndicatorLineGraph = drawRiskIndicatorLineGraph('rick-indicator-line-graph', riskIndicator)
+
+                const drawdown = this.record.getDrawdownData(cumulativeReturn)
+                this.drawdownLineGraph = drawDrawdownLineGraph('drawdown-line-graph', drawdown)
             },
 
             dropdownMenus: [
@@ -339,6 +346,7 @@ export default {
         this.assetDeltaChangeBarGraph.dispose()
         this.cumulativeReturnLineGraph.dispose()
         this.riskIndicatorLineGraph.dispose()
+        this.drawDrawdownLineGraph.dispose()
     },
 
 }
