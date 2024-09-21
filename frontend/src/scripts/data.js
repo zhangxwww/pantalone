@@ -56,6 +56,7 @@ class Data {
 
                     mHis.annualizedReturnRate = ret / days * 365;
                     mHis.latestReturnRate = mHis.annualizedReturnRate;
+                    mHis.cumReturnRate = 1;
                 } else {
                     const latest = mData.history[i - 1];
                     const latestSpan = (latest.currentTime - latest.beginningTime) / (1000 * 3600 * 24);
@@ -70,6 +71,7 @@ class Data {
                         mHis.annualizedReturnRate = statistic.averageReturn(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan);
                     }
                     mHis.latestReturnRate = currentRet / currentSpan * 365;
+                    mHis.cumReturnRate = latest.cumReturnRate * (currentRet + 1);
                 }
                 mHis.cumReturn = mHis.currentAmount - mHis.currentShares;
 
@@ -108,6 +110,7 @@ class Data {
                     uHis.annualizedReturnRate = 0;
                     uHis.cumInvest = uHis.currentAmount;
                     uHis.cumReturn = 0;
+                    uHis.CumReturnRate = 1;
                     uHis.latestReturnRate = 0;
                 } else {
                     const first = uData.history[0];
@@ -120,6 +123,7 @@ class Data {
 
                     uHis.cumInvest = latest.cumInvest + (uHis.currentShares - latest.currentShares) * uHis.currentNetValue;
                     uHis.cumReturn = uHis.currentAmount - uHis.cumInvest;
+                    uHis.cumReturnRate = latest.cumReturnRate * (currentRet + 1);
 
                     uHis.latestReturnRate = currentRet / currentSpan * 365;
                 }
@@ -696,6 +700,46 @@ class Data {
             time: averageReturn.time,
             sharpeRatio: sharpeRatio,
             sharpeConfidence: confidence
+        }
+    }
+
+    async getCumulativeReturnData (months) {
+        const dates = this.sampleDates(months);
+        const cumReturn = [];
+
+        for (let date of dates) {
+            let weighted = 0;
+            let sum = 0;
+            for (let mData of this.data.monetaryFundData) {
+                const candidate = mData.history.filter(h => h.currentTime <= date);
+                const d = candidate[candidate.length - 1];
+                if (d && d.holding && d.currentAmount > 0) {
+                    weighted += d.currentAmount * (d.cumReturnRate - 1);
+                    sum += d.currentAmount;
+                    console.log(d.cumReturnRate);
+                }
+            }
+            for (let fData of this.data.fixedDepositData) {
+                const candidate = fData.history.filter(h => h.beginningTime <= date && h.endingTime >= date);
+                const d = candidate[candidate.length - 1];
+                if (d && d.beginningAmount > 0) {
+                    weighted += d.beginningAmount * d.rate * (date - d.beginningTime) / (d.endingTime - d.beginningTime);
+                    sum += d.beginningAmount;
+                }
+            }
+            for (let uData of this.data.fundData) {
+                const candidate = uData.history.filter(h => h.currentTime <= date);
+                const d = candidate[candidate.length - 1];
+                if (d && d.holding && d.currentAmount > 0) {
+                    weighted += d.currentAmount * (d.cumReturnRate - 1);
+                    sum += d.currentAmount;
+                }
+            }
+            cumReturn.push(weighted / sum);
+        }
+        return {
+            time: dates.map(t => timeFormat(t, true)),
+            cumReturn: cumReturn
         }
     }
 }

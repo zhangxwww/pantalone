@@ -361,7 +361,7 @@ function drawAverageReturnLineGraph (domId, data) {
     const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
-            text: "平均收益",
+            text: "平均年化收益",
             x: "center",
             y: "top",
             textAlign: "center"
@@ -409,6 +409,72 @@ function drawAverageReturnLineGraph (domId, data) {
                 name: "1年期LPR利率",
                 type: "line",
                 data: data.lpr,
+                smooth: true
+            }
+        ],
+        tooltip: {
+            trigger: "axis",
+            textStyle: {
+                align: "left"
+            },
+            formatter: params => {
+                let name = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${params[0].name}</b></td>
+                        </tr>
+                `;
+                for (let i = 0; i < params.length; i++) {
+                    name += `<tr>
+                        <td align="left">${params[i].marker}${params[i].seriesName}：</td>
+                        <td align="right"><b>${(params[i].value * 100).toFixed(2)}%</b></td>
+                    </tr>`;
+                }
+                name += "</tbody></table>";
+                return name;
+            }
+        },
+    }
+    chart.setOption(option);
+    return chart;
+}
+
+function drawCumulativeReturnLineGraph (domId, data) {
+    console.log(data);
+    const chart = echarts.init(document.getElementById(domId));
+    const option = {
+        title: {
+            text: "累计收益",
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: data.time,
+            axisLabel: {
+                interval: index => { return index % 2 == 1 }
+            },
+        },
+        yAxis: {
+            type: "value",
+            axisLabel: {
+                formatter: value => {
+                    return (value * 100).toFixed(1) + "%";
+                }
+            }
+        },
+        legend: {
+            x: "center",
+            y: "bottom"
+        },
+        series: [
+            {
+                name: "累计收益",
+                type: "line",
+                data: data.cumReturn,
                 smooth: true
             }
         ],
@@ -609,8 +675,17 @@ function drawEmptyAverageReturnLineGraph (domId, dates) {
         time: dates.map(date => timeFormat(date, true)),
         data: Array(dates.length).fill(Number.NaN),
         yields: Array(dates.length).fill(Number.NaN),
+        lpr: Array(dates.length).fill(Number.NaN),
     }
     drawAverageReturnLineGraph(domId, data);
+}
+
+function drawEmptyCumulativeReturnLineGraph (domId, dates) {
+    const data = {
+        time: dates.map(date => timeFormat(date, true)),
+        cumReturn: Array(dates.length).fill(Number.NaN),
+    }
+    drawCumulativeReturnLineGraph(domId, data);
 }
 
 function drawEmptyRiskIndicatorLineGraph (domId, dates) {
@@ -629,6 +704,7 @@ export {
     drawExpectedReturnPieGraph,
     drawLiquidityReturnPositionScatterGraph,
     drawAverageReturnLineGraph,
+    drawCumulativeReturnLineGraph,
     drawRiskIndicatorLineGraph,
 
     drawEmptyAssetChangeLineGraph,
@@ -637,5 +713,6 @@ export {
     drawEmptyExpectedReturnPieGraph,
     drawEmptyLiquidityReturnPositionScatterGraph,
     drawEmptyAverageReturnLineGraph,
+    drawEmptyCumulativeReturnLineGraph,
     drawEmptyRiskIndicatorLineGraph
 }

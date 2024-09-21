@@ -40,6 +40,14 @@ function rolling (array, windowSize, func) {
     return result;
 }
 
+function expanding (array, func) {
+    const result = [];
+    for (let end = 1; end < array.length + 1; end++) {
+        result.push(func(array.slice(0, end)));
+    }
+    return result;
+}
+
 function averageReturn (ret1, ret2, span1, span2, method = 'arithmetic') {
     if (method === 'arithmetic') {
         return (ret1 * span1 + ret2 * span2) / (span1 + span2);
@@ -54,4 +62,4 @@ function averageReturn (ret1, ret2, span1, span2, method = 'arithmetic') {
     }
 }
 
-export default { mean, std, rolling, nanmean, nanstd, countNotNaN, averageReturn };
+export default { mean, std, rolling, expanding, nanmean, nanstd, countNotNaN, averageReturn };

@@ -5,15 +5,22 @@
                 <div id="asset-change-line-graph" style="width: 100%; height: 300px"></div>
             </el-col>
             <el-col :span="12">
-                <div id="average-return-line-graph" style="width: 100%; height: 300px"></div>
+                <div id="asset-delta-change-bar-graph" style="width: 100%; height: 300px"></div>
             </el-col>
         </el-row>
         <el-row style="margin-top: 60px">
             <el-col :span="12">
-                <div id="asset-delta-change-bar-graph" style="width: 100%; height: 300px"></div>
+                <div id="average-return-line-graph" style="width: 100%; height: 300px"></div>
             </el-col>
             <el-col :span="12">
                 <div id="rick-indicator-line-graph" style="width: 100%; height: 300px"></div>
+            </el-col>
+        </el-row>
+        <el-row style="margin-top: 60px">
+            <el-col :span="12">
+                <div id="cumulative-return-line-graph" style="width: 100%; height: 300px"></div>
+            </el-col>
+            <el-col :span="12">
             </el-col>
         </el-row>
         <el-row justify="center">
@@ -97,6 +104,7 @@ import {
     drawExpectedReturnPieGraph,
     drawLiquidityReturnPositionScatterGraph,
     drawAverageReturnLineGraph,
+    drawCumulativeReturnLineGraph,
     drawAssetDeltaChangeBarGraph,
     drawRiskIndicatorLineGraph,
 
@@ -106,6 +114,7 @@ import {
     drawEmptyExpectedReturnPieGraph,
     drawEmptyLiquidityReturnPositionScatterGraph,
     drawEmptyAverageReturnLineGraph,
+    drawEmptyCumulativeReturnLineGraph,
     drawEmptyRiskIndicatorLineGraph
 } from '@/scripts/graph.js'
 
@@ -231,6 +240,7 @@ export default {
                 this.expectedReturnPieGraph = drawEmptyExpectedReturnPieGraph('expected-return-pie-graph');
                 this.liquidityReturnPositionScatterGraph = drawEmptyLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph');
                 this.averageReturnLineGraph = drawEmptyAverageReturnLineGraph('average-return-line-graph', dates);
+                this.cumulativeReturnLineGraph = drawEmptyCumulativeReturnLineGraph('cumulative-return-line-graph', dates);
                 this.riskIndicatorLineGraph = drawEmptyRiskIndicatorLineGraph('rick-indicator-line-graph', dates);
             },
             draw: async () => {
@@ -259,6 +269,9 @@ export default {
 
                 const averageReturn = this.record.getAverageReturnData(this.drawMonths, chinaBondYield, lpr)
                 this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)
+
+                const cumulativeReturn = await this.record.getCumulativeReturnData(this.drawMonths)
+                this.cumulativeReturnLineGraph = drawCumulativeReturnLineGraph('cumulative-return-line-graph', cumulativeReturn)
 
                 const riskIndicator = await this.record.getRiskIndicatorData(averageReturn, period, p)
                 this.riskIndicatorLineGraph = drawRiskIndicatorLineGraph('rick-indicator-line-graph', riskIndicator)
@@ -324,6 +337,7 @@ export default {
         this.liquidityReturnPositionScatterGraph.dispose()
         this.averageReturnLineGraph.dispose()
         this.assetDeltaChangeBarGraph.dispose()
+        this.cumulativeReturnLineGraph.dispose()
         this.riskIndicatorLineGraph.dispose()
     },
 
