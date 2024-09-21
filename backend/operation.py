@@ -53,14 +53,22 @@ def _align_lpr_date(lpr_list, query_dates):
     lpr_list = sorted(lpr_list, key=lambda x: x['date'])
     query_dates = sorted(query_dates)
 
+    logger.debug('LPR list: ')
+    logger.debug(lpr_list)
+
+    logger.debug('Query dates: ')
+    logger.debug(query_dates)
+
     res = []
     lpr_index = 0
     for qd in query_dates:
+        if lpr_index >= len(lpr_list):
+            break
         l = float('nan')
         while True:
             lpr = lpr_list[lpr_index]
             lpr_date = lpr['date']
-            if qd > lpr_date:
+            if qd >= lpr_date:
                 l = lpr['rate']
                 lpr_index += 1
                 if lpr_index >= len(lpr_list):
