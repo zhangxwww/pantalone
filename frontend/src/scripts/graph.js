@@ -75,7 +75,6 @@ function drawAssetChangeLineGraph (domId, data) {
             }
         },
         legend: {
-            data: ["现金", "货币基金", "定期存款", "基金"],
             x: "center",
             y: "bottom"
         },
@@ -166,7 +165,6 @@ function drawAssetDeltaChangeBarGraph (domId, data) {
             }
         },
         legend: {
-            data: ["现金", "货币基金", "定期存款", "基金", "总资产"],
             x: "center",
             y: "bottom"
         },
@@ -385,7 +383,6 @@ function drawAverageReturnLineGraph (domId, data) {
             }
         },
         legend: {
-            data: ["持有收益", "最新收益", "1年期国债收益率", "1年期LPR利率"],
             x: "center",
             y: "bottom"
         },
@@ -539,7 +536,7 @@ function drawRiskIndicatorLineGraph (domId, data) {
                     }
                     name += `<tr>
                         <td align="left">${params[i].marker}${params[i].seriesName}：</td>
-                        <td align="right"><b>${params[i].value}</b></td>
+                        <td align="right"><b>${params[i].value.toFixed(2)}</b></td>
                     </tr>`;
                 }
                 name += "</tbody></table>";
