@@ -14,7 +14,7 @@ from utils import get_log_file_path, timeit
 
 logger.add(
     os.path.join(get_log_file_path(), '{time}.log'),
-    level='INFO',
+    level='DEBUG',
     rotation='1 day',
     retention='1 week',
     compression='zip')

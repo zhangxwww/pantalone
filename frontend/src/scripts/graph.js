@@ -664,6 +664,7 @@ function drawRiskIndicatorLineGraph (domId, data) {
                 align: "left"
             },
             formatter: params => {
+                const dataIndex = params[0].dataIndex;
                 let name = `
                 <table>
                     <tbody>
@@ -677,7 +678,7 @@ function drawRiskIndicatorLineGraph (domId, data) {
                     }
                     name += `<tr>
                         <td align="left">${params[i].marker}${params[i].seriesName}：</td>
-                        <td align="right"><b>${params[i].value.toFixed(2)}</b></td>
+                        <td align="right"><b>${params[i].value.toFixed(2)}</b>±${data.sharpeConfidence[dataIndex].upper.toFixed(2)}</td>
                     </tr>`;
                 }
                 name += "</tbody></table>";
