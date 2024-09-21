@@ -268,9 +268,9 @@ export default {
 
                 const chinaBondYieldPromise = this.record.getChinaBondYieldData(this.drawMonths)
                 const lprPromise = this.record.getLPRData(this.drawMonths)
-                const shClosePromise = this.record.getSHCloseData(this.drawMonths)
+                const closePromise = this.record.getIndexCloseData(this.drawMonths)
 
-                const [chinaBondYield, lpr, shClose] = await Promise.all([chinaBondYieldPromise, lprPromise, shClosePromise])
+                const [chinaBondYield, lpr, shClose] = await Promise.all([chinaBondYieldPromise, lprPromise, closePromise])
 
                 const averageReturn = this.record.getAverageReturnData(this.drawMonths, chinaBondYield, lpr)
                 this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)

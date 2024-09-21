@@ -111,9 +111,10 @@ class LPR(Base):
     lpr = Column(Float)
 
 
-class SH000001Close(Base):
-    __tablename__ = 'sh000001_close'
+class IndexClose(Base):
+    __tablename__ = 'index_close'
 
     id = Column(Integer, primary_key=True, index=True)
+    code = Column(String)
     date = Column(Date)
     close = Column(Float)

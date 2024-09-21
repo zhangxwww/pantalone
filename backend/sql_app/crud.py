@@ -305,30 +305,30 @@ def get_lpr_data(
     return db.query(models.LPR).filter(models.LPR.date.in_(dates)).all()
 
 
-# ********** save sh000001 close data **********
+# ********** save index close data **********
 
-def create_sh000001_close_data(
+def create_index_close_data(
     db: Session,
-    data: schemas.SH000001CloseDataCreate
+    data: schemas.IndexCloseDataCreate
 ):
-    db_sh000001_close_data = models.SH000001Close(**data.model_dump())
-    db.add(db_sh000001_close_data)
+    db_index_close_data = models.IndexClose(**data.model_dump())
+    db.add(db_index_close_data)
     db.commit()
-    db.refresh(db_sh000001_close_data)
-    return db_sh000001_close_data
+    db.refresh(db_index_close_data)
+    return db_index_close_data
 
 
-def create_sh000001_close_data_from_list(
+def create_index_close_data_from_list(
     db: Session,
-    data: List[schemas.SH000001CloseDataCreate]
+    data: List[schemas.IndexCloseDataCreate]
 ):
     for item in data:
-        create_sh000001_close_data(db, item)
+        create_index_close_data(db, item)
 
-# ********** get sh000001 close data **********
+# ********** get index close data **********
 
-def get_sh000001_close_data(
+def get_index_close_data(
     db: Session,
     dates: List[date]
 ):
-    return db.query(models.SH000001Close).filter(models.SH000001Close.date.in_(dates)).all()
+    return db.query(models.IndexClose).filter(models.IndexClose.date.in_(dates)).all()

@@ -195,18 +195,19 @@ class LPRData(LPRDataBase):
         from_attributes = True
 
 
-# ********** SH000001 Close Data **********
+# ********** Index Close Data **********
 
-class SH000001CloseDataBase(BaseModel):
+class IndexCloseDataBase(BaseModel):
+    code: str
     close: float
     date: date
 
 
-class SH000001CloseDataCreate(SH000001CloseDataBase):
+class IndexCloseDataCreate(IndexCloseDataBase):
     pass
 
 
-class SH000001CloseData(SH000001CloseDataBase):
+class IndexCloseData(IndexCloseDataBase):
     id: int
 
     class Config:

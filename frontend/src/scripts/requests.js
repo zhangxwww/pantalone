@@ -10,8 +10,8 @@ async function getLPRDataRequest (dates) {
     return res.data;
 }
 
-async function getSHCloseRequest (dates) {
-    const res = await axios.post('/api/sh-close', { 'dates': dates });
+async function getIndexCloseRequest (dates) {
+    const res = await axios.post('/api/index-close', { 'dates': dates });
     return res.data;
 }
 
@@ -74,5 +74,5 @@ export {
     addDataRequest,
     getTIntervalRequest,
     getNormalIntervalRequest,
-    getSHCloseRequest
+    getIndexCloseRequest
 }

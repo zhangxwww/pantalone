@@ -480,9 +480,15 @@ function drawCumulativeReturnLineGraph (domId, data) {
             {
                 name: "上证指数",
                 type: "line",
-                data: data.cumReturn.sh000001,
+                data: data.cumReturn['000001'],
                 smooth: true
             },
+            {
+                name: "国债指数",
+                type: "line",
+                data: data.cumReturn['000012'],
+                smooth: true
+            }
         ],
         tooltip: {
             trigger: "axis",
@@ -754,7 +760,8 @@ function drawEmptyCumulativeReturnLineGraph (domId, dates) {
         time: dates.map(date => timeFormat(date, true)),
         cumReturn: {
             holding: Array(dates.length).fill(Number.NaN),
-            sh000001: Array(dates.length).fill(Number.NaN),
+            '000001': Array(dates.length).fill(Number.NaN),
+            '000012': Array(dates.length).fill(Number.NaN),
         }
     }
     drawCumulativeReturnLineGraph(domId, data);

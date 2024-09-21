@@ -2,13 +2,20 @@ import json
 import base64
 from datetime import datetime
 from joblib import Parallel, delayed
+import itertools
 
 from loguru import logger
 
-from spider import get_china_bond_yield, get_lpr, get_sh000001_close
+from spider import get_china_bond_yield, get_lpr, get_close
 import sql_app.schemas as schemas
 import sql_app.crud as crud
 from utils import trans_str_date_to_trade_date
+
+
+INDEX_CODES = [
+    '000001',  # 上证指数
+    '000012',  # 国债指数
+]
 
 
 def get_china_bond_yield_data(db, dates):
@@ -124,32 +131,34 @@ def get_lpr_data(db, dates):
     return data
 
 
-def get_sh000001_close_data(db, dates):
+def get_index_close_data(db, dates):
     query_dates = [trans_str_date_to_trade_date(d) for d in dates]
 
     logger.debug('Query dates: ')
     logger.debug(query_dates)
 
-    db_data = crud.get_sh000001_close_data(db, query_dates)
-    db_data_list = [{'date': d.date, 'close': d.close} for d in db_data]
+    db_data = crud.get_index_close_data(db, query_dates)
+    db_data_list = [{'date': d.date, 'close': d.close, 'code': d.code} for d in db_data]
 
     logger.debug('DB data: ')
     logger.debug(db_data_list)
 
-    not_found_dates = list(set(query_dates) - set(d.date for d in db_data))
+    required_data = set(itertools.product(INDEX_CODES, query_dates))
 
-    logger.debug('Not found dates: ')
-    logger.debug(not_found_dates)
+    not_found_data = list(required_data - set((d.code, d.date) for d in db_data))
 
-    def _f(date):
-        close = get_sh000001_close(date)
-        return schemas.SH000001CloseDataCreate(date=date, close=close)
+    logger.debug('Not found data: ')
+    logger.debug(not_found_data)
 
-    not_found_dates_close = Parallel(n_jobs=-1)(delayed(_f)(date) for date in not_found_dates)
+    def _f(code, date):
+        close = get_close(code, date)
+        return schemas.IndexCloseDataCreate(date=date, close=close, code=code)
 
-    crud.create_sh000001_close_data_from_list(db, not_found_dates_close)
+    not_found_dates_close = Parallel(n_jobs=-1)(delayed(_f)(code, date) for code, date in not_found_data)
 
-    spider_data = [{'date': d.date, 'close': d.close} for d in not_found_dates_close]
+    crud.create_index_close_data_from_list(db, not_found_dates_close)
+
+    spider_data = [{'date': d.date, 'close': d.close, 'code': d.code} for d in not_found_dates_close]
 
     logger.debug('Spider data: ')
     logger.debug(spider_data)
@@ -157,10 +166,20 @@ def get_sh000001_close_data(db, dates):
     data = db_data_list + spider_data
     data = sorted(data, key=lambda x: x['date'])
 
-    logger.debug('Final data: ')
+    logger.debug('All data: ')
     logger.debug(data)
 
-    return data
+    final_data = []
+    for date, group in itertools.groupby(data, key=lambda x: x['date']):
+        d = {'date': date}
+        for item in group:
+            d[item['code']] = item['close']
+        final_data.append(d)
+
+    logger.debug('Final data: ')
+    logger.debug(final_data)
+
+    return final_data
 
 
 def save_base64_data(db, data):

@@ -11,7 +11,7 @@ class LPRDateData(BaseModel):
     dates: List[str]
 
 
-class SH000001DateData(BaseModel):
+class IndexCloseDateData(BaseModel):
     dates: List[str]
 
 

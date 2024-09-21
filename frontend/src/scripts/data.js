@@ -7,7 +7,7 @@ import {
     uploadRequest,
     addDataRequest,
     getNormalIntervalRequest,
-    getSHCloseRequest
+    getIndexCloseRequest
 } from './requests.js';
 
 
@@ -162,9 +162,9 @@ class Data {
         return data.lpr;
     }
 
-    async getSHCloseData (months) {
+    async getIndexCloseData (months) {
         const dates = this.sampleDates(months).map(t => timeFormat(t));
-        const data = await getSHCloseRequest(dates);
+        const data = await getIndexCloseRequest(dates);
         console.log(data);
         return data.close;
     }
@@ -711,7 +711,7 @@ class Data {
         }
     }
 
-    async getCumulativeReturnData (months, shClose) {
+    async getCumulativeReturnData (months, indexCloseData) {
         const dates = this.sampleDates(months);
         const cumReturn = [];
 
@@ -747,18 +747,26 @@ class Data {
 
         const first_not_nan_index = cumReturn.findIndex(x => !isNaN(x));
 
-        let shCloseCumReturn = Array(first_not_nan_index).fill(Number.NaN);
-        shCloseCumReturn.push(0);
-        for (let i = first_not_nan_index + 1; i < shClose.length; i++) {
-            shCloseCumReturn.push(shClose[i].close / shClose[0].close - 1);
+        const allIndexCumReturn = {
+            '000001': null,
+            '000012': null
+        };
+        for (let code of ['000001', '000012']) {
+            let indexCumReturn = Array(first_not_nan_index).fill(Number.NaN);
+            indexCumReturn.push(0);
+            for (let i = first_not_nan_index + 1; i < indexCloseData.length; i++) {
+                indexCumReturn.push(indexCloseData[i][code] / indexCloseData[first_not_nan_index][code] - 1);
+            }
+            allIndexCumReturn[code] = indexCumReturn;
         }
-        console.log(shCloseCumReturn);
+        console.log(allIndexCumReturn);
 
         return {
             time: dates.map(t => timeFormat(t, true)),
             cumReturn: {
                 holding: cumReturn,
-                sh000001: shCloseCumReturn
+                '000001': allIndexCumReturn['000001'],
+                '000012': allIndexCumReturn['000012']
             }
         }
     }
