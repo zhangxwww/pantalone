@@ -111,7 +111,7 @@ class Data {
                     uHis.annualizedReturnRate = 0;
                     uHis.cumInvest = uHis.currentAmount;
                     uHis.cumReturn = 0;
-                    uHis.CumReturnRate = 1;
+                    uHis.cumReturnRate = 1;
                     uHis.latestReturnRate = 0;
                 } else {
                     const first = uData.history[0];
@@ -744,6 +744,8 @@ class Data {
             }
             cumReturn.push(weighted / sum);
         }
+
+        console.log(cumReturn);
 
         const first_not_nan_index = cumReturn.findIndex(x => !isNaN(x));
 
