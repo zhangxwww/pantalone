@@ -749,7 +749,10 @@ function drawEmptyLiquidityReturnPositionScatterGraph (domId) {
 function drawEmptyAverageReturnLineGraph (domId, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
-        data: Array(dates.length).fill(Number.NaN),
+        data: {
+            holding: Array(dates.length).fill(Number.NaN),
+            latest: Array(dates.length).fill(Number.NaN),
+        },
         yields: Array(dates.length).fill(Number.NaN),
         lpr: Array(dates.length).fill(Number.NaN),
     }
@@ -780,6 +783,7 @@ function drawEmptyRiskIndicatorLineGraph (domId, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         sharpeRatio: Array(dates.length).fill(Number.NaN),
+        sharpeConfidence: Array(dates.length).fill({ lower: Number.NaN, upper: Number.NaN })
     }
     drawRiskIndicatorLineGraph(domId, data);
 }
