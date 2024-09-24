@@ -711,45 +711,58 @@ class Data {
         }
     }
 
-    async getCumulativeReturnData (months, indexCloseData) {
+    async getCumulativeReturnData (months, indexCloseData, assetChangeData) {
         const dates = this.sampleDates(months);
         const cumReturn = [];
+        const deltaReturnRate = [Number.NaN];
+        const cumReturnRate = [Number.NaN];
 
-        for (let date of dates) {
-            let weighted = 0;
-            let sum = 0;
+        for (let [i, date] of dates.entries()) {
+            let cum = 0;
             for (let mData of this.data.monetaryFundData) {
                 const candidate = mData.history.filter(h => h.currentTime <= date);
                 const d = candidate[candidate.length - 1];
                 if (d && d.holding && d.currentAmount > 0) {
-                    weighted += d.currentAmount * (d.cumReturnRate - 1);
-                    sum += d.currentAmount;
+                    cum += d.cumReturn;
+
+                    console.log(date, d.currentTime, d.cumReturn, cum);
                 }
             }
             for (let fData of this.data.fixedDepositData) {
                 const candidate = fData.history.filter(h => h.beginningTime <= date && h.endingTime >= date);
                 const d = candidate[candidate.length - 1];
                 if (d && d.beginningAmount > 0) {
-                    weighted += d.beginningAmount * d.rate * (date - d.beginningTime) / (d.endingTime - d.beginningTime);
-                    sum += d.beginningAmount;
+                    cum += d.beginningAmount * d.rate * (date - d.beginningTime) / (d.endingTime - d.beginningTime);
+
+                    console.log(date, d.beginningTime, d.endingTime, d.rate, d.beginningAmount, d.beginningAmount * d.rate * (date - d.beginningTime) / (d.endingTime - d.beginningTime), cum);
                 }
             }
             for (let uData of this.data.fundData) {
                 const candidate = uData.history.filter(h => h.currentTime <= date);
                 const d = candidate[candidate.length - 1];
                 if (d && d.holding && d.currentAmount > 0) {
-                    weighted += d.currentAmount * (d.cumReturnRate - 1);
-                    sum += d.currentAmount;
+                    cum += d.cumReturn;
                 }
             }
-            cumReturn.push(weighted / sum);
+            cumReturn.push(cum);
+            if (i > 0) {
+                const deltaReturn = cumReturn[i] - cumReturn[i - 1];
+                const total = assetChangeData.monetaryFundData[i] + assetChangeData.fixedDepositData[i] + assetChangeData.fundData[i];
+                deltaReturnRate.push(deltaReturn / total);
+
+                const crr = isNaN(cumReturnRate[i - 1]) ?
+                    deltaReturnRate[i] :
+                    (cumReturnRate[i - 1] + 1) * (deltaReturnRate[i] + 1) - 1;
+                cumReturnRate.push(crr);
+            }
         }
-
         console.log(cumReturn);
+        console.log(deltaReturnRate);
+        console.log(cumReturnRate);
 
-        const first_not_nan_index = cumReturn.findIndex(x => !isNaN(x));
+        const first_not_nan_index = cumReturnRate.findIndex(x => !isNaN(x));
 
-        const allIndexCumReturn = {
+        const allIndexCumReturnRate = {
             '000001': null,
             '000012': null
         };
@@ -759,16 +772,16 @@ class Data {
             for (let i = first_not_nan_index + 1; i < indexCloseData.length; i++) {
                 indexCumReturn.push(indexCloseData[i][code] / indexCloseData[first_not_nan_index][code] - 1);
             }
-            allIndexCumReturn[code] = indexCumReturn;
+            allIndexCumReturnRate[code] = indexCumReturn;
         }
-        console.log(allIndexCumReturn);
+        console.log(allIndexCumReturnRate);
 
         return {
             time: dates.map(t => timeFormat(t, true)),
             cumReturn: {
-                holding: cumReturn,
-                '000001': allIndexCumReturn['000001'],
-                '000012': allIndexCumReturn['000012']
+                holding: cumReturnRate,
+                '000001': allIndexCumReturnRate['000001'],
+                '000012': allIndexCumReturnRate['000012']
             }
         }
     }
