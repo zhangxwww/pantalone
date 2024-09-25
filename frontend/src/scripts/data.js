@@ -56,6 +56,7 @@ class Data {
                     const days = (mHis.currentTime - mHis.beginningTime) / (1000 * 3600 * 24);
 
                     mHis.annualizedReturnRate = ret / days * 365;
+                    mHis.annualizedReturnRate = isNaN(mHis.annualizedReturnRate) ? 0 : mHis.annualizedReturnRate;
                     mHis.latestReturnRate = mHis.annualizedReturnRate;
                     mHis.cumReturnRate = 1;
                 } else {
