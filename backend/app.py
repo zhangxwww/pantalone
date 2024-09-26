@@ -41,7 +41,7 @@ async def get_CN1YR(
 ):
     logger.debug(data.dates)
     for n_days in [1, 2, 3]:
-        background_tasks.add_task(add_data_after_n_days_to_db, operation.get_CN1YR_data, db, data.dates, n_days)
+        background_tasks.add_task(add_data_after_n_days_to_db, operation.get_china_bond_yield_data, db, data.dates, n_days)
     return {'yields': operation.get_china_bond_yield_data(db, data.dates)}
 
 

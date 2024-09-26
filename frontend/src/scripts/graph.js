@@ -445,7 +445,7 @@ function drawCumulativeReturnLineGraph (domId, data) {
     const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
-            text: "累计收益",
+            text: "累计持有收益",
             x: "center",
             y: "top",
             textAlign: "center"
