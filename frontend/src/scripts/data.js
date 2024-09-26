@@ -790,7 +790,7 @@ class Data {
     getDrawdownData (cumReturnData) {
         const cum = cumReturnData.cumReturn.holding;
         let peak = cum[0];
-        const drawdown = [0];
+        const drawdown = [Number.NaN];
         for (let i = 1; i < cum.length; i++) {
             if (isNaN(peak) || cum[i] > peak) {
                 peak = cum[i];
