@@ -1,7 +1,7 @@
 import os
 
 from scipy.stats import chi2, t, norm
-from fastapi import FastAPI, staticfiles, Depends
+from fastapi import FastAPI, staticfiles, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
 from loguru import logger
 
@@ -10,6 +10,7 @@ import api_model
 from sql_app import models
 from sql_app.database import SessionLocal, engine
 from utils import get_log_file_path, timeit
+from background import add_data_after_n_days_to_db
 
 
 logger.add(
@@ -33,8 +34,14 @@ def get_db():
 
 @app.post('/api/CN1YR')
 @timeit
-async def get_CN1YR(data: api_model.CN1YRDateData, db: Session = Depends(get_db)):
+async def get_CN1YR(
+    data: api_model.CN1YRDateData,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
     logger.debug(data.dates)
+    for n_days in [1, 2, 3]:
+        background_tasks.add_task(add_data_after_n_days_to_db, operation.get_CN1YR_data, db, data.dates, n_days)
     return {'yields': operation.get_china_bond_yield_data(db, data.dates)}
 
 
@@ -47,8 +54,10 @@ async def get_lpr(data: api_model.LPRDateData, db: Session = Depends(get_db)):
 
 @app.post('/api/index-close')
 @timeit
-async def get_sh_close(data: api_model.IndexCloseDateData, db: Session = Depends(get_db)):
+async def get_sh_close(data: api_model.IndexCloseDateData, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     logger.debug(data.dates)
+    for n_days in [1, 2, 3]:
+        background_tasks.add_task(add_data_after_n_days_to_db, operation.get_index_close_data, db, data.dates, n_days)
     return {'close': operation.get_index_close_data(db, data.dates)}
 
 
