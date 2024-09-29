@@ -6,11 +6,10 @@ import itertools
 
 from loguru import logger
 
-# from spider import get_china_bond_yield, get_lpr, get_close, get_fund_name_from_symbol, get_latest_net_value_of_fund
 import spider
 import sql_app.schemas as schemas
 import sql_app.crud as crud
-from utils import trans_str_date_to_trade_date
+from utils import trans_str_date_to_trade_date, get_one_quarter_before
 
 
 INDEX_CODES = [
@@ -348,3 +347,79 @@ def get_refreshed_fund_net_value(symbols):
 
     ret = Parallel(n_jobs=-1)(delayed(_f)(symbol) for symbol in symbols)
     return ret
+
+
+def get_fund_holding_data(db, symbols):
+
+    now = datetime.now()
+    current_year = now.year
+    current_month = now.month
+    current_quarter = (current_month - 1) // 3 + 1
+
+    logger.debug(f'Current: {current_year}Q{current_quarter}')
+
+    year, quarter = get_one_quarter_before(current_year, current_quarter)
+
+    found = set()
+
+    holdings = {}
+    for symbol in symbols:
+        holding = crud.get_fund_holding_data(db, year, quarter, symbol, 'all')
+        if holding:
+            holdings[symbol] = holding
+            found.add(symbol)
+
+    logger.debug(f'Found in db ({year}Q{quarter}): {found}')
+
+    not_found_symbols = set(symbols) - found
+
+    def _f(symbol, year, quarter):
+        stock = spider.get_fund_holding(symbol, year, 'stock')
+        bond = spider.get_fund_holding(symbol, year, 'bond')
+        all_holding = stock + bond
+        ret_holding = [h for h in all_holding if h['quarter'] == quarter]
+        return symbol, ret_holding, all_holding
+
+    spider_res = Parallel(n_jobs=-1)(delayed(_f)(symbol, year, quarter) for symbol in not_found_symbols)
+
+    for symbol, quarter_holding, all_holding in spider_res:
+
+        logger.debug(f'Get {symbol} from spider: {quarter_holding}')
+
+        if quarter_holding:
+            holdings[symbol] = quarter_holding
+            found.add(symbol)
+
+            logger.debug(f'Found {symbol} in spider')
+
+        for h in all_holding:
+            item = schemas.FundHoldingDataCreate(**h)
+            crud.create_fund_holding_data_if_not_exist(db, item)
+
+    logger.debug(f'Found in spider ({year}Q{quarter}): {found}')
+
+    year, quarter = get_one_quarter_before(year, quarter)
+
+    not_found_symbols = set(symbols) - found
+    for symbol in not_found_symbols:
+        holding = crud.get_fund_holding_data(db, year, quarter, symbol, 'all')
+        if holding:
+            holdings[symbol] = holding
+            found.add(symbol)
+    not_found_symbols = set(symbols) - found
+
+    spider_res = Parallel(n_jobs=-1)(delayed(_f)(symbol, year, quarter) for symbol in not_found_symbols)
+    for symbol, quarter_holding, all_holding in spider_res:
+        if quarter_holding:
+            holdings[symbol] = quarter_holding
+            found.add(symbol)
+
+        for h in all_holding:
+            item = schemas.FundHoldingDataCreate(**h)
+            crud.create_fund_holding_data_if_not_exist(db, item)
+
+    not_found_symbols = set(symbols) - found
+    for symbol in not_found_symbols:
+        holdings[symbol] = []
+
+    return holdings

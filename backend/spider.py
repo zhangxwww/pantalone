@@ -62,7 +62,7 @@ def get_latest_net_value_of_fund(symbol):
     return ak.fund_open_fund_info_em(symbol=symbol, indicator="单位净值走势")['单位净值'].iloc[-1]
 
 
-def get_fund_position(symbol, year, type_):
+def get_fund_holding(symbol, year, type_):
 
     func = {
         'stock': ak.fund_portfolio_hold_em,
@@ -80,7 +80,7 @@ def get_fund_position(symbol, year, type_):
         for row in df.itertuples(index=False):
             res.append({
                 'year': row.年份,
-                'quarter': row.季度,
+                'quarter': int(row.季度),
                 'fund_code': row.基金代码,
                 'code': row[3],
                 'name': row[4],
@@ -106,6 +106,6 @@ if __name__ == '__main__':
         ]
     t = ['stock', 'bond']
 
-    res = Parallel(n_jobs=4)(delayed(get_fund_position)(symbol=c, year='2024', type_=t) for c, t in product(codes, t))
+    res = Parallel(n_jobs=4)(delayed(get_fund_holding)(symbol=c, year='2024', type_=t) for c, t in product(codes, t))
 
     print(res)

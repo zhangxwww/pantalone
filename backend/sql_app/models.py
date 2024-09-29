@@ -126,3 +126,16 @@ class FundName(Base):
 
     symbol = Column(String, primary_key=True, index=True)
     name = Column(String)
+
+
+class FundHolding(Base):
+    __tablename__ = 'fund_holding'
+
+    id = Column(Integer, primary_key=True, index=True)
+    fund_code = Column(String)
+    year = Column(Integer)
+    quarter = Column(Integer)
+    code = Column(String)
+    name = Column(String)
+    ratio = Column(Float)
+    type = Column(String)

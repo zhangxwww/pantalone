@@ -57,3 +57,10 @@ def trans_str_date_to_next_n_trade_date(date, n):
 
 def trans_date_to_str(date):
     return date.strftime('%Y-%m-%d')
+
+
+def get_one_quarter_before(year, quarter):
+    if quarter > 1:
+        return year, quarter - 1
+    else:
+        return year - 1, 4

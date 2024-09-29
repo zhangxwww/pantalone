@@ -229,3 +229,26 @@ class FundNameDataCreate(FundNameDataBase):
 class FundNameData(FundNameDataBase):
     class Config:
         from_attributes = True
+
+
+# ********** Fund Holding Data **********
+
+class FundHoldingDataBase(BaseModel):
+    year: int
+    quarter: int
+    fund_code: str
+    code: str
+    name: str
+    ratio: float
+    type: str
+
+
+class FundHoldingDataCreate(FundHoldingDataBase):
+    pass
+
+
+class FundHoldingData(FundHoldingDataBase):
+    id: int
+
+    class Config:
+        from_attributes = True

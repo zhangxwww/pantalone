@@ -77,3 +77,7 @@ class AddFundHistoryData(BaseModel):
 
 class RefreshFundNetValueData(BaseModel):
     symbols: list[str]
+
+
+class GetFundHoldingData(BaseModel):
+    symbols: list[str]

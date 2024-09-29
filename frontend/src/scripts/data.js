@@ -8,7 +8,8 @@ import {
     addDataRequest,
     getNormalIntervalRequest,
     getIndexCloseRequest,
-    getRefreshedFundNetValueRequest
+    getRefreshedFundNetValueRequest,
+    getFundHoldingDataRequest
 } from './requests.js';
 
 
@@ -280,6 +281,17 @@ class Data {
             data.fundData.push(d);
         }
         return data;
+    }
+
+    async getHoldingData (tableData) {
+        let symbols = [];
+        for (let u of tableData.fundData) {
+            symbols.push(u.symbol);
+        }
+        symbols = [...new Set(symbols)];
+        const holdingData = await getFundHoldingDataRequest(symbols);
+        console.log(holdingData);
+        return holdingData;
     }
 
     async refreshFundNetValue (data) {

@@ -352,3 +352,53 @@ def create_fund_name(
     db.commit()
     db.refresh(db_fund_name)
     return db_fund_name
+
+
+# ********** fund holding data **********
+
+def get_fund_holding_data(
+    db: Session,
+    year: int,
+    quarter: int,
+    fund_code: str,
+    type_: str
+):
+    res = db.query(models.FundHolding).filter(
+        models.FundHolding.year == year,
+        models.FundHolding.quarter == quarter,
+        models.FundHolding.fund_code == fund_code
+    )
+    if type_ != 'all':
+        res = res.filter(models.FundHolding.type == type_)
+    return res.all()
+
+
+def create_fund_holding_data(
+    db: Session,
+    data: schemas.FundHoldingDataCreate
+):
+    db_fund_holding_data = models.FundHolding(**data.model_dump())
+    db.add(db_fund_holding_data)
+    db.commit()
+    db.refresh(db_fund_holding_data)
+    return db_fund_holding_data
+
+
+def create_fund_holding_data_if_not_exist(
+    db: Session,
+    data: schemas.FundHoldingDataCreate
+):
+    existing_record = db.query(models.FundHolding).filter(
+        models.FundHolding.fund_code == data.fund_code,
+        models.FundHolding.year == data.year,
+        models.FundHolding.quarter == data.quarter,
+        models.FundHolding.code == data.code,
+        models.FundHolding.type == data.type
+    ).first()
+
+    if existing_record is None:
+        # 如果不存在，则创建新的记录
+        return create_fund_holding_data(db, data)
+    else:
+        # 如果已经存在，返回现有记录
+        return existing_record

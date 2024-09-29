@@ -405,22 +405,29 @@ export default {
     },
 
     async mounted () {
-        this.record = new Data()
-        this.drawEmpty()
-        await this.record.load()
-        this.data = this.record.getData()
+        this.record = new Data();
+        this.drawEmpty();
+        await this.record.load();
+        this.data = this.record.getData();
         await this.draw();
+        await this.record.getHoldingData(this.data);
+
+        // eslint-disable-next-line no-unused-vars
+        // const [_, holding] = await Promise.all([
+        //     this.draw(),
+        //     this.record.getHoldingData(this.data)
+        // ]);
     },
     unmounted () {
-        this.assetChangeLineGraph.dispose()
-        this.residualMaturatyPieGraph.dispose()
-        this.expectedReturnPieGraph.dispose()
-        this.liquidityReturnPositionScatterGraph.dispose()
-        this.averageReturnLineGraph.dispose()
-        this.assetDeltaChangeBarGraph.dispose()
-        this.cumulativeReturnLineGraph.dispose()
-        this.riskIndicatorLineGraph.dispose()
-        this.drawdownLineGraph.dispose()
+        this.assetChangeLineGraph.dispose();
+        this.residualMaturatyPieGraph.dispose();
+        this.expectedReturnPieGraph.dispose();
+        this.liquidityReturnPositionScatterGraph.dispose();
+        this.averageReturnLineGraph.dispose();
+        this.assetDeltaChangeBarGraph.dispose();
+        this.cumulativeReturnLineGraph.dispose();
+        this.riskIndicatorLineGraph.dispose();
+        this.drawdownLineGraph.dispose();
     },
 
 }
