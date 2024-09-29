@@ -25,7 +25,7 @@
             </el-col>
         </el-row>
         <el-row justify="center">
-            <el-radio-group v-model="drawMonths" @change="draw">
+            <el-radio-group v-model="drawMonths" @change="onDrawMonthsChange">
                 <el-radio-button v-for="radio in drawMonthsRadio" :key="radio.value" :label="radio.label"
                     :value="radio.value" />
             </el-radio-group>
@@ -207,26 +207,27 @@ export default {
                     currentNetValue: form.currentNetValue,
                     lockupPeriod: form.lockupPeriod,
                     holding: form.holding
-                }, this.editId)
+                }, this.editId);
             },
             onAddData: async (form, type) => {
                 switch (type) {
                     case 'cash':
-                        await this.addCashData(form)
+                        await this.addCashData(form);
                         break
                     case 'monetary-fund':
-                        await this.addMonetaryFundData(form)
+                        await this.addMonetaryFundData(form);
                         break
                     case 'fixed-deposit':
-                        await this.addFixedDepositData(form)
+                        await this.addFixedDepositData(form);
                         break
                     case 'fund':
-                        await this.addFundData(form)
+                        await this.addFundData(form);
                         break
                 }
-                this.data = this.record.getData()
-                await this.draw()
-                this.editId = null
+                this.setMonthChangeGraphLoading();
+                this.data = this.record.getData();
+                await this.draw();
+                this.editId = null;
             },
 
             onDownload: () => {
@@ -237,54 +238,92 @@ export default {
             },
             drawEmpty: () => {
                 const dates = this.record.sampleDates(this.drawMonths);
+
                 this.assetChangeLineGraph = drawEmptyAssetChangeLineGraph('asset-change-line-graph', dates);
+                this.assetChangeLineGraph.showLoading();
+
                 this.assetDeltaChangeBarGraph = drawEmptyAssetDeltaChangeBarGraph('asset-delta-change-bar-graph', dates);
+                this.assetDeltaChangeBarGraph.showLoading();
+
                 this.residualMaturatyPieGraph = drawEmptyResidualMaturityPieGraph('residual-maturity-pie-graph');
+                this.residualMaturatyPieGraph.showLoading();
+
                 this.expectedReturnPieGraph = drawEmptyExpectedReturnPieGraph('expected-return-pie-graph');
+                this.expectedReturnPieGraph.showLoading();
+
                 this.liquidityReturnPositionScatterGraph = drawEmptyLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph');
+                this.liquidityReturnPositionScatterGraph.showLoading();
+
                 this.averageReturnLineGraph = drawEmptyAverageReturnLineGraph('average-return-line-graph', dates);
+                this.averageReturnLineGraph.showLoading();
+
                 this.cumulativeReturnLineGraph = drawEmptyCumulativeReturnLineGraph('cumulative-return-line-graph', dates);
+                this.cumulativeReturnLineGraph.showLoading();
+
                 this.riskIndicatorLineGraph = drawEmptyRiskIndicatorLineGraph('rick-indicator-line-graph', dates);
+                this.riskIndicatorLineGraph.showLoading();
+
                 this.drawdownLineGraph = drawEmptyDrawdownLineGraph('drawdown-line-graph', dates);
+                this.drawdownLineGraph.showLoading();
             },
             draw: async () => {
-                const period = 12
-                const p = 0.95
+                const period = 12;
+                const p = 0.95;
 
-                const assetChange = this.record.getAssetChangeData(this.drawMonths)
-                this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange)
+                const assetChange = this.record.getAssetChangeData(this.drawMonths);
+                this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange);
+                this.assetChangeLineGraph.hideLoading();
 
-                const assetDeltaChange = this.record.getAssetDeltaChangeData(assetChange)
-                this.assetDeltaChangeBarGraph = drawAssetDeltaChangeBarGraph('asset-delta-change-bar-graph', assetDeltaChange)
+                const assetDeltaChange = this.record.getAssetDeltaChangeData(assetChange);
+                this.assetDeltaChangeBarGraph = drawAssetDeltaChangeBarGraph('asset-delta-change-bar-graph', assetDeltaChange);
+                this.assetDeltaChangeBarGraph.hideLoading();
 
-                const residualMaturaty = this.record.getResidualMaturityData()
-                this.residualMaturatyPieGraph = drawResidualMaturityPieGraph('residual-maturity-pie-graph', residualMaturaty)
+                const residualMaturaty = this.record.getResidualMaturityData();
+                this.residualMaturatyPieGraph = drawResidualMaturityPieGraph('residual-maturity-pie-graph', residualMaturaty);
+                this.residualMaturatyPieGraph.hideLoading();
 
-                const expectedReturn = this.record.getExpectedReturnData()
-                this.expectedReturnPieGraph = drawExpectedReturnPieGraph('expected-return-pie-graph', expectedReturn)
+                const expectedReturn = this.record.getExpectedReturnData();
+                this.expectedReturnPieGraph = drawExpectedReturnPieGraph('expected-return-pie-graph', expectedReturn);
+                this.expectedReturnPieGraph.hideLoading();
 
-                const liquidityReturnPosition = this.record.getLiquidityReturnPositionData()
-                this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition)
+                const liquidityReturnPosition = this.record.getLiquidityReturnPositionData();
+                this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition);
+                this.liquidityReturnPositionScatterGraph.hideLoading();
 
-                const chinaBondYieldPromise = this.record.getChinaBondYieldData(this.drawMonths)
-                const lprPromise = this.record.getLPRData(this.drawMonths)
-                const closePromise = this.record.getIndexCloseData(this.drawMonths)
+                const chinaBondYieldPromise = this.record.getChinaBondYieldData(this.drawMonths);
+                const lprPromise = this.record.getLPRData(this.drawMonths);
+                const closePromise = this.record.getIndexCloseData(this.drawMonths);
 
-                const [chinaBondYield, lpr, close] = await Promise.all([chinaBondYieldPromise, lprPromise, closePromise])
+                const [chinaBondYield, lpr, close] = await Promise.all([chinaBondYieldPromise, lprPromise, closePromise]);
 
-                const averageReturn = this.record.getAverageReturnData(this.drawMonths, chinaBondYield, lpr)
-                this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn)
+                const averageReturn = this.record.getAverageReturnData(this.drawMonths, chinaBondYield, lpr);
+                this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn);
+                this.averageReturnLineGraph.hideLoading();
 
-                const cumulativeReturn = await this.record.getCumulativeReturnData(this.drawMonths, close, assetChange)
-                this.cumulativeReturnLineGraph = drawCumulativeReturnLineGraph('cumulative-return-line-graph', cumulativeReturn)
+                const cumulativeReturn = await this.record.getCumulativeReturnData(this.drawMonths, close, assetChange);
+                this.cumulativeReturnLineGraph = drawCumulativeReturnLineGraph('cumulative-return-line-graph', cumulativeReturn);
+                this.cumulativeReturnLineGraph.hideLoading();
 
-                const riskIndicator = await this.record.getRiskIndicatorData(averageReturn, period, p)
-                this.riskIndicatorLineGraph = drawRiskIndicatorLineGraph('rick-indicator-line-graph', riskIndicator)
+                const riskIndicator = await this.record.getRiskIndicatorData(averageReturn, period, p);
+                this.riskIndicatorLineGraph = drawRiskIndicatorLineGraph('rick-indicator-line-graph', riskIndicator);
+                this.riskIndicatorLineGraph.hideLoading();
 
-                const drawdown = this.record.getDrawdownData(cumulativeReturn)
-                this.drawdownLineGraph = drawDrawdownLineGraph('drawdown-line-graph', drawdown)
+                const drawdown = this.record.getDrawdownData(cumulativeReturn);
+                this.drawdownLineGraph = drawDrawdownLineGraph('drawdown-line-graph', drawdown);
+                this.drawdownLineGraph.hideLoading();
             },
-
+            setMonthChangeGraphLoading: () => {
+                this.assetChangeLineGraph.showLoading();
+                this.averageReturnLineGraph.showLoading();
+                this.assetDeltaChangeBarGraph.showLoading();
+                this.cumulativeReturnLineGraph.showLoading();
+                this.riskIndicatorLineGraph.showLoading();
+                this.drawdownLineGraph.showLoading();
+            },
+            onDrawMonthsChange: async () => {
+                this.setMonthChangeGraphLoading();
+                await this.draw();
+            },
             dropdownMenus: [
                 {
                     command: 'cash',
@@ -347,7 +386,7 @@ export default {
         this.assetDeltaChangeBarGraph.dispose()
         this.cumulativeReturnLineGraph.dispose()
         this.riskIndicatorLineGraph.dispose()
-        this.drawDrawdownLineGraph.dispose()
+        this.drawdownLineGraph.dispose()
     },
 
 }

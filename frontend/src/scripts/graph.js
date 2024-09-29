@@ -698,7 +698,7 @@ function drawEmptyAssetChangeLineGraph (domId, dates) {
         fixedDepositData: Array(dates.length).fill(Number.NaN),
         fundData: Array(dates.length).fill(Number.NaN),
     }
-    drawAssetChangeLineGraph(domId, data);
+    return drawAssetChangeLineGraph(domId, data);
 }
 
 function drawEmptyAssetDeltaChangeBarGraph (domId, dates) {
@@ -710,7 +710,7 @@ function drawEmptyAssetDeltaChangeBarGraph (domId, dates) {
         fundDeltaData: Array(dates.length).fill(Number.NaN),
         totalDeltaData: Array(dates.length).fill(Number.NaN),
     }
-    drawAssetDeltaChangeBarGraph(domId, data);
+    return drawAssetDeltaChangeBarGraph(domId, data);
 }
 
 function drawEmptyResidualMaturityPieGraph (domId) {
@@ -724,7 +724,7 @@ function drawEmptyResidualMaturityPieGraph (domId) {
         { value: 0, name: "365日内" },
         { value: 0, name: "365日以上" },
     ]
-    drawResidualMaturityPieGraph(domId, data);
+    return drawResidualMaturityPieGraph(domId, data);
 }
 
 function drawEmptyExpectedReturnPieGraph (domId) {
@@ -735,7 +735,7 @@ function drawEmptyExpectedReturnPieGraph (domId) {
         { value: 0, name: "5%-10%" },
         { value: 0, name: ">10%" },
     ]
-    drawExpectedReturnPieGraph(domId, data);
+    return drawExpectedReturnPieGraph(domId, data);
 }
 
 function drawEmptyLiquidityReturnPositionScatterGraph (domId) {
@@ -743,7 +743,7 @@ function drawEmptyLiquidityReturnPositionScatterGraph (domId) {
         data: [],
         amount: []
     }
-    drawLiquidityReturnPositionScatterGraph(domId, data);
+    return drawLiquidityReturnPositionScatterGraph(domId, data);
 }
 
 function drawEmptyAverageReturnLineGraph (domId, dates) {
@@ -756,7 +756,7 @@ function drawEmptyAverageReturnLineGraph (domId, dates) {
         yields: Array(dates.length).fill(Number.NaN),
         lpr: Array(dates.length).fill(Number.NaN),
     }
-    drawAverageReturnLineGraph(domId, data);
+    return drawAverageReturnLineGraph(domId, data);
 }
 
 function drawEmptyCumulativeReturnLineGraph (domId, dates) {
@@ -768,7 +768,7 @@ function drawEmptyCumulativeReturnLineGraph (domId, dates) {
             '000012': Array(dates.length).fill(Number.NaN),
         }
     }
-    drawCumulativeReturnLineGraph(domId, data);
+    return drawCumulativeReturnLineGraph(domId, data);
 }
 
 function drawEmptyDrawdownLineGraph (domId, dates) {
@@ -776,7 +776,7 @@ function drawEmptyDrawdownLineGraph (domId, dates) {
         time: dates.map(date => timeFormat(date, true)),
         drawdown: Array(dates.length).fill(Number.NaN),
     }
-    drawDrawdownLineGraph(domId, data);
+    return drawDrawdownLineGraph(domId, data);
 }
 
 function drawEmptyRiskIndicatorLineGraph (domId, dates) {
@@ -785,7 +785,7 @@ function drawEmptyRiskIndicatorLineGraph (domId, dates) {
         sharpeRatio: Array(dates.length).fill(Number.NaN),
         sharpeConfidence: Array(dates.length).fill({ lower: Number.NaN, upper: Number.NaN })
     }
-    drawRiskIndicatorLineGraph(domId, data);
+    return drawRiskIndicatorLineGraph(domId, data);
 }
 
 
