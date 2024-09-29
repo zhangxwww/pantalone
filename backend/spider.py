@@ -52,6 +52,10 @@ def get_close(code, date):
     return df['收盘'][0]
 
 
+def get_fund_name_from_symbol(symbol):
+    return ak.fund_individual_basic_info_xq(symbol=symbol).loc[1, 'value']
+
+
 if __name__ == '__main__':
     # get_china_bond_yield(datetime.datetime.now())
     # print(get_lpr())

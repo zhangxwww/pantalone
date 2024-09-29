@@ -212,3 +212,19 @@ class IndexCloseData(IndexCloseDataBase):
 
     class Config:
         from_attributes = True
+
+
+# ********** Fund Name Data **********
+
+class FundNameDataBase(BaseModel):
+    symbol: str
+    name: str
+
+
+class FundNameDataCreate(FundNameDataBase):
+    pass
+
+
+class FundNameData(FundNameDataBase):
+    class Config:
+        from_attributes = True

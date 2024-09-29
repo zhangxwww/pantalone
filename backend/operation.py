@@ -6,7 +6,7 @@ import itertools
 
 from loguru import logger
 
-from spider import get_china_bond_yield, get_lpr, get_close
+from spider import get_china_bond_yield, get_lpr, get_close, get_fund_name_from_symbol
 import sql_app.schemas as schemas
 import sql_app.crud as crud
 from utils import trans_str_date_to_trade_date
@@ -180,6 +180,19 @@ def get_index_close_data(db, dates):
     logger.debug(final_data)
 
     return final_data
+
+
+def get_fund_name(db, symbol):
+    db_data = crud.get_fund_name(db, symbol)
+    if db_data is not None:
+        logger.debug(f'Get fund name from db: {db_data.name}')
+        return db_data.name
+    else:
+        name = get_fund_name_from_symbol(symbol)
+        item = schemas.FundNameDataCreate(symbol=symbol, name=name)
+        crud.create_fund_name(db, item)
+        logger.debug(f'Get fund name from spider: {name}')
+        return name
 
 
 def save_base64_data(db, data):

@@ -332,3 +332,23 @@ def get_index_close_data(
     dates: List[date]
 ):
     return db.query(models.IndexClose).filter(models.IndexClose.date.in_(dates)).all()
+
+
+# ********** fund name data **********
+
+def get_fund_name(
+    db: Session,
+    symbol: str
+):
+    return db.query(models.FundName).filter(models.FundName.symbol == symbol).one()
+
+
+def save_fund_name(
+    db: Session,
+    data: schemas.FundNameDataCreate
+):
+    db_fund_name = models.FundName(**data.model_dump())
+    db.add(db_fund_name)
+    db.commit()
+    db.refresh(db_fund_name)
+    return db_fund_name

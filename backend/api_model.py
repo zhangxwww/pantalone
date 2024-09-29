@@ -15,6 +15,10 @@ class IndexCloseDateData(BaseModel):
     dates: List[str]
 
 
+class QueryFundNameData(BaseModel):
+    symbol: str
+
+
 class UploadData(BaseModel):
     file: str
 

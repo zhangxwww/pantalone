@@ -118,3 +118,10 @@ class IndexClose(Base):
     code = Column(String)
     date = Column(Date)
     close = Column(Float)
+
+
+class FundName(Base):
+    __tablename__ = 'fund_name'
+
+    symbol = Column(String, primary_key=True, index=True)
+    name = Column(String)
