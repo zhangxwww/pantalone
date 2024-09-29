@@ -7,7 +7,8 @@ import {
     uploadRequest,
     addDataRequest,
     getNormalIntervalRequest,
-    getIndexCloseRequest
+    getIndexCloseRequest,
+    getRefreshedFundNetValueRequest
 } from './requests.js';
 
 
@@ -281,6 +282,53 @@ class Data {
         return data;
     }
 
+    async refreshFundNetValue (data) {
+        let symbols = [];
+        for (let u of data.fundData) {
+            symbols.push(u.symbol);
+        }
+        symbols = [...new Set(symbols)];
+
+        const d = await getRefreshedFundNetValueRequest(symbols);
+        console.log(d);
+        const latestNetValue = {};
+        for (let refreshed of d.refresh) {
+            const s = refreshed.symbol;
+            const v = refreshed.value;
+            latestNetValue[s] = v;
+        }
+        console.log(latestNetValue);
+
+        let update = false;
+
+        for (let u of data.fundData) {
+            const now = new Date();
+            const deltaTime = (now - u.currentTime) / (24 * 3600 * 1000)
+            const newNetValue = latestNetValue[u.symbol];
+            if (deltaTime < 1 && newNetValue === u.currentNetValue) {
+                continue
+            }
+            const toBeAdded = {
+                name: u.name,
+                symbol: u.symbol,
+                currentNetValue: newNetValue,
+                currentShares: u.currentShares,
+                holding: u.holding,
+                lockupPeriod: u.lockupPeriod - Math.max(Math.ceil(deltaTime), 2)
+            }
+            console.log(toBeAdded);
+            await this._addData('fund', toBeAdded, u.id);
+            update = true;
+        }
+
+        if (update) {
+            await this.load();
+            this.data = this.prepareData();
+        }
+
+        return update;
+    }
+
     download () {
         const json = JSON.stringify(this.json);
         const blob = new Blob([json], { type: 'text/plain' });
@@ -296,13 +344,17 @@ class Data {
         uploadRequest(file, callback);
     }
 
+    async _addData (type, data, id) {
+        await addDataRequest(type, data, id);
+    }
+
     async addData (type, data, id) {
-        console.log(type)
-        console.log(data)
-        console.log(id)
-        await addDataRequest(type, data, id)
-        await this.load()
-        this.data = this.prepareData()
+        console.log(type);
+        console.log(data);
+        console.log(id);
+        await this._addData(type, data, id);
+        await this.load();
+        this.data = this.prepareData();
     }
 
     sampleDates (months) {

@@ -45,7 +45,7 @@
             <el-col :span="6" :offset="9">
                 <span style="font-size: var(--el-font-size-large); font-weight: bold">项目明细</span>
             </el-col>
-            <el-col :span="1" :offset="5">
+            <el-col :span="1" :offset="4">
                 <el-dropdown trigger="hover" v-on:command="onAddSelect">
                     <el-button type="primary">
                         <el-icon>
@@ -81,6 +81,19 @@
                     </template>
                 </el-upload>
             </el-col>
+
+            <el-col :span="1" style="margin-left: 10px">
+                <el-button @click="onRefresh" v-if="!refreshing">
+                    <el-icon>
+                        <refresh />
+                    </el-icon>
+                </el-button>
+                <el-button v-else disabled>
+                    <el-icon>
+                        <refresh />
+                    </el-icon>
+                </el-button>
+            </el-col>
         </el-row>
         <el-row>
             <tab-table :data="data" @edit="handleEdit"></tab-table>
@@ -97,7 +110,7 @@
 </template>
 
 <script>
-import { Plus, Download, Upload } from '@element-plus/icons-vue'
+import { Plus, Download, Upload, Refresh } from '@element-plus/icons-vue'
 import Data from '@/scripts/data.js'
 import {
     drawAssetChangeLineGraph,
@@ -142,6 +155,7 @@ export default {
 
             editId: null,
             drawMonths: 12,
+            refreshing: false,
 
             handleEdit: (row, type) => {
                 this.editId = row.id
@@ -237,35 +251,31 @@ export default {
             onUpload: (file) => {
                 this.record.upload(file, () => { location.reload(); });
             },
+            onRefresh: async () => {
+                this.refreshing = true;
+                this.setAllGraphLoading();
+                const update = await this.record.refreshFundNetValue(this.data);
+                if (update) {
+                    this.data = this.record.getData();
+                    await this.draw();
+                } else {
+                    this.setAllGraphUnLoading();
+                }
+                this.refreshing = false;
+            },
             drawEmpty: () => {
                 const dates = this.record.sampleDates(this.drawMonths);
 
                 this.assetChangeLineGraph = drawEmptyAssetChangeLineGraph('asset-change-line-graph', dates);
-                this.assetChangeLineGraph.showLoading();
-
                 this.assetDeltaChangeBarGraph = drawEmptyAssetDeltaChangeBarGraph('asset-delta-change-bar-graph', dates);
-                this.assetDeltaChangeBarGraph.showLoading();
-
                 this.residualMaturatyPieGraph = drawEmptyResidualMaturityPieGraph('residual-maturity-pie-graph');
-                this.residualMaturatyPieGraph.showLoading();
-
                 this.expectedReturnPieGraph = drawEmptyExpectedReturnPieGraph('expected-return-pie-graph');
-                this.expectedReturnPieGraph.showLoading();
-
                 this.liquidityReturnPositionScatterGraph = drawEmptyLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph');
-                this.liquidityReturnPositionScatterGraph.showLoading();
-
                 this.averageReturnLineGraph = drawEmptyAverageReturnLineGraph('average-return-line-graph', dates);
-                this.averageReturnLineGraph.showLoading();
-
                 this.cumulativeReturnLineGraph = drawEmptyCumulativeReturnLineGraph('cumulative-return-line-graph', dates);
-                this.cumulativeReturnLineGraph.showLoading();
-
                 this.riskIndicatorLineGraph = drawEmptyRiskIndicatorLineGraph('rick-indicator-line-graph', dates);
-                this.riskIndicatorLineGraph.showLoading();
-
                 this.drawdownLineGraph = drawEmptyDrawdownLineGraph('drawdown-line-graph', dates);
-                this.drawdownLineGraph.showLoading();
+                this.setAllGraphLoading();
             },
             draw: async () => {
                 const period = 12;
@@ -321,6 +331,28 @@ export default {
                 this.riskIndicatorLineGraph.showLoading();
                 this.drawdownLineGraph.showLoading();
             },
+            setAllGraphLoading: () => {
+                this.assetChangeLineGraph.showLoading();
+                this.averageReturnLineGraph.showLoading();
+                this.assetDeltaChangeBarGraph.showLoading();
+                this.cumulativeReturnLineGraph.showLoading();
+                this.riskIndicatorLineGraph.showLoading();
+                this.drawdownLineGraph.showLoading();
+                this.residualMaturatyPieGraph.showLoading();
+                this.expectedReturnPieGraph.showLoading();
+                this.liquidityReturnPositionScatterGraph.showLoading();
+            },
+            setAllGraphUnLoading: () => {
+                this.assetChangeLineGraph.hideLoading();
+                this.averageReturnLineGraph.hideLoading();
+                this.assetDeltaChangeBarGraph.hideLoading();
+                this.cumulativeReturnLineGraph.hideLoading();
+                this.riskIndicatorLineGraph.hideLoading();
+                this.drawdownLineGraph.hideLoading();
+                this.residualMaturatyPieGraph.hideLoading();
+                this.expectedReturnPieGraph.hideLoading();
+                this.liquidityReturnPositionScatterGraph.hideLoading();
+            },
             onDrawMonthsChange: async () => {
                 this.setMonthChangeGraphLoading();
                 await this.draw();
@@ -364,6 +396,7 @@ export default {
         Plus,
         Download,
         Upload,
+        Refresh,
         AddCashDialog,
         AddMonetaryDialog,
         AddFixedDialog,

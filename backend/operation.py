@@ -6,7 +6,8 @@ import itertools
 
 from loguru import logger
 
-from spider import get_china_bond_yield, get_lpr, get_close, get_fund_name_from_symbol
+# from spider import get_china_bond_yield, get_lpr, get_close, get_fund_name_from_symbol, get_latest_net_value_of_fund
+import spider
 import sql_app.schemas as schemas
 import sql_app.crud as crud
 from utils import trans_str_date_to_trade_date
@@ -38,7 +39,7 @@ def get_china_bond_yield_data(db, dates):
 
     not_found_dates_yield = []
     for date in not_found_dates:
-        yield_1yr = get_china_bond_yield(date)
+        yield_1yr = spider.get_china_bond_yield(date)
         item = schemas.CN1YRDataCreate(date=date, yield_1yr=yield_1yr)
         not_found_dates_yield.append(item)
     crud.create_CN1YR_data_from_list(db, not_found_dates_yield)
@@ -106,7 +107,7 @@ def get_lpr_data(db, dates):
 
     if len(not_found_dates) > 0:
 
-        spider_data = get_lpr()
+        spider_data = spider.get_lpr()
 
         logger.debug('Spider data:')
         logger.debug(spider_data)
@@ -151,7 +152,7 @@ def get_index_close_data(db, dates):
     logger.debug(not_found_data)
 
     def _f(code, date):
-        close = get_close(code, date)
+        close = spider.get_close(code, date)
         return schemas.IndexCloseDataCreate(date=date, close=close, code=code)
 
     not_found_dates_close = Parallel(n_jobs=-1)(delayed(_f)(code, date) for code, date in not_found_data)
@@ -188,7 +189,7 @@ def get_fund_name(db, symbol):
         logger.debug(f'Get fund name from db: {db_data.name}')
         return db_data.name
     else:
-        name = get_fund_name_from_symbol(symbol)
+        name = spider.get_fund_name_from_symbol(symbol)
         item = schemas.FundNameDataCreate(symbol=symbol, name=name)
         crud.create_fund_name(db, item)
         logger.debug(f'Get fund name from spider: {name}')
@@ -338,3 +339,12 @@ def add_fund_history(db, data):
     content['currentTime'] = datetime.now().date()
     item = schemas.FundDataHistoryItemCreate(**content)
     crud.create_fund_data_history_item(db, item, data.id)
+
+
+def get_refreshed_fund_net_value(symbols):
+    def _f(symbol):
+        net_value = spider.get_latest_net_value_of_fund(symbol)
+        return {'symbol': symbol, 'value': net_value}
+
+    ret = Parallel(n_jobs=-1)(delayed(_f)(symbol) for symbol in symbols)
+    return ret

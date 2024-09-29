@@ -45,3 +45,10 @@ async def get_sh_close(data: api_model.IndexCloseDateData, background_tasks: Bac
 async def get_fund_name(data: api_model.QueryFundNameData, db: Session = Depends(get_db)):
     logger.debug(data.symbol)
     return {'fund_name': operation.get_fund_name(db, data.symbol)}
+
+
+@router.post('/refresh')
+@timeit
+async def get_refresh_data(data: api_model.RefreshFundNetValueData):
+    logger.debug(data.symbols)
+    return {'refresh': operation.get_refreshed_fund_net_value(data.symbols)}

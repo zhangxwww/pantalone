@@ -21,6 +21,11 @@ async function getFundNameRequest (symbol) {
     return res.data;
 }
 
+async function getRefreshedFundNetValueRequest (symbols) {
+    const res = await axios.post('/api/refresh', { 'symbols': symbols });
+    return res.data;
+}
+
 function uploadRequest (file, callback) {
 
     const reader = new FileReader();
@@ -81,5 +86,6 @@ export {
     addDataRequest,
     getTIntervalRequest,
     getNormalIntervalRequest,
-    getIndexCloseRequest
+    getIndexCloseRequest,
+    getRefreshedFundNetValueRequest
 }

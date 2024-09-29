@@ -56,6 +56,10 @@ def get_fund_name_from_symbol(symbol):
     return ak.fund_individual_basic_info_xq(symbol=symbol).loc[1, 'value']
 
 
+def get_latest_net_value_of_fund(symbol):
+    return ak.fund_open_fund_info_em(symbol=symbol, indicator="单位净值走势")['单位净值'].iloc[-1]
+
+
 if __name__ == '__main__':
     # get_china_bond_yield(datetime.datetime.now())
     # print(get_lpr())
