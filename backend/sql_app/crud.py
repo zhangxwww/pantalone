@@ -340,10 +340,10 @@ def get_fund_name(
     db: Session,
     symbol: str
 ):
-    return db.query(models.FundName).filter(models.FundName.symbol == symbol).one()
+    return db.query(models.FundName).filter(models.FundName.symbol == symbol).one_or_none()
 
 
-def save_fund_name(
+def create_fund_name(
     db: Session,
     data: schemas.FundNameDataCreate
 ):

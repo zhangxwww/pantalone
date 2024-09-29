@@ -203,6 +203,7 @@ export default {
             addFundData: async (form) => {
                 await this.record.addData('fund', {
                     name: form.name,
+                    symbol: form.symbol,
                     currentShares: form.currentShares,
                     currentNetValue: form.currentNetValue,
                     lockupPeriod: form.lockupPeriod,

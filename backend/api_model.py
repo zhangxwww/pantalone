@@ -63,6 +63,7 @@ class AddFixedDepositHistoryData(BaseModel):
 
 class _AddFundData(BaseModel):
     name: str
+    symbol: str
     currentNetValue: float
     currentShares: float
     holding: bool

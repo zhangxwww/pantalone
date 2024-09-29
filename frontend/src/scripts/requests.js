@@ -15,6 +15,12 @@ async function getIndexCloseRequest (dates) {
     return res.data;
 }
 
+async function getFundNameRequest (symbol) {
+    const res = await axios.post('/api/fund-name', { 'symbol': symbol });
+    console.log(res);
+    return res.data;
+}
+
 function uploadRequest (file, callback) {
 
     const reader = new FileReader();
@@ -69,6 +75,7 @@ async function getNormalIntervalRequest (p) {
 export {
     getChinaBondYieldDataRequest,
     getLPRDataRequest,
+    getFundNameRequest,
     uploadRequest,
     loadDataRequest,
     addDataRequest,
