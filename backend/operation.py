@@ -361,17 +361,14 @@ def get_fund_holding_data(db, symbols):
     year, quarter = get_one_quarter_before(current_year, current_quarter)
 
     found = set()
-
     holdings = {}
-    for symbol in symbols:
-        holding = crud.get_fund_holding_data(db, year, quarter, symbol, 'all')
-        if holding:
-            holdings[symbol] = holding
-            found.add(symbol)
 
-    logger.debug(f'Found in db ({year}Q{quarter}): {found}')
-
-    not_found_symbols = set(symbols) - found
+    def _search_in_db(symbols, year, quarter, holdings, found):
+        for symbol in symbols:
+            holding = crud.get_fund_holding_data(db, year, quarter, symbol, 'all')
+            if holding:
+                holdings[symbol] = holding
+                found.add(symbol)
 
     def _f(symbol, year, quarter):
         stock = spider.get_fund_holding(symbol, year, 'stock')
@@ -380,43 +377,34 @@ def get_fund_holding_data(db, symbols):
         ret_holding = [h for h in all_holding if h['quarter'] == quarter]
         return symbol, ret_holding, all_holding
 
-    spider_res = Parallel(n_jobs=-1)(delayed(_f)(symbol, year, quarter) for symbol in not_found_symbols)
+    def _search_by_spider(symbols, year, quarter, holdings, found):
+        spider_res = Parallel(n_jobs=-1)(delayed(_f)(symbol, year, quarter) for symbol in symbols)
 
-    for symbol, quarter_holding, all_holding in spider_res:
+        for symbol, quarter_holding, all_holding in spider_res:
 
-        logger.debug(f'Get {symbol} from spider: {quarter_holding}')
+            if quarter_holding:
+                holdings[symbol] = quarter_holding
+                found.add(symbol)
 
-        if quarter_holding:
-            holdings[symbol] = quarter_holding
-            found.add(symbol)
+            for h in all_holding:
+                item = schemas.FundHoldingDataCreate(**h)
+                crud.create_fund_holding_data_if_not_exist(db, item)
 
-            logger.debug(f'Found {symbol} in spider')
 
-        for h in all_holding:
-            item = schemas.FundHoldingDataCreate(**h)
-            crud.create_fund_holding_data_if_not_exist(db, item)
+    _search_in_db(symbols, year, quarter, holdings, found)
+    logger.debug(f'Found in db ({year}Q{quarter}): {found}')
 
+    not_found_symbols = set(symbols) - found
+    _search_by_spider(not_found_symbols, year, quarter, holdings, found)
     logger.debug(f'Found in spider ({year}Q{quarter}): {found}')
 
     year, quarter = get_one_quarter_before(year, quarter)
 
     not_found_symbols = set(symbols) - found
-    for symbol in not_found_symbols:
-        holding = crud.get_fund_holding_data(db, year, quarter, symbol, 'all')
-        if holding:
-            holdings[symbol] = holding
-            found.add(symbol)
+    _search_in_db(not_found_symbols, year, quarter, holdings, found)
+
     not_found_symbols = set(symbols) - found
-
-    spider_res = Parallel(n_jobs=-1)(delayed(_f)(symbol, year, quarter) for symbol in not_found_symbols)
-    for symbol, quarter_holding, all_holding in spider_res:
-        if quarter_holding:
-            holdings[symbol] = quarter_holding
-            found.add(symbol)
-
-        for h in all_holding:
-            item = schemas.FundHoldingDataCreate(**h)
-            crud.create_fund_holding_data_if_not_exist(db, item)
+    _search_by_spider(not_found_symbols, year, quarter, holdings, found)
 
     not_found_symbols = set(symbols) - found
     for symbol in not_found_symbols:
