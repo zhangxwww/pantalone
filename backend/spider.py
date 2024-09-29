@@ -1,7 +1,9 @@
 import datetime
 import requests
+
 from bs4 import BeautifulSoup
 import akshare as ak
+
 
 
 def get_china_bond_yield(date):
@@ -60,7 +62,50 @@ def get_latest_net_value_of_fund(symbol):
     return ak.fund_open_fund_info_em(symbol=symbol, indicator="单位净值走势")['单位净值'].iloc[-1]
 
 
+def get_fund_position(symbol, year, type_):
+
+    func = {
+        'stock': ak.fund_portfolio_hold_em,
+        'bond': ak.fund_portfolio_bond_hold_em
+    }
+    try:
+        df = func[type_](symbol=symbol, date=year)
+
+        df['基金代码'] = symbol
+        df['年份'] = year
+        df['季度'] = df['季度'].apply(lambda x: x.split('年')[1].split('季度')[0])
+        cn_type = '股票' if type_ == 'stock' else '债券'
+        df = df[['年份', '季度', '基金代码', f'{cn_type}代码', f'{cn_type}名称', '占净值比例']]
+        res = []
+        for row in df.itertuples(index=False):
+            res.append({
+                'year': row.年份,
+                'quarter': row.季度,
+                'fund_code': row.基金代码,
+                'code': row[3],
+                'name': row[4],
+                'ratio': row.占净值比例,
+                'type': type_
+            })
+    except:
+        res = []
+    return res
+
+
+
 if __name__ == '__main__':
     # get_china_bond_yield(datetime.datetime.now())
     # print(get_lpr())
-    print(get_close('000001', datetime.datetime.strptime('2024-09-20', '%Y-%m-%d')))
+    # print(get_close('000001', datetime.datetime.strptime('2024-09-20', '%Y-%m-%d')))
+    from itertools import product
+    from joblib import Parallel, delayed
+
+    codes = [
+        '015716',
+        '007997', '000043', '015301', '270042'
+        ]
+    t = ['stock', 'bond']
+
+    res = Parallel(n_jobs=4)(delayed(get_fund_position)(symbol=c, year='2024', type_=t) for c, t in product(codes, t))
+
+    print(res)
