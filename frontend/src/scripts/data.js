@@ -255,10 +255,7 @@ class Data {
             }
             const d = {
                 name: last.name,
-                // beginningAmount: last.beginningAmount,
-                // beginningAmountFmt: last.beginningAmountFmt,
-                // beginningTime: last.beginningTime,
-                // beginningTimeFmt: last.beginningTimeFmt,
+                symbol: last.symbol,
                 currentAmount: last.currentAmount,
                 currentAmountFmt: last.currentAmountFmt,
                 currentShares: last.currentShares,

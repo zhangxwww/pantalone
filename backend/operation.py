@@ -283,6 +283,7 @@ def _get_fund_data_from_db(db):
         for his in history_data:
             h = {
                 'name': his.name,
+                'symbol': his.symbol,
                 'currentNetValue': his.currentNetValue,
                 'currentShares': his.currentShares,
                 'currentTime': his.currentTime,

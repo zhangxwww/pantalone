@@ -1,5 +1,5 @@
 <template>
-    <el-tabs type="border-card" style="width: 80%; margin-left: 10%; margin-bottom: 5%">
+    <el-tabs type="border-card" style="width: 90%; margin-left: 5%; margin-bottom: 5%">
         <el-tab-pane label="现金">
             <el-table :data="data.cashData" table-layout="auto" style="width: 100%">
                 <el-table-column v-for="header, i in headers.cash" :key="i" :prop="header.prop" :label="header.label"
@@ -177,7 +177,13 @@ export default {
                     {
                         prop: 'name',
                         label: '名称',
-                        width: '240',
+                        width: '300',
+                        sortable: false
+                    },
+                    {
+                        prop: 'symbol',
+                        label: '代码',
+                        width: '85',
                         sortable: false
                     },
                     {

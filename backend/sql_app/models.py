@@ -53,6 +53,7 @@ class FundDataHistoryItem(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
+    symbol = Column(String)
     currentNetValue = Column(Float)
     currentShares = Column(Float)
     currentTime = Column(Date)

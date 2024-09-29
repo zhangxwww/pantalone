@@ -124,6 +124,7 @@ class FixedDepositDataHistory(FixedDepositDataHistoryBase):
 
 class FundDataHistoryItemBase(BaseModel):
     name: str
+    symbol: str
     currentNetValue: float
     currentShares: float
     currentTime: date
