@@ -24,7 +24,7 @@
                 <div id="drawdown-line-graph" style="width: 100%; height: 300px"></div>
             </el-col>
         </el-row>
-        <el-row justify="center">
+        <el-row justify="center" style="margin-top: 20px;">
             <el-radio-group v-model="drawMonths" @change="onDrawMonthsChange">
                 <el-radio-button v-for="radio in drawMonthsRadio" :key="radio.value" :label="radio.label"
                     :value="radio.value" />
@@ -41,7 +41,7 @@
                 <div id="expected-return-pie-graph" style="width: 100%; height: 300px"></div>
             </el-col>
         </el-row>
-        <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
+        <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px; ">
             <el-col :span="6" :offset="9">
                 <span style="font-size: var(--el-font-size-large); font-weight: bold">项目明细</span>
             </el-col>
