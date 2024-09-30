@@ -68,8 +68,6 @@ class Data {
                     const currentRet = (mHis.currentNetValue - latest.currentNetValue) / latest.currentNetValue;
                     const currentSpan = (mHis.currentTime - latest.currentTime) / (1000 * 3600 * 24);
 
-                    console.log(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan);
-
                     if (currentSpan < 1) {
                         mHis.annualizedReturnRate = latest.annualizedReturnRate;
                     } else {
@@ -283,24 +281,13 @@ class Data {
         return data;
     }
 
-    async getHoldingData (tableData) {
-        let symbols = [];
-        for (let u of tableData.fundData) {
-            symbols.push(u.symbol);
-        }
-        symbols = [...new Set(symbols)];
+    async getHoldingData (symbols) {
         const holdingData = await getFundHoldingDataRequest(symbols);
         console.log(holdingData);
         return holdingData;
     }
 
-    async refreshFundNetValue (data) {
-        let symbols = [];
-        for (let u of data.fundData) {
-            symbols.push(u.symbol);
-        }
-        symbols = [...new Set(symbols)];
-
+    async refreshFundNetValue (data, symbols) {
         const d = await getRefreshedFundNetValueRequest(symbols);
         console.log(d);
         const latestNetValue = {};
@@ -796,8 +783,6 @@ class Data {
                 const d = candidate[candidate.length - 1];
                 if (d && d.holding && d.currentAmount > 0) {
                     cum += d.cumReturn;
-
-                    console.log(date, d.currentTime, d.cumReturn, cum);
                 }
             }
             for (let fData of this.data.fixedDepositData) {
@@ -805,8 +790,6 @@ class Data {
                 const d = candidate[candidate.length - 1];
                 if (d && d.beginningAmount > 0) {
                     cum += d.beginningAmount * d.rate * (date - d.beginningTime) / (d.endingTime - d.beginningTime);
-
-                    console.log(date, d.beginningTime, d.endingTime, d.rate, d.beginningAmount, d.beginningAmount * d.rate * (date - d.beginningTime) / (d.endingTime - d.beginningTime), cum);
                 }
             }
             for (let uData of this.data.fundData) {

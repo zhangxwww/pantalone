@@ -51,9 +51,10 @@ export default {
     };
   },
   methods: {
-    goBack () {
-      this.$router.go(-1);
-    },
+
   },
+  beforeMount () {
+    console.log(this.$route.query.symbols);
+  }
 }
 </script>

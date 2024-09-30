@@ -105,7 +105,8 @@
                     <template #dropdown>
                         <el-dropdown-menu>
                             <el-dropdown-item>
-                                <router-link to="/position" style="text-decoration-line: none; font: inherit">
+                                <router-link :to="{ path: '/position', query: { symbols: getFundSymbols() } }"
+                                    style="text-decoration-line: none; font: inherit">
                                     基金仓位明细
                                 </router-link>
                             </el-dropdown-item>
@@ -176,34 +177,39 @@ export default {
             drawMonths: 12,
             refreshing: false,
 
+            getFundSymbols: () => {
+                const symbols = this.data.fundData.map(fund => fund.symbol);
+                console.log(symbols);
+                return [...new Set(symbols)];
+            },
             handleEdit: (row, type) => {
-                this.editId = row.id
+                this.editId = row.id;
 
                 if (type === 'cash') {
-                    this.$refs.addCashDialog.edit(row)
+                    this.$refs.addCashDialog.edit(row);
                 } else if (type === 'monetary-fund') {
-                    this.$refs.addMonetaryDialog.edit(row)
+                    this.$refs.addMonetaryDialog.edit(row);
                 } else if (type === 'fixed-deposit') {
-                    this.$refs.addFixedDialog.edit(row)
+                    this.$refs.addFixedDialog.edit(row);
                 } else if (type === 'fund') {
-                    this.$refs.addFundDialog.edit(row)
+                    this.$refs.addFundDialog.edit(row);
                 }
             },
             onAddSelect: type => {
-                this.editId = null
+                this.editId = null;
 
                 switch (type) {
                     case 'cash':
-                        this.$refs.addCashDialog.show()
+                        this.$refs.addCashDialog.show();
                         break
                     case 'monetary-fund':
-                        this.$refs.addMonetaryDialog.show()
+                        this.$refs.addMonetaryDialog.show();
                         break
                     case 'fixed-deposit':
-                        this.$refs.addFixedDialog.show()
+                        this.$refs.addFixedDialog.show();
                         break
                     case 'fund':
-                        this.$refs.addFundDialog.show()
+                        this.$refs.addFundDialog.show();
                         break
                 }
             },
@@ -211,7 +217,7 @@ export default {
                 await this.record.addData('cash', {
                     name: form.name,
                     amount: form.amount
-                }, this.editId)
+                }, this.editId);
             },
             addMonetaryFundData: async (form) => {
                 await this.record.addData('monetary-fund', {
@@ -222,7 +228,7 @@ export default {
                     currentShares: form.currentShares,
                     fastRedemption: form.fastRedemption,
                     holding: form.holding
-                }, this.editId)
+                }, this.editId);
             },
             addFixedDepositData: async (form) => {
                 await this.record.addData('fixed-deposit', {
@@ -231,7 +237,7 @@ export default {
                     beginningTime: form.beginningTime,
                     rate: form.rate,
                     maturity: form.maturity
-                }, this.editId)
+                }, this.editId);
             },
             addFundData: async (form) => {
                 await this.record.addData('fund', {
@@ -273,7 +279,7 @@ export default {
             onRefresh: async () => {
                 this.refreshing = true;
                 this.setAllGraphLoading();
-                const update = await this.record.refreshFundNetValue(this.data);
+                const update = await this.record.refreshFundNetValue(this.data, this.getFundSymbols());
                 if (update) {
                     this.data = this.record.getData();
                     await this.draw();
@@ -435,7 +441,7 @@ export default {
         // eslint-disable-next-line no-unused-vars
         const [_, holding] = await Promise.all([
             this.draw(),
-            this.record.getHoldingData(this.data)
+            this.record.getHoldingData(this.getFundSymbols())
         ]);
     },
     unmounted () {
