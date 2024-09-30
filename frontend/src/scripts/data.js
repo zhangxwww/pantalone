@@ -317,7 +317,7 @@ class Data {
             const now = new Date();
             const deltaTime = (now - u.currentTime) / (24 * 3600 * 1000)
             const newNetValue = latestNetValue[u.symbol];
-            if (deltaTime < 1 && newNetValue === u.currentNetValue) {
+            if (newNetValue === u.currentNetValue) {
                 continue
             }
             const toBeAdded = {
@@ -614,7 +614,8 @@ class Data {
             data.push({
                 liquidity: 1,
                 return: 0,
-                amount: last.amount
+                amount: last.amount,
+                name: last.name
             })
         }
         for (let mData of this.data.monetaryFundData) {
@@ -626,13 +627,15 @@ class Data {
                 data.push({
                     liquidity: 1,
                     return: last.annualizedReturnRate,
-                    amount: last.currentAmount
+                    amount: last.currentAmount,
+                    name: last.name
                 })
             } else {
                 data.push({
                     liquidity: 1,
                     return: last.annualizedReturnRate,
-                    amount: last.currentAmount
+                    amount: last.currentAmount,
+                    name: last.name
                 })
             }
         }
@@ -644,7 +647,8 @@ class Data {
             data.push({
                 liquidity: last.residualMaturaty,
                 return: last.rate,
-                amount: last.beginningAmount
+                amount: last.beginningAmount,
+                name: last.name
             })
         }
         for (let uData of this.data.fundData) {
@@ -655,7 +659,8 @@ class Data {
             data.push({
                 liquidity: last.residualLockupPeriod,
                 return: last.annualizedReturnRate,
-                amount: last.currentAmount
+                amount: last.currentAmount,
+                name: last.name
             })
         }
         data = data.sort((a, b) => {
@@ -671,6 +676,7 @@ class Data {
                 const last = acc[acc.length - 1];
                 if (last.liquidity === cur.liquidity && last.return === cur.return) {
                     last.amount += cur.amount;
+                    last.name = `${last.name}、${cur.name}`;
                 } else {
                     acc.push(cur);
                 }
@@ -680,7 +686,8 @@ class Data {
 
         return {
             data: data.map(d => [d.liquidity, d.return]),
-            amount: data.map(d => d.amount)
+            amount: data.map(d => d.amount),
+            name: data.map(d => d.name)
         };
     }
 
@@ -779,7 +786,8 @@ class Data {
         const dates = this.sampleDates(months);
         const cumReturn = [];
         const deltaReturnRate = [Number.NaN];
-        const cumReturnRate = [Number.NaN];
+        const cumReturnRateGeo = [Number.NaN];
+        const cumReturnRateAri = [Number.NaN];
 
         for (let [i, date] of dates.entries()) {
             let cum = 0;
@@ -814,17 +822,21 @@ class Data {
                 const total = assetChangeData.monetaryFundData[i] + assetChangeData.fixedDepositData[i] + assetChangeData.fundData[i];
                 deltaReturnRate.push(deltaReturn / total);
 
-                const crr = isNaN(cumReturnRate[i - 1]) ?
+                const crrGeo = isNaN(cumReturnRateGeo[i - 1]) ?
                     deltaReturnRate[i] :
-                    (cumReturnRate[i - 1] + 1) * (deltaReturnRate[i] + 1) - 1;
-                cumReturnRate.push(crr);
+                    (cumReturnRateGeo[i - 1] + 1) * (deltaReturnRate[i] + 1) - 1;
+                cumReturnRateGeo.push(crrGeo);
+                const crrAri = isNaN(cumReturnRateAri[i - 1]) ?
+                    deltaReturnRate[i] :
+                    cumReturnRateAri[i - 1] + deltaReturnRate[i];
+                cumReturnRateAri.push(crrAri);
             }
         }
         console.log(cumReturn);
         console.log(deltaReturnRate);
-        console.log(cumReturnRate);
+        console.log(cumReturnRateGeo);
 
-        const first_not_nan_index = cumReturnRate.findIndex(x => !isNaN(x));
+        const first_not_nan_index = cumReturnRateGeo.findIndex(x => !isNaN(x));
 
         const allIndexCumReturnRate = {
             '000001': null,
@@ -843,7 +855,8 @@ class Data {
         return {
             time: dates.map(t => timeFormat(t, true)),
             cumReturn: {
-                holding: cumReturnRate,
+                geometric: cumReturnRateGeo,
+                arithmetic: cumReturnRateAri,
                 '000001': allIndexCumReturnRate['000001'],
                 '000012': allIndexCumReturnRate['000012']
             }
@@ -851,19 +864,24 @@ class Data {
     }
 
     getDrawdownData (cumReturnData) {
-        const cum = cumReturnData.cumReturn.holding;
-        let peak = cum[0];
-        const drawdown = [Number.NaN];
-        for (let i = 1; i < cum.length; i++) {
-            if (isNaN(peak) || cum[i] > peak) {
-                peak = cum[i];
+
+        function cal (array) {
+            const cum = array;
+            let peak = cum[0];
+            const drawdown = [Number.NaN];
+            for (let i = 1; i < cum.length; i++) {
+                if (isNaN(peak) || cum[i] > peak) {
+                    peak = cum[i];
+                }
+                drawdown.push((peak - cum[i]) / peak);
             }
-            drawdown.push((peak - cum[i]) / peak);
-            console.log(peak, cum[i], drawdown[i]);
+            return drawdown;
         }
+
         return {
             time: cumReturnData.time,
-            drawdown: drawdown
+            drawdownGeometric: cal(cumReturnData.cumReturn.geometric),
+            drawdownArithmetic: cal(cumReturnData.cumReturn.arithmetic),
         }
     }
 }

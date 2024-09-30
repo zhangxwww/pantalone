@@ -319,6 +319,9 @@ function drawLiquidityReturnPositionScatterGraph (domId, data) {
                 <table>
                     <tbody>
                         <tr>
+                            <td align="left"><b>${data.name[params.dataIndex]}</b></td>
+                        </tr>
+                        <tr>
                             <td align="left">流动性：</td>
                             <td align="right"><b>${params.data[0]}</b></td>
                         </tr>
@@ -472,9 +475,15 @@ function drawCumulativeReturnLineGraph (domId, data) {
         },
         series: [
             {
-                name: "累计收益",
+                name: "累计收益（几何平均）",
                 type: "line",
-                data: data.cumReturn.holding,
+                data: data.cumReturn.geometric,
+                smooth: true
+            },
+            {
+                name: "累计收益（算术平均）",
+                type: "line",
+                data: data.cumReturn.arithmetic,
                 smooth: true
             },
             {
@@ -547,12 +556,22 @@ function drawDrawdownLineGraph (domId, data) {
         },
         series: [
             {
-                name: "回撤",
+                name: "回撤（几何平均）",
                 type: "line",
-                data: data.drawdown,
+                data: data.drawdownGeometric,
+                smooth: true
+            },
+            {
+                name: "回撤（算术平均）",
+                type: "line",
+                data: data.drawdownArithmetic,
                 smooth: true
             }
         ],
+        legend: {
+            x: "center",
+            y: "bottom"
+        },
         tooltip: {
             trigger: "axis",
             textStyle: {
@@ -741,7 +760,8 @@ function drawEmptyExpectedReturnPieGraph (domId) {
 function drawEmptyLiquidityReturnPositionScatterGraph (domId) {
     const data = {
         data: [],
-        amount: []
+        amount: [],
+        name: []
     }
     return drawLiquidityReturnPositionScatterGraph(domId, data);
 }
@@ -763,7 +783,8 @@ function drawEmptyCumulativeReturnLineGraph (domId, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         cumReturn: {
-            holding: Array(dates.length).fill(Number.NaN),
+            geometrc: Array(dates.length).fill(Number.NaN),
+            arithmetic: Array(dates.length).fill(Number.NaN),
             '000001': Array(dates.length).fill(Number.NaN),
             '000012': Array(dates.length).fill(Number.NaN),
         }
@@ -774,7 +795,8 @@ function drawEmptyCumulativeReturnLineGraph (domId, dates) {
 function drawEmptyDrawdownLineGraph (domId, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
-        drawdown: Array(dates.length).fill(Number.NaN),
+        drawdownGeometric: Array(dates.length).fill(Number.NaN),
+        drawdownArithmetic: Array(dates.length).fill(Number.NaN),
     }
     return drawDrawdownLineGraph(domId, data);
 }

@@ -409,14 +409,14 @@ export default {
         this.drawEmpty();
         await this.record.load();
         this.data = this.record.getData();
-        await this.draw();
-        await this.record.getHoldingData(this.data);
+        // await this.draw();
+        // await this.record.getHoldingData(this.data);
 
         // eslint-disable-next-line no-unused-vars
-        // const [_, holding] = await Promise.all([
-        //     this.draw(),
-        //     this.record.getHoldingData(this.data)
-        // ]);
+        const [_, holding] = await Promise.all([
+            this.draw(),
+            this.record.getHoldingData(this.data)
+        ]);
     },
     unmounted () {
         this.assetChangeLineGraph.dispose();
