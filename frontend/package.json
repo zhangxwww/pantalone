@@ -16,7 +16,8 @@
         "element-plus": "^2.7.3",
         "vue": "^3.0.0",
         "vue-axios": "^3.5.2",
-        "vue-cli-service": "^5.0.10"
+        "vue-cli-service": "^5.0.10",
+        "vue-router": "^4.4.5"
     },
     "devDependencies": {
         "@eslint/js": "^9.9.0",

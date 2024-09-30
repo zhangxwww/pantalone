@@ -1,6 +1,7 @@
 import os
 
 from fastapi import FastAPI, staticfiles
+from fastapi.responses import FileResponse
 from loguru import logger
 
 from sql_app import models
@@ -28,6 +29,12 @@ app.include_router(statistic_router, prefix='/api')
 app.include_router(local_data_router, prefix='/api')
 app.include_router(network_data_router, prefix='/api')
 app.include_router(file_router, prefix='/api')
+
+
+@app.get('/position')
+async def position():
+    logger.debug('frontend')
+    return FileResponse('../frontend/dist/index.html')
 
 app.mount('/', staticfiles.StaticFiles(directory='../frontend/dist/', html=True), name='static')
 

@@ -13,7 +13,8 @@
                 </el-table-column>
             </el-table>
         </el-tab-pane>
-        <el-tab-pane label="货币基金"><el-table :data="data.monetaryFundData" table-layout="auto" style="width: 100%">
+        <el-tab-pane label="货币基金">
+            <el-table :data="data.monetaryFundData" table-layout="auto" style="width: 100%">
                 <el-table-column v-for="header, i in headers.monetaryFund" :key="i" :prop="header.prop"
                     :label="header.label" :width="header.width" :sortable="header.sortable" />
 
@@ -26,7 +27,8 @@
                 </el-table-column>
             </el-table>
         </el-tab-pane>
-        <el-tab-pane label="定期存款"><el-table :data="data.fixedDepositData" table-layout="auto" style="width: 100%">
+        <el-tab-pane label="定期存款">
+            <el-table :data="data.fixedDepositData" table-layout="auto" style="width: 100%">
                 <el-table-column v-for="header, i in headers.fixedDeposit" :key="i" :prop="header.prop"
                     :label="header.label" :width="header.width" :sortable="header.sortable" />
                 <el-table-column label="" align="right">
@@ -38,7 +40,8 @@
                 </el-table-column>
             </el-table>
         </el-tab-pane>
-        <el-tab-pane label="基金"><el-table :data="data.fundData" table-layout="auto" style="width: 100%">
+        <el-tab-pane label="基金">
+            <el-table :data="data.fundData" table-layout="auto" style="width: 100%">
                 <el-table-column v-for="header, i in headers.fund" :key="i" :prop="header.prop" :label="header.label"
                     :width="header.width" :sortable="header.sortable" />
                 <el-table-column label="" align="right">

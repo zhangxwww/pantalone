@@ -45,7 +45,7 @@
             <el-col :span="6" :offset="9">
                 <span style="font-size: var(--el-font-size-large); font-weight: bold">项目明细</span>
             </el-col>
-            <el-col :span="1" :offset="4">
+            <el-col :span="1" :offset="3">
                 <el-dropdown trigger="hover" v-on:command="onAddSelect">
                     <el-button type="primary">
                         <el-icon>
@@ -94,6 +94,25 @@
                     </el-icon>
                 </el-button>
             </el-col>
+
+            <el-col :span="1" style="margin-left: 10px">
+                <el-dropdown>
+                    <el-button>
+                        <el-icon>
+                            <tools />
+                        </el-icon>
+                    </el-button>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item>
+                                <router-link to="/position" style="text-decoration-line: none; font: inherit">
+                                    基金仓位明细
+                                </router-link>
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+            </el-col>
         </el-row>
         <el-row>
             <tab-table :data="data" @edit="handleEdit"></tab-table>
@@ -110,7 +129,7 @@
 </template>
 
 <script>
-import { Plus, Download, Upload, Refresh } from '@element-plus/icons-vue'
+import { Plus, Download, Upload, Refresh, Tools } from '@element-plus/icons-vue'
 import Data from '@/scripts/data.js'
 import {
     drawAssetChangeLineGraph,
@@ -397,6 +416,7 @@ export default {
         Download,
         Upload,
         Refresh,
+        Tools,
         AddCashDialog,
         AddMonetaryDialog,
         AddFixedDialog,
