@@ -375,6 +375,8 @@ class Data {
         const fixedDepositData = [];
         const fundData = [];
 
+        console.log(dates);
+
         for (let date of dates) {
             let cash = 0;
             for (let cData of this.data.cashData) {
@@ -424,7 +426,7 @@ class Data {
             fundData.push(fund);
         }
         return {
-            time: dates.map(t => timeFormat(t, true)),
+            time: dates.map(t => timeFormat(t, false)),
             cashData: cashData,
             monetaryFundData: monetaryFundData,
             fixedDepositData: fixedDepositData,
@@ -721,7 +723,7 @@ class Data {
             latestReturn.push(latest / sum);
         }
         return {
-            time: dates.map(t => timeFormat(t, true)),
+            time: dates.map(t => timeFormat(t, false)),
             data: {
                 holding: weightedReturn,
                 latest: latestReturn
@@ -836,7 +838,7 @@ class Data {
         console.log(allIndexCumReturnRate);
 
         return {
-            time: dates.map(t => timeFormat(t, true)),
+            time: dates.map(t => timeFormat(t, false)),
             cumReturn: {
                 geometric: cumReturnRateGeo,
                 arithmetic: cumReturnRateAri,
