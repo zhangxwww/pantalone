@@ -9,7 +9,6 @@ import {
     getNormalIntervalRequest,
     getIndexCloseRequest,
     getRefreshedFundNetValueRequest,
-    getFundHoldingDataRequest
 } from './requests.js';
 
 
@@ -281,12 +280,6 @@ class Data {
         return data;
     }
 
-    async getHoldingData (symbols) {
-        const holdingData = await getFundHoldingDataRequest(symbols);
-        console.log(holdingData);
-        return holdingData;
-    }
-
     async refreshFundNetValue (data, symbols) {
         const d = await getRefreshedFundNetValueRequest(symbols);
         console.log(d);
@@ -362,7 +355,7 @@ class Data {
 
         const interval = Math.ceil(months / 12);
         for (let i = 0; i < months; i += interval) {
-            let newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, currentDate.getDate() + 1);
+            let newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, currentDate.getDate(), 23, 59, 59);
             dates.unshift(newDate);
         }
         return dates;

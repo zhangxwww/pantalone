@@ -17,7 +17,6 @@ async function getIndexCloseRequest (dates) {
 
 async function getFundNameRequest (symbol) {
     const res = await axios.post('/api/fund-name', { 'symbol': symbol });
-    console.log(res);
     return res.data;
 }
 

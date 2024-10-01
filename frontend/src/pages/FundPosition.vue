@@ -9,52 +9,125 @@
         <span style="font-size: var(--el-font-size-large); font-weight: bold">基金持仓明细</span>
       </el-col>
     </el-row>
-    <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
-      <el-collapse accordion style="width: 100%;">
-        <el-collapse-item name="1">
+    <el-row v-if="isReady" style="width: 70%; margin-left: 15%; margin-bottom: 15px">
+      <el-collapse accordion style="width: 100%">
+        <el-collapse-item v-for="holding in holdingData" :key="holding.fundCode" :name="holding.fundCode">
           <template #title>
-            <span style="font-size: var(--el-font-size-medium); font-weight: bold">基金名称基金名称基金名称</span>
-            <span style="font-size: var(--el-font-size-base); margin-left: 20px">000000</span>
+            <span style="font-size: var(--el-font-size-medium); font-weight: bold">
+              {{ holding.fundName }}
+            </span>
+            <span style="font-size: var(--el-font-size-base); margin-left: 20px">
+              {{ holding.fundCode }}
+            </span>
           </template>
 
-          <el-collapse accordion style="width: 95%; margin-left: 5%">
-            <el-collapse-item name="11" title="股票">
-              <div>
-                股票内容
-              </div>
-            </el-collapse-item>
-          </el-collapse>
-
-        </el-collapse-item>
-        <el-collapse-item title="Feedback" name="2">
-          <div>
-            Operation feedback: enable the users to clearly perceive their
-            operations by style updates and interactive effects;
-          </div>
-          <div>
-            Visual feedback: reflect current state by updating or rearranging
-            elements of the page.
-          </div>
+          <el-row>
+            <el-col :span="12">
+              <el-table :data="holding.stockHoldings" table-layout="auto">
+                <el-table-column v-for="header in headers.stock" :key="header.prop" :prop="header.prop"
+                  :label="header.label" :width="header.width" :align="header.align" show-overflow-tooltip />
+              </el-table>
+            </el-col>
+            <el-col :span="12">
+              <el-table :data="holding.bondHoldings" table-layout="auto">
+                <el-table-column v-for="header in headers.bond" :key="header.prop" :prop="header.prop"
+                  :label="header.label" :width="header.width" :align="header.align" show-overflow-tooltip />
+              </el-table>
+            </el-col>
+          </el-row>
         </el-collapse-item>
       </el-collapse>
     </el-row>
+    <el-skeleton v-else :rows="5" animated
+      style="width: 70%; margin-left: 15%; margin-bottom: 15px; margin-top: 30px; text-align: left;" />
   </div>
 </template>
 
 <script>
+import {
+  getFundHoldingDataRequest,
+  getFundNameRequest
+} from '../scripts/requests';
 
 export default {
   name: 'FundPosition',
   data () {
     return {
-      activeName: '',
+      holdingData: [],
+
+      isReady: false,
+
+      headers: {
+        stock: [
+          { prop: 'name', label: '股票名称', width: '150', align: 'left' },
+          { prop: 'code', label: '股票代码', width: '100', align: 'right' },
+          { prop: 'ratio', label: '占净值比例', width: '100', align: 'right' },
+          { prop: 'updatedAt', label: '更新时间', width: '100', align: 'right' }
+        ],
+        bond: [
+          { prop: 'name', label: '债券名称', width: '150', align: 'left' },
+          { prop: 'code', label: '债券代码', width: '100', align: 'right' },
+          { prop: 'ratio', label: '占净值比例', width: '100', align: 'right' },
+          { prop: 'updatedAt', label: '更新时间', width: '100', align: 'right' }
+        ]
+      }
     };
   },
   methods: {
 
+    async updateHoldings (symbols) {
+      this.isReady = false;
+
+      const data = await getFundHoldingDataRequest(symbols);
+      const holding = data.holding;
+
+      console.log(holding);
+
+      const promises = Object.entries(holding).map(async ([fundCode, holdings]) => {
+        const stockHoldings = holdings
+          .stock
+          .sort((a, b) => b.ratio - a.ratio)
+          .map(holding => {
+            return {
+              name: holding.name,
+              code: holding.code,
+              ratio: `${holding.ratio.toFixed(2)}%`,
+              updatedAt: `${holding.year}-Q${holding.quarter}`
+            };
+          });
+        const bondHoldings = holdings
+          .bond
+          .sort((a, b) => b.ratio - a.ratio)
+          .map(holding => {
+            return {
+              name: holding.name,
+              code: holding.code,
+              ratio: holding.ratio,
+              updatedAt: `${holding.year}-Q${holding.quarter}`
+            };
+          });
+        return {
+          fundCode: fundCode,
+          fundName: await this.getFundName(fundCode),
+          stockHoldings: stockHoldings.slice(0, 10),
+          bondHoldings: bondHoldings.slice(0, 10)
+        };
+      });
+      const results = await Promise.all(promises);
+      this.holdingData.push(...results);
+
+      console.log(this.holdingData);
+      this.isReady = true;
+    },
+
+    async getFundName (symbol) {
+      const data = await getFundNameRequest(symbol);
+      return data.fund_name;
+    }
   },
-  beforeMount () {
+  async mounted () {
     console.log(this.$route.query.symbols);
+    await this.updateHoldings(this.$route.query.symbols);
   }
 }
 </script>

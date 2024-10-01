@@ -358,27 +358,30 @@ def get_fund_holding_data(db, symbols):
 
     logger.debug(f'Current: {current_year}Q{current_quarter}')
 
-    year, quarter = get_one_quarter_before(current_year, current_quarter)
-
-    found = set()
-    holdings = {}
-
-    def _search_in_db(symbols, year, quarter, holdings, found):
+    def _search_in_db(symbols, year, quarter, holdings, found, type_):
         for symbol in symbols:
-            holding = crud.get_fund_holding_data(db, year, quarter, symbol, 'all')
+            holding = crud.get_fund_holding_data(db, year, quarter, symbol, type_)
             if holding:
-                holdings[symbol] = holding
+                holdings[symbol] = [{
+                    'fund_code': h.fund_code,
+                    'code': h.code,
+                    'name': h.name,
+                    'ratio': h.ratio,
+                    'type': h.type,
+                    'year': h.year,
+                    'quarter': h.quarter
+                } for h in holding]
                 found.add(symbol)
 
-    def _f(symbol, year, quarter):
-        stock = spider.get_fund_holding(symbol, year, 'stock')
-        bond = spider.get_fund_holding(symbol, year, 'bond')
-        all_holding = stock + bond
-        ret_holding = [h for h in all_holding if h['quarter'] == quarter]
-        return symbol, ret_holding, all_holding
+        logger.debug(f'Found in db ({year}Q{quarter}): {holdings.keys()}')
 
-    def _search_by_spider(symbols, year, quarter, holdings, found):
-        spider_res = Parallel(n_jobs=-1)(delayed(_f)(symbol, year, quarter) for symbol in symbols)
+    def _f(symbol, year, quarter, type_):
+        holding = spider.get_fund_holding(symbol, year, type_)
+        ret_holding = [h for h in holding if h['quarter'] == quarter]
+        return symbol, ret_holding, holding
+
+    def _search_by_spider(symbols, year, quarter, holdings, found, type_):
+        spider_res = Parallel(n_jobs=-1)(delayed(_f)(symbol, year, quarter, type_) for symbol in symbols)
 
         for symbol, quarter_holding, all_holding in spider_res:
 
@@ -390,24 +393,62 @@ def get_fund_holding_data(db, symbols):
                 item = schemas.FundHoldingDataCreate(**h)
                 crud.create_fund_holding_data_if_not_exist(db, item)
 
+        logger.debug(f'Spider result ({year}Q{quarter}): {holdings.keys()}')
 
-    _search_in_db(symbols, year, quarter, holdings, found)
-    logger.debug(f'Found in db ({year}Q{quarter}): {found}')
+    year, quarter = current_year, current_quarter
 
-    not_found_symbols = set(symbols) - found
-    _search_by_spider(not_found_symbols, year, quarter, holdings, found)
-    logger.debug(f'Found in spider ({year}Q{quarter}): {found}')
+    stock_found = set()
+    bond_found = set()
+    stock_holdings = {}
+    bond_holdings = {}
 
-    year, quarter = get_one_quarter_before(year, quarter)
+    for _ in range(16):
+        year, quarter = get_one_quarter_before(year, quarter)
 
-    not_found_symbols = set(symbols) - found
-    _search_in_db(not_found_symbols, year, quarter, holdings, found)
+        not_found_stock_symbols = set(symbols) - stock_found
+        not_found_bond_symbols = set(symbols) - bond_found
 
-    not_found_symbols = set(symbols) - found
-    _search_by_spider(not_found_symbols, year, quarter, holdings, found)
+        logger.debug(f'Not found stock symbols before db ({year}Q{quarter}): {not_found_stock_symbols}')
+        logger.debug(f'Not found bond symbols before db ({year}Q{quarter}): {not_found_bond_symbols}')
 
-    not_found_symbols = set(symbols) - found
-    for symbol in not_found_symbols:
-        holdings[symbol] = []
+        if len(not_found_stock_symbols) == 0 and len(not_found_bond_symbols) == 0:
+            break
+
+        _search_in_db(not_found_stock_symbols, year, quarter, stock_holdings, stock_found, 'stock')
+        _search_in_db(not_found_bond_symbols, year, quarter, bond_holdings, bond_found, 'bond')
+
+        logger.debug(f'Already found stock in db ({year}Q{quarter}): {stock_found}')
+        logger.debug(f'Already found bond in db ({year}Q{quarter}): {bond_found}')
+
+        not_found_stock_symbols = set(symbols) - stock_found
+        not_found_bond_symbols = set(symbols) - bond_found
+
+        logger.debug(f'Not found stock symbols before spider ({year}Q{quarter}): {not_found_stock_symbols}')
+        logger.debug(f'Not found bond symbols before spider ({year}Q{quarter}): {not_found_bond_symbols}')
+
+        if len(not_found_stock_symbols) == 0 and len(not_found_bond_symbols) == 0:
+            break
+
+        _search_by_spider(not_found_stock_symbols, year, quarter, stock_holdings, stock_found, 'stock')
+        _search_by_spider(not_found_bond_symbols, year, quarter, bond_holdings, bond_found, 'bond')
+
+        logger.debug(f'Already found stock in spider ({year}Q{quarter}): {stock_found}')
+        logger.debug(f'Already found bond in spider ({year}Q{quarter}): {bond_found}')
+
+    not_found_stock_symbols = set(symbols) - stock_found
+    not_found_bond_symbols = set(symbols) - bond_found
+
+    for symbol in not_found_stock_symbols:
+        stock_holdings[symbol] = []
+
+    for symbol in not_found_bond_symbols:
+        bond_holdings[symbol] = []
+
+    holdings = {}
+    for symbol in symbols:
+        holdings[symbol] = {
+            'stock': stock_holdings[symbol],
+            'bond': bond_holdings[symbol]
+        }
 
     return holdings

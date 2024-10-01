@@ -18,6 +18,24 @@ def timeit(func):
         return result
     return wrapper
 
+def log_request(func):
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        logger.info(f"Request: {func.__name__}")
+        logger.info(f"Args: {args}")
+        logger.info(f"Kwargs: {kwargs}")
+        return await func(*args, **kwargs)
+    return wrapper
+
+def log_response(func):
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        result = await func(*args, **kwargs)
+        logger.info(f"Response: {func.__name__}")
+        logger.info(f"Result: {result}")
+        return result
+    return wrapper
+
 
 def get_log_file_path():
     log_dir = os.path.join(os.path.expanduser('~'), 'pantalone', 'logs')
