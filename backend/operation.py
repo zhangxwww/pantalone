@@ -5,7 +5,10 @@ from joblib import Parallel, delayed
 import itertools
 
 from loguru import logger
-from cachetools import cached, TTLCache
+
+import numpy as np
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.metrics.pairwise import pairwise_distances
 
 import spider
 import sql_app.schemas as schemas
@@ -18,7 +21,6 @@ INDEX_CODES = [
     '000012',  # 国债指数
 ]
 
-cache = TTLCache(maxsize=128, ttl=3600)
 
 def get_china_bond_yield_data(db, dates):
     query_dates = [trans_str_date_to_trade_date(d) for d in dates]
@@ -351,7 +353,6 @@ def get_refreshed_fund_net_value(symbols):
     return ret
 
 
-@cached(cache)
 def get_fund_holding_data(db, symbols):
 
     now = datetime.now()
@@ -462,3 +463,58 @@ def get_fund_holding_data(db, symbols):
         }
 
     return holdings
+
+def get_fund_holding_relevance_data(fund_holding_data):
+    def _to_one_hot(data):
+
+        logger.debug(f'Data: {data}')
+
+        all_data = set(item for sublist in data for item in sublist)
+        all_data = [(s, ) for s in all_data]
+
+        logger.debug(f'All data: {len(all_data)}')
+
+        encoder = MultiLabelBinarizer()
+        encoder.fit(all_data)
+
+        ret = []
+        for d in data:
+            if len(d) == 0:
+                ret.append(np.zeros((1, len(all_data))))
+                continue
+            logger.debug(f'd: {d}')
+
+            d = [tuple(d)]
+            one_hot = encoder.transform(d)
+
+            logger.debug(f'One hot: {one_hot.shape}')
+
+            ret.append(one_hot)
+        return np.concatenate(ret, axis=0)
+
+    stock_data = [[i['code'] for i in item['stock']] for item in fund_holding_data.values()]
+    bond_data = [[i['code'] for i in item['bond']] for item in fund_holding_data.values()]
+
+    stock_one_hot = _to_one_hot(stock_data)
+    bond_one_hot = _to_one_hot(bond_data)
+
+    logger.debug(f'Stock one hot: {stock_one_hot.shape}')
+    logger.debug(f'Bond one hot: {bond_one_hot.shape}')
+
+    all_one_hot = np.concatenate((stock_one_hot, bond_one_hot), axis=1)
+
+    logger.debug(f'All one hot: {all_one_hot.shape}')
+
+    def _pairwise_relevance(data):
+        return pairwise_distances(data, metric='euclidean')
+
+    stock_relevance = _pairwise_relevance(stock_one_hot).tolist()
+    bond_relevance = _pairwise_relevance(bond_one_hot).tolist()
+    all_relevance = _pairwise_relevance(all_one_hot).tolist()
+
+    return {
+        'stock': stock_relevance,
+        'bond': bond_relevance,
+        'all': all_relevance,
+        'order': list(fund_holding_data.keys())
+    }

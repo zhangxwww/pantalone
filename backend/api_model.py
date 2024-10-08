@@ -81,3 +81,7 @@ class RefreshFundNetValueData(BaseModel):
 
 class GetFundHoldingData(BaseModel):
     symbols: list[str]
+
+
+class GetFundHoldingRelevanceData(BaseModel):
+    holding: dict[str, dict[str, list]]

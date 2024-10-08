@@ -30,6 +30,11 @@ async function getFundHoldingDataRequest (symbols) {
     return res.data;
 }
 
+async function getFundHoldingRelevanceDataRequest (holding) {
+    const res = await axios.post('/api/relevance', { 'holding': holding });
+    return res.data;
+}
+
 
 function uploadRequest (file, callback) {
 
@@ -93,5 +98,6 @@ export {
     getNormalIntervalRequest,
     getIndexCloseRequest,
     getRefreshedFundNetValueRequest,
-    getFundHoldingDataRequest
+    getFundHoldingDataRequest,
+    getFundHoldingRelevanceDataRequest
 }

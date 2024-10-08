@@ -46,7 +46,8 @@
 <script>
 import {
   getFundHoldingDataRequest,
-  getFundNameRequest
+  getFundNameRequest,
+  getFundHoldingRelevanceDataRequest
 } from '../scripts/requests';
 
 export default {
@@ -118,16 +119,25 @@ export default {
 
       console.log(this.holdingData);
       this.isReady = true;
+
+      return holding;
     },
 
     async getFundName (symbol) {
       const data = await getFundNameRequest(symbol);
       return data.fund_name;
+    },
+
+    async drawRelevanceChart (holding) {
+      const data = await getFundHoldingRelevanceDataRequest(holding);
+      console.log(data);
     }
+
   },
   async mounted () {
     console.log(this.$route.query.symbols);
-    await this.updateHoldings(this.$route.query.symbols);
+    const holding = await this.updateHoldings(this.$route.query.symbols);
+    await this.drawRelevanceChart(holding);
   }
 }
 </script>
