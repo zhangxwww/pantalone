@@ -5,6 +5,7 @@ from joblib import Parallel, delayed
 import itertools
 
 from loguru import logger
+from cachetools import cached, TTLCache
 
 import spider
 import sql_app.schemas as schemas
@@ -17,6 +18,7 @@ INDEX_CODES = [
     '000012',  # 国债指数
 ]
 
+cache = TTLCache(maxsize=128, ttl=3600)
 
 def get_china_bond_yield_data(db, dates):
     query_dates = [trans_str_date_to_trade_date(d) for d in dates]
@@ -349,6 +351,7 @@ def get_refreshed_fund_net_value(symbols):
     return ret
 
 
+@cached(cache)
 def get_fund_holding_data(db, symbols):
 
     now = datetime.now()

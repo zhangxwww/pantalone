@@ -64,4 +64,4 @@ async def get_refresh_data(data: api_model.RefreshFundNetValueData):
 @log_response
 @timeit
 async def get_holding_data(data: api_model.GetFundHoldingData, db: Session = Depends(get_db)):
-    return {'holding': operation.get_fund_holding_data(db, data.symbols)}
+    return {'holding': operation.get_fund_holding_data(db, tuple(data.symbols))}
