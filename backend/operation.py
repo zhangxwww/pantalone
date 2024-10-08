@@ -397,6 +397,8 @@ def get_fund_holding_data(db, symbols):
 
     year, quarter = current_year, current_quarter
 
+    spider_year = None
+
     stock_found = set()
     bond_found = set()
     stock_holdings = {}
@@ -419,6 +421,11 @@ def get_fund_holding_data(db, symbols):
 
         logger.debug(f'Already found stock in db ({year}Q{quarter}): {stock_found}')
         logger.debug(f'Already found bond in db ({year}Q{quarter}): {bond_found}')
+
+        if spider_year == year:
+            continue
+
+        spider_year = year
 
         not_found_stock_symbols = set(symbols) - stock_found
         not_found_bond_symbols = set(symbols) - bond_found
