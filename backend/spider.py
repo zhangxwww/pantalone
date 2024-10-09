@@ -1,6 +1,7 @@
 import datetime
 import requests
 
+from loguru import logger
 from bs4 import BeautifulSoup
 import akshare as ak
 
@@ -49,8 +50,13 @@ def get_lpr():
 
 
 def get_close(code, date):
-    date = date.strftime('%Y%m%d')
-    df = ak.index_zh_a_hist(symbol=code, period='daily', start_date=date, end_date=date)
+    while True:
+        date_str = date.strftime('%Y%m%d')
+        df = ak.index_zh_a_hist(symbol=code, period='daily', start_date=date_str, end_date=date_str)
+        if not df.empty:
+            break
+        logger.warning(f'Not found close data of {code} in {date}')
+        date = date - datetime.timedelta(days=1)
     return df['收盘'][0]
 
 

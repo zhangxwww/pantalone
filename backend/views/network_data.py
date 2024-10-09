@@ -37,7 +37,7 @@ async def get_lpr(data: api_model.LPRDateData, db: Session = Depends(get_db)):
 @log_request
 @log_response
 @timeit
-async def get_sh_close(data: api_model.IndexCloseDateData, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+async def get_index_close(data: api_model.IndexCloseDateData, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     for n_days in [1, 2, 3]:
         background_tasks.add_task(add_data_after_n_days_to_db, operation.get_index_close_data, db, data.dates, n_days)
     return {'close': operation.get_index_close_data(db, data.dates)}

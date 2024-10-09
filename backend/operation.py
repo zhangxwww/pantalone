@@ -8,6 +8,7 @@ from loguru import logger
 
 import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.manifold import TSNE
 from sklearn.metrics.pairwise import pairwise_distances
 
 import spider
@@ -512,9 +513,21 @@ def get_fund_holding_relevance_data(fund_holding_data):
     bond_relevance = _pairwise_relevance(bond_one_hot).tolist()
     all_relevance = _pairwise_relevance(all_one_hot).tolist()
 
+    def _tsne(data):
+        perplexity = min(30, data.shape[0] - 1)
+        tsne = TSNE(n_components=2, random_state=0, perplexity=perplexity)
+        return tsne.fit_transform(data)
+
+    stock_pos = _tsne(stock_one_hot).tolist()
+    bond_pos = _tsne(bond_one_hot).tolist()
+    all_pos = _tsne(all_one_hot).tolist()
+
     return {
         'stock': stock_relevance,
         'bond': bond_relevance,
         'all': all_relevance,
+        'stockPos': stock_pos,
+        'bondPos': bond_pos,
+        'allPos': all_pos,
         'order': list(fund_holding_data.keys())
     }
