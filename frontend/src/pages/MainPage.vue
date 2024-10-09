@@ -99,7 +99,7 @@
                 <el-dropdown>
                     <el-button>
                         <el-icon>
-                            <tools />
+                            <more />
                         </el-icon>
                     </el-button>
                     <template #dropdown>
@@ -130,9 +130,11 @@
 </template>
 
 <script>
-import { Plus, Download, Upload, Refresh, Tools } from '@element-plus/icons-vue'
+import { Plus, Download, Upload, Refresh, More } from '@element-plus/icons-vue'
 import Data from '@/scripts/data.js'
 import {
+    initGraph,
+
     drawAssetChangeLineGraph,
     drawResidualMaturityPieGraph,
     drawExpectedReturnPieGraph,
@@ -288,18 +290,29 @@ export default {
                 }
                 this.refreshing = false;
             },
+            initGraph: () => {
+                this.assetChangeLineGraph = initGraph('asset-change-line-graph');
+                this.assetDeltaChangeBarGraph = initGraph('asset-delta-change-bar-graph');
+                this.residualMaturatyPieGraph = initGraph('residual-maturity-pie-graph');
+                this.expectedReturnPieGraph = initGraph('expected-return-pie-graph');
+                this.liquidityReturnPositionScatterGraph = initGraph('liquidity-return-position-scatter-graph');
+                this.averageReturnLineGraph = initGraph('average-return-line-graph');
+                this.cumulativeReturnLineGraph = initGraph('cumulative-return-line-graph');
+                this.riskIndicatorLineGraph = initGraph('rick-indicator-line-graph');
+                this.drawdownLineGraph = initGraph('drawdown-line-graph');
+            },
             drawEmpty: () => {
                 const dates = this.record.sampleDates(this.drawMonths);
 
-                this.assetChangeLineGraph = drawEmptyAssetChangeLineGraph('asset-change-line-graph', dates);
-                this.assetDeltaChangeBarGraph = drawEmptyAssetDeltaChangeBarGraph('asset-delta-change-bar-graph', dates);
-                this.residualMaturatyPieGraph = drawEmptyResidualMaturityPieGraph('residual-maturity-pie-graph');
-                this.expectedReturnPieGraph = drawEmptyExpectedReturnPieGraph('expected-return-pie-graph');
-                this.liquidityReturnPositionScatterGraph = drawEmptyLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph');
-                this.averageReturnLineGraph = drawEmptyAverageReturnLineGraph('average-return-line-graph', dates);
-                this.cumulativeReturnLineGraph = drawEmptyCumulativeReturnLineGraph('cumulative-return-line-graph', dates);
-                this.riskIndicatorLineGraph = drawEmptyRiskIndicatorLineGraph('rick-indicator-line-graph', dates);
-                this.drawdownLineGraph = drawEmptyDrawdownLineGraph('drawdown-line-graph', dates);
+                drawEmptyAssetChangeLineGraph(this.assetChangeLineGraph, dates);
+                drawEmptyAssetDeltaChangeBarGraph(this.assetDeltaChangeBarGraph, dates);
+                drawEmptyResidualMaturityPieGraph(this.residualMaturatyPieGraph);
+                drawEmptyExpectedReturnPieGraph(this.expectedReturnPieGraph);
+                drawEmptyLiquidityReturnPositionScatterGraph(this.liquidityReturnPositionScatterGraph);
+                drawEmptyAverageReturnLineGraph(this.averageReturnLineGraph, dates);
+                drawEmptyCumulativeReturnLineGraph(this.cumulativeReturnLineGraph, dates);
+                drawEmptyRiskIndicatorLineGraph(this.riskIndicatorLineGraph, dates);
+                drawEmptyDrawdownLineGraph(this.drawdownLineGraph, dates);
                 this.setAllGraphLoading();
             },
             draw: async () => {
@@ -307,23 +320,23 @@ export default {
                 const p = 0.95;
 
                 const assetChange = this.record.getAssetChangeData(this.drawMonths);
-                this.assetChangeLineGraph = drawAssetChangeLineGraph('asset-change-line-graph', assetChange);
+                drawAssetChangeLineGraph(this.assetChangeLineGraph, assetChange);
                 this.assetChangeLineGraph.hideLoading();
 
                 const assetDeltaChange = this.record.getAssetDeltaChangeData(assetChange);
-                this.assetDeltaChangeBarGraph = drawAssetDeltaChangeBarGraph('asset-delta-change-bar-graph', assetDeltaChange);
+                drawAssetDeltaChangeBarGraph(this.assetDeltaChangeBarGraph, assetDeltaChange);
                 this.assetDeltaChangeBarGraph.hideLoading();
 
                 const residualMaturaty = this.record.getResidualMaturityData();
-                this.residualMaturatyPieGraph = drawResidualMaturityPieGraph('residual-maturity-pie-graph', residualMaturaty);
+                drawResidualMaturityPieGraph(this.residualMaturatyPieGraph, residualMaturaty);
                 this.residualMaturatyPieGraph.hideLoading();
 
                 const expectedReturn = this.record.getExpectedReturnData();
-                this.expectedReturnPieGraph = drawExpectedReturnPieGraph('expected-return-pie-graph', expectedReturn);
+                drawExpectedReturnPieGraph(this.expectedReturnPieGraph, expectedReturn);
                 this.expectedReturnPieGraph.hideLoading();
 
                 const liquidityReturnPosition = this.record.getLiquidityReturnPositionData();
-                this.liquidityReturnPositionScatterGraph = drawLiquidityReturnPositionScatterGraph('liquidity-return-position-scatter-graph', liquidityReturnPosition);
+                drawLiquidityReturnPositionScatterGraph(this.liquidityReturnPositionScatterGraph, liquidityReturnPosition);
                 this.liquidityReturnPositionScatterGraph.hideLoading();
 
                 const chinaBondYieldPromise = this.record.getChinaBondYieldData(this.drawMonths);
@@ -333,19 +346,19 @@ export default {
                 const [chinaBondYield, lpr, close] = await Promise.all([chinaBondYieldPromise, lprPromise, closePromise]);
 
                 const averageReturn = this.record.getAverageReturnData(this.drawMonths, chinaBondYield, lpr);
-                this.averageReturnLineGraph = drawAverageReturnLineGraph('average-return-line-graph', averageReturn);
+                drawAverageReturnLineGraph(this.averageReturnLineGraph, averageReturn);
                 this.averageReturnLineGraph.hideLoading();
 
                 const cumulativeReturn = await this.record.getCumulativeReturnData(this.drawMonths, close, assetChange);
-                this.cumulativeReturnLineGraph = drawCumulativeReturnLineGraph('cumulative-return-line-graph', cumulativeReturn);
+                drawCumulativeReturnLineGraph(this.cumulativeReturnLineGraph, cumulativeReturn);
                 this.cumulativeReturnLineGraph.hideLoading();
 
                 const riskIndicator = await this.record.getRiskIndicatorData(averageReturn, period, p);
-                this.riskIndicatorLineGraph = drawRiskIndicatorLineGraph('rick-indicator-line-graph', riskIndicator);
+                drawRiskIndicatorLineGraph(this.riskIndicatorLineGraph, riskIndicator);
                 this.riskIndicatorLineGraph.hideLoading();
 
                 const drawdown = this.record.getDrawdownData(cumulativeReturn);
-                this.drawdownLineGraph = drawDrawdownLineGraph('drawdown-line-graph', drawdown);
+                drawDrawdownLineGraph(this.drawdownLineGraph, drawdown);
                 this.drawdownLineGraph.hideLoading();
             },
             setMonthChangeGraphLoading: () => {
@@ -422,7 +435,7 @@ export default {
         Download,
         Upload,
         Refresh,
-        Tools,
+        More,
         AddCashDialog,
         AddMonetaryDialog,
         AddFixedDialog,
@@ -432,6 +445,7 @@ export default {
 
     async mounted () {
         this.record = new Data();
+        this.initGraph();
         this.drawEmpty();
         await this.record.load();
         this.data = this.record.getData();

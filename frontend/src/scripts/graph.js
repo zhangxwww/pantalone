@@ -35,9 +35,12 @@ echarts.use([
     UniversalTransition
 ]);
 
-function drawAssetChangeLineGraph (domId, data) {
+function initGraph (domId) {
+    return echarts.init(document.getElementById(domId));
+}
+
+function drawAssetChangeLineGraph (chart, data) {
     console.log(data);
-    const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
             text: "资产总额",
@@ -131,9 +134,8 @@ function drawAssetChangeLineGraph (domId, data) {
     return chart;
 }
 
-function drawAssetDeltaChangeBarGraph (domId, data) {
+function drawAssetDeltaChangeBarGraph (chart, data) {
     console.log(data);
-    const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
             text: "资产变动",
@@ -219,9 +221,8 @@ function drawAssetDeltaChangeBarGraph (domId, data) {
     return chart;
 }
 
-function drawPieGraph (domId, data, title) {
+function drawPieGraph (chart, data, title) {
     console.log(data);
-    const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
             text: title,
@@ -267,18 +268,16 @@ function drawPieGraph (domId, data, title) {
     return chart;
 }
 
-
-function drawResidualMaturityPieGraph (domId, data) {
-    return drawPieGraph(domId, data, "剩余期限");
+function drawResidualMaturityPieGraph (chart, data) {
+    return drawPieGraph(chart, data, "剩余期限");
 }
 
-function drawExpectedReturnPieGraph (domId, data) {
-    return drawPieGraph(domId, data, "预期收益");
+function drawExpectedReturnPieGraph (chart, data) {
+    return drawPieGraph(chart, data, "预期收益");
 }
 
-function drawLiquidityReturnPositionScatterGraph (domId, data) {
+function drawLiquidityReturnPositionScatterGraph (chart, data) {
     console.log(data);
-    const chart = echarts.init(document.getElementById(domId));
     let amount = [];
     if (data.amount.length === 1) {
         amount.push(25);
@@ -326,7 +325,7 @@ function drawLiquidityReturnPositionScatterGraph (domId, data) {
                             <td align="right"><b>${params.data[0]}</b></td>
                         </tr>
                         <tr>
-                            <td align="left">收益：</td>
+                            <td align="left">年化收益：</td>
                             <td align="right"><b>${(params.data[1] * 100).toFixed(2)}%</b></td>
                         </tr>
                         <tr>
@@ -359,9 +358,8 @@ function drawLiquidityReturnPositionScatterGraph (domId, data) {
     return chart;
 }
 
-function drawAverageReturnLineGraph (domId, data) {
+function drawAverageReturnLineGraph (chart, data) {
     console.log(data);
-    const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
             text: "平均年化收益",
@@ -443,9 +441,8 @@ function drawAverageReturnLineGraph (domId, data) {
     return chart;
 }
 
-function drawCumulativeReturnLineGraph (domId, data) {
+function drawCumulativeReturnLineGraph (chart, data) {
     console.log(data);
-    const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
             text: "累计持有收益",
@@ -528,9 +525,8 @@ function drawCumulativeReturnLineGraph (domId, data) {
 }
 
 
-function drawDrawdownLineGraph (domId, data) {
+function drawDrawdownLineGraph (chart, data) {
     console.log(data);
-    const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
             text: "历史回撤",
@@ -600,7 +596,7 @@ function drawDrawdownLineGraph (domId, data) {
     return chart;
 }
 
-function drawRiskIndicatorLineGraph (domId, data) {
+function drawRiskIndicatorLineGraph (chart, data) {
     console.log(data);
 
     const help = {
@@ -620,7 +616,6 @@ function drawRiskIndicatorLineGraph (domId, data) {
         }
     }
 
-    const chart = echarts.init(document.getElementById(domId));
     const option = {
         title: {
             text: "风险指标",
@@ -709,7 +704,7 @@ function drawRiskIndicatorLineGraph (domId, data) {
     return chart;
 }
 
-function drawEmptyAssetChangeLineGraph (domId, dates) {
+function drawEmptyAssetChangeLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         cashData: Array(dates.length).fill(Number.NaN),
@@ -717,10 +712,10 @@ function drawEmptyAssetChangeLineGraph (domId, dates) {
         fixedDepositData: Array(dates.length).fill(Number.NaN),
         fundData: Array(dates.length).fill(Number.NaN),
     }
-    return drawAssetChangeLineGraph(domId, data);
+    return drawAssetChangeLineGraph(chart, data);
 }
 
-function drawEmptyAssetDeltaChangeBarGraph (domId, dates) {
+function drawEmptyAssetDeltaChangeBarGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         cashDeltaData: Array(dates.length).fill(Number.NaN),
@@ -729,10 +724,10 @@ function drawEmptyAssetDeltaChangeBarGraph (domId, dates) {
         fundDeltaData: Array(dates.length).fill(Number.NaN),
         totalDeltaData: Array(dates.length).fill(Number.NaN),
     }
-    return drawAssetDeltaChangeBarGraph(domId, data);
+    return drawAssetDeltaChangeBarGraph(chart, data);
 }
 
-function drawEmptyResidualMaturityPieGraph (domId) {
+function drawEmptyResidualMaturityPieGraph (chart) {
     const data = [
         { value: 0, name: "T+0" },
         { value: 0, name: "T+1" },
@@ -743,10 +738,10 @@ function drawEmptyResidualMaturityPieGraph (domId) {
         { value: 0, name: "365日内" },
         { value: 0, name: "365日以上" },
     ]
-    return drawResidualMaturityPieGraph(domId, data);
+    return drawResidualMaturityPieGraph(chart, data);
 }
 
-function drawEmptyExpectedReturnPieGraph (domId) {
+function drawEmptyExpectedReturnPieGraph (chart) {
     const data = [
         { value: 0, name: "<1%" },
         { value: 0, name: "1%-2%" },
@@ -754,19 +749,19 @@ function drawEmptyExpectedReturnPieGraph (domId) {
         { value: 0, name: "5%-10%" },
         { value: 0, name: ">10%" },
     ]
-    return drawExpectedReturnPieGraph(domId, data);
+    return drawExpectedReturnPieGraph(chart, data);
 }
 
-function drawEmptyLiquidityReturnPositionScatterGraph (domId) {
+function drawEmptyLiquidityReturnPositionScatterGraph (chart) {
     const data = {
         data: [],
         amount: [],
         name: []
     }
-    return drawLiquidityReturnPositionScatterGraph(domId, data);
+    return drawLiquidityReturnPositionScatterGraph(chart, data);
 }
 
-function drawEmptyAverageReturnLineGraph (domId, dates) {
+function drawEmptyAverageReturnLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         data: {
@@ -776,10 +771,10 @@ function drawEmptyAverageReturnLineGraph (domId, dates) {
         yields: Array(dates.length).fill(Number.NaN),
         lpr: Array(dates.length).fill(Number.NaN),
     }
-    return drawAverageReturnLineGraph(domId, data);
+    return drawAverageReturnLineGraph(chart, data);
 }
 
-function drawEmptyCumulativeReturnLineGraph (domId, dates) {
+function drawEmptyCumulativeReturnLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         cumReturn: {
@@ -789,29 +784,31 @@ function drawEmptyCumulativeReturnLineGraph (domId, dates) {
             '000012': Array(dates.length).fill(Number.NaN),
         }
     }
-    return drawCumulativeReturnLineGraph(domId, data);
+    return drawCumulativeReturnLineGraph(chart, data);
 }
 
-function drawEmptyDrawdownLineGraph (domId, dates) {
+function drawEmptyDrawdownLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         drawdownGeometric: Array(dates.length).fill(Number.NaN),
         drawdownArithmetic: Array(dates.length).fill(Number.NaN),
     }
-    return drawDrawdownLineGraph(domId, data);
+    return drawDrawdownLineGraph(chart, data);
 }
 
-function drawEmptyRiskIndicatorLineGraph (domId, dates) {
+function drawEmptyRiskIndicatorLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         sharpeRatio: Array(dates.length).fill(Number.NaN),
         sharpeConfidence: Array(dates.length).fill({ lower: Number.NaN, upper: Number.NaN })
     }
-    return drawRiskIndicatorLineGraph(domId, data);
+    return drawRiskIndicatorLineGraph(chart, data);
 }
 
 
 export {
+    initGraph,
+
     drawAssetChangeLineGraph,
     drawAssetDeltaChangeBarGraph,
     drawResidualMaturityPieGraph,
