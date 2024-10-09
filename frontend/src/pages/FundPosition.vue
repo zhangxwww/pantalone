@@ -4,6 +4,17 @@
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>基金持仓明细</el-breadcrumb-item>
     </el-breadcrumb>
+    <el-row justify="center" style="margin-top: 60px">
+      <el-col :span="7">
+        <div id="relevance-stock" style="width: 100%; height: 300px"></div>
+      </el-col>
+      <el-col :span="7">
+        <div id="relevance-bond" style="width: 100%; height: 300px"></div>
+      </el-col>
+      <el-col :span="7">
+        <div id="relevance-all" style="width: 100%; height: 300px"></div>
+      </el-col>
+    </el-row>
     <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
       <el-col :span="6" :offset="9">
         <span style="font-size: var(--el-font-size-large); font-weight: bold">基金持仓明细</span>
@@ -49,6 +60,9 @@ import {
   getFundNameRequest,
   getFundHoldingRelevanceDataRequest
 } from '../scripts/requests';
+import {
+  initGraph
+} from '../scripts/graph';
 
 export default {
   name: 'FundPosition',
@@ -128,6 +142,12 @@ export default {
       return data.fund_name;
     },
 
+    initGraph () {
+      this.relStockGraph = initGraph('relevance-stock');
+      this.relBondGraph = initGraph('relevance-bond');
+      this.relAllGraph = initGraph('relevance-all');
+    },
+
     async drawRelevanceChart (holding) {
       const data = await getFundHoldingRelevanceDataRequest(holding);
       console.log(data);
@@ -138,6 +158,11 @@ export default {
     console.log(this.$route.query.symbols);
     const holding = await this.updateHoldings(this.$route.query.symbols);
     await this.drawRelevanceChart(holding);
+  },
+  unmounted () {
+    this.relStockGraph.dispose();
+    this.relBondGraph.dispose();
+    this.relAllGraph.dispose();
   }
 }
 </script>

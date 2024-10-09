@@ -60,8 +60,8 @@ def trans_str_date_to_trade_date(date):
     now = datetime.now()
     if date > now.date():
         date = now.date()
-        if now.hour < 18:
-            date = date - timedelta(days=1)
+    if date == now.date() and now.hour < 18:
+        date = date - timedelta(days=1)
     date = _find_latest_trade_day(date)
     return date
 
