@@ -7,8 +7,8 @@ import itertools
 from loguru import logger
 
 import numpy as np
-from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.manifold import TSNE
+from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler
+from sklearn.decomposition import PCA
 from sklearn.metrics.pairwise import pairwise_distances
 
 import spider
@@ -409,7 +409,7 @@ def get_fund_holding_data(db, symbols):
     stock_holdings = {}
     bond_holdings = {}
 
-    for _ in range(16):
+    for _ in range(12):
         year, quarter = get_one_quarter_before(year, quarter)
 
         not_found_stock_symbols = set(symbols) - stock_found
@@ -513,14 +513,16 @@ def get_fund_holding_relevance_data(fund_holding_data):
     bond_relevance = _pairwise_relevance(bond_one_hot).tolist()
     all_relevance = _pairwise_relevance(all_one_hot).tolist()
 
-    def _tsne(data):
-        perplexity = min(30, data.shape[0] - 1)
-        tsne = TSNE(n_components=2, random_state=0, perplexity=perplexity)
-        return tsne.fit_transform(data)
+    def _decomposition(data):
+        pca = PCA(n_components=2)
+        scaler = MinMaxScaler()
+        pos = pca.fit_transform(data)
+        pos = scaler.fit_transform(pos)
+        return pos
 
-    stock_pos = _tsne(stock_one_hot).tolist()
-    bond_pos = _tsne(bond_one_hot).tolist()
-    all_pos = _tsne(all_one_hot).tolist()
+    stock_pos = _decomposition(stock_one_hot).tolist()
+    bond_pos = _decomposition(bond_one_hot).tolist()
+    all_pos = _decomposition(all_one_hot).tolist()
 
     return {
         'stock': stock_relevance,

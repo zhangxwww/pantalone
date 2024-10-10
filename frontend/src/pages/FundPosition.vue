@@ -61,7 +61,8 @@ import {
   getFundHoldingRelevanceDataRequest
 } from '../scripts/requests';
 import {
-  initGraph
+  initGraph,
+  drawRelevanceScatterGraph
 } from '../scripts/graph';
 
 export default {
@@ -151,12 +152,20 @@ export default {
     async drawRelevanceChart (holding) {
       const data = await getFundHoldingRelevanceDataRequest(holding);
       console.log(data);
+      const relevance = data.relevance;
+      const promise = relevance.order.map(async code => await this.getFundName(code));
+      relevance.name = await Promise.all(promise);
+
+      drawRelevanceScatterGraph(this.relStockGraph, relevance, '股票持仓', 'stockPos');
+      drawRelevanceScatterGraph(this.relBondGraph, relevance, '债券持仓', 'bondPos');
+      drawRelevanceScatterGraph(this.relAllGraph, relevance, '全部持仓', 'allPos');
     }
 
   },
   async mounted () {
     console.log(this.$route.query.symbols);
     const holding = await this.updateHoldings(this.$route.query.symbols);
+    this.initGraph();
     await this.drawRelevanceChart(holding);
   },
   unmounted () {

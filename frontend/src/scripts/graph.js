@@ -704,6 +704,101 @@ function drawRiskIndicatorLineGraph (chart, data) {
     return chart;
 }
 
+function drawRelevanceScatterGraph (chart, data, title, key) {
+    console.log(data);
+
+    const mergeDistance = 0.01;
+
+    // 计算点之间的距离并合并距离过近的点
+    function mergeClosePoints (points, names, threshold) {
+        const mergedPoints = [];
+        const mergedNames = [];
+        const visited = new Array(points.length).fill(false);
+
+        for (let i = 0; i < points.length; i++) {
+            if (visited[i]) {
+                continue;
+            }
+
+            let sumX = points[i][0];
+            let sumY = points[i][1];
+            let count = 1;
+            let name = names[i];
+
+            for (let j = i + 1; j < points.length; j++) {
+                if (visited[j]) {
+                    continue;
+                }
+
+                const dx = points[i][0] - points[j][0];
+                const dy = points[i][1] - points[j][1];
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < threshold) {
+                    sumX += points[j][0];
+                    sumY += points[j][1];
+                    count++;
+                    visited[j] = true;
+                    name += `<br>${names[j]}`;
+                }
+            }
+
+            mergedPoints.push([sumX / count, sumY / count]);
+            mergedNames.push(name);
+            visited[i] = true;
+        }
+
+        return [mergedPoints, mergedNames];
+    }
+
+    const [mergedData, mergedNames] = mergeClosePoints(data[key], data.name, mergeDistance);
+
+    const option = {
+        title: {
+            text: title,
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        xAxis: {
+            axisTick: { show: false },
+            axisLabel: { show: false }
+        },
+        yAxis: {
+            axisTick: { show: false },
+            axisLabel: { show: false }
+        },
+        tooltip: {
+            formatter: function (params) {
+                return `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${mergedNames[params.dataIndex]}</b></td>
+                        </tr>
+                    </tbody>
+                </table>
+                `
+            }
+        },
+        series: [
+            {
+                type: 'scatter',
+                data: mergedData,
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 5,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    },
+                },
+            }
+        ]
+    };
+    chart.setOption(option);
+    return chart;
+}
+
 function drawEmptyAssetChangeLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
@@ -818,6 +913,7 @@ export {
     drawCumulativeReturnLineGraph,
     drawDrawdownLineGraph,
     drawRiskIndicatorLineGraph,
+    drawRelevanceScatterGraph,
 
     drawEmptyAssetChangeLineGraph,
     drawEmptyAssetDeltaChangeBarGraph,
