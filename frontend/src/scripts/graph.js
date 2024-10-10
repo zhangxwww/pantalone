@@ -753,6 +753,9 @@ function drawRelevanceScatterGraph (chart, data, title, key) {
 
     const [mergedData, mergedNames] = mergeClosePoints(data[key], data.name, mergeDistance);
 
+    console.log(mergedData);
+    console.log(mergedNames);
+
     const option = {
         title: {
             text: title,
@@ -900,6 +903,14 @@ function drawEmptyRiskIndicatorLineGraph (chart, dates) {
     return drawRiskIndicatorLineGraph(chart, data);
 }
 
+function drawEmptyRelevanceScatterGraph (chart, title, key) {
+    const data = {
+        name: []
+    };
+    data[key] = [];
+    return drawRelevanceScatterGraph(chart, data, title, key);
+}
+
 
 export {
     initGraph,
@@ -923,5 +934,6 @@ export {
     drawEmptyAverageReturnLineGraph,
     drawEmptyCumulativeReturnLineGraph,
     drawEmptyDrawdownLineGraph,
-    drawEmptyRiskIndicatorLineGraph
+    drawEmptyRiskIndicatorLineGraph,
+    drawEmptyRelevanceScatterGraph
 }

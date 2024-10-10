@@ -8,7 +8,8 @@ from loguru import logger
 
 import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler
-from sklearn.decomposition import PCA
+# from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 from sklearn.metrics.pairwise import pairwise_distances
 
 import spider
@@ -514,9 +515,11 @@ def get_fund_holding_relevance_data(fund_holding_data):
     all_relevance = _pairwise_relevance(all_one_hot).tolist()
 
     def _decomposition(data):
-        pca = PCA(n_components=2)
+        perplexity = min(30, data.shape[0] - 1)
+        tsne = TSNE(n_components=2, perplexity=perplexity)
+        # pca = PCA(n_components=2)
         scaler = MinMaxScaler()
-        pos = pca.fit_transform(data)
+        pos = tsne.fit_transform(data)
         pos = scaler.fit_transform(pos)
         return pos
 

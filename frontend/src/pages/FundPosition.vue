@@ -62,7 +62,8 @@ import {
 } from '../scripts/requests';
 import {
   initGraph,
-  drawRelevanceScatterGraph
+  drawRelevanceScatterGraph,
+  drawEmptyRelevanceScatterGraph
 } from '../scripts/graph';
 
 export default {
@@ -149,6 +150,18 @@ export default {
       this.relAllGraph = initGraph('relevance-all');
     },
 
+    setAllGraphLoading () {
+      this.relAllGraph.showLoading();
+      this.relStockGraph.showLoading();
+      this.relBondGraph.showLoading();
+    },
+
+    setAllGraphUnloading () {
+      this.relAllGraph.hideLoading();
+      this.relStockGraph.hideLoading();
+      this.relBondGraph.hideLoading();
+    },
+
     async drawRelevanceChart (holding) {
       const data = await getFundHoldingRelevanceDataRequest(holding);
       console.log(data);
@@ -159,13 +172,23 @@ export default {
       drawRelevanceScatterGraph(this.relStockGraph, relevance, '股票持仓', 'stockPos');
       drawRelevanceScatterGraph(this.relBondGraph, relevance, '债券持仓', 'bondPos');
       drawRelevanceScatterGraph(this.relAllGraph, relevance, '全部持仓', 'allPos');
-    }
+      this.setAllGraphUnloading();
+    },
+
+    drawEmptyRelevanceChart () {
+      drawEmptyRelevanceScatterGraph(this.relStockGraph, '股票持仓', 'stockPos');
+      drawEmptyRelevanceScatterGraph(this.relBondGraph, '债券持仓', 'bondPos');
+      drawEmptyRelevanceScatterGraph(this.relAllGraph, '全部持仓', 'allPos');
+      this.setAllGraphLoading();
+    },
+
 
   },
   async mounted () {
     console.log(this.$route.query.symbols);
-    const holding = await this.updateHoldings(this.$route.query.symbols);
     this.initGraph();
+    this.drawEmptyRelevanceChart();
+    const holding = await this.updateHoldings(this.$route.query.symbols);
     await this.drawRelevanceChart(holding);
   },
   unmounted () {
