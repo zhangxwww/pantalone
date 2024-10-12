@@ -402,3 +402,29 @@ def create_fund_holding_data_if_not_exist(
     else:
         # 如果已经存在，返回现有记录
         return existing_record
+
+
+# ********** holding not found in spider history **********
+
+def create_holding_not_found_in_spider_history_data(
+    db: Session,
+    data: schemas.HoldingNotFoundInSpiderHistoryCreate
+):
+    db_holding_not_found_in_spider_history = models.HoldingNotFoundInSpiderHistory(**data.model_dump())
+    db.add(db_holding_not_found_in_spider_history)
+    db.commit()
+    db.refresh(db_holding_not_found_in_spider_history)
+    return db_holding_not_found_in_spider_history
+
+
+def find_holding_not_found_in_spider_history_data(
+    db: Session,
+    code: str,
+    year: int,
+    quarter: int
+):
+    return db.query(models.HoldingNotFoundInSpiderHistory).filter(
+        models.HoldingNotFoundInSpiderHistory.code == code,
+        models.HoldingNotFoundInSpiderHistory.year == year,
+        models.HoldingNotFoundInSpiderHistory.quarter == quarter
+    ).one_or_none()

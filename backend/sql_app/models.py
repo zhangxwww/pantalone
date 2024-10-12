@@ -139,3 +139,12 @@ class FundHolding(Base):
     name = Column(String)
     ratio = Column(Float)
     type = Column(String)
+
+
+class HoldingNotFoundInSpiderHistory(Base):
+    __tablename__ = 'spider_not_found_history'
+
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String)
+    year = Column(Integer)
+    quarter = Column(Integer)

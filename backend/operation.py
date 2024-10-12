@@ -8,7 +8,6 @@ from loguru import logger
 
 import numpy as np
 from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler
-# from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.metrics.pairwise import pairwise_distances
 
@@ -386,7 +385,19 @@ def get_fund_holding_data(db, symbols):
         ret_holding = [h for h in holding if h['quarter'] == quarter]
         return symbol, ret_holding, holding
 
+
+    def _skip_not_found_in_spider_symbols(symbols, year, quarter):
+        res = set()
+        for s in symbols:
+            if not crud.find_holding_not_found_in_spider_history_data(db, s, year, quarter):
+                res.add(s)
+            else:
+                logger.debug(f'Skip {s} in {year}Q{quarter}')
+        return res
+
+
     def _search_by_spider(symbols, year, quarter, holdings, found, type_):
+        symbols = _skip_not_found_in_spider_symbols(symbols, year, quarter)
         spider_res = Parallel(n_jobs=-1)(delayed(_f)(symbol, year, quarter, type_) for symbol in symbols)
 
         for symbol, quarter_holding, all_holding in spider_res:
@@ -394,6 +405,11 @@ def get_fund_holding_data(db, symbols):
             if quarter_holding:
                 holdings[symbol] = quarter_holding
                 found.add(symbol)
+            elif year != current_year or quarter != current_quarter:
+                item = schemas.HoldingNotFoundInSpiderHistoryCreate(code=symbol, year=year, quarter=quarter)
+                crud.create_holding_not_found_in_spider_history_data(db, item)
+
+                logger.debug(f'Add {symbol} in {year}Q{quarter} to not found in spider history')
 
             for h in all_holding:
                 item = schemas.FundHoldingDataCreate(**h)
@@ -410,11 +426,13 @@ def get_fund_holding_data(db, symbols):
     stock_holdings = {}
     bond_holdings = {}
 
-    for _ in range(12):
-        year, quarter = get_one_quarter_before(year, quarter)
+    not_found_stock_symbols = set(symbols[:])
+    not_found_bond_symbols = set(symbols[:])
 
-        not_found_stock_symbols = set(symbols) - stock_found
-        not_found_bond_symbols = set(symbols) - bond_found
+    for _ in range(12):
+
+        not_found_stock_symbols = not_found_stock_symbols - stock_found
+        not_found_bond_symbols = not_found_bond_symbols - bond_found
 
         logger.debug(f'Not found stock symbols before db ({year}Q{quarter}): {not_found_stock_symbols}')
         logger.debug(f'Not found bond symbols before db ({year}Q{quarter}): {not_found_bond_symbols}')
@@ -428,25 +446,25 @@ def get_fund_holding_data(db, symbols):
         logger.debug(f'Already found stock in db ({year}Q{quarter}): {stock_found}')
         logger.debug(f'Already found bond in db ({year}Q{quarter}): {bond_found}')
 
-        if spider_year == year:
-            continue
+        if spider_year != year:
+            spider_year = year
 
-        spider_year = year
+            not_found_stock_symbols = not_found_stock_symbols - stock_found
+            not_found_bond_symbols = not_found_bond_symbols - bond_found
 
-        not_found_stock_symbols = set(symbols) - stock_found
-        not_found_bond_symbols = set(symbols) - bond_found
+            logger.debug(f'Not found stock symbols before spider ({year}Q{quarter}): {not_found_stock_symbols}')
+            logger.debug(f'Not found bond symbols before spider ({year}Q{quarter}): {not_found_bond_symbols}')
 
-        logger.debug(f'Not found stock symbols before spider ({year}Q{quarter}): {not_found_stock_symbols}')
-        logger.debug(f'Not found bond symbols before spider ({year}Q{quarter}): {not_found_bond_symbols}')
+            if len(not_found_stock_symbols) == 0 and len(not_found_bond_symbols) == 0:
+                break
 
-        if len(not_found_stock_symbols) == 0 and len(not_found_bond_symbols) == 0:
-            break
+            _search_by_spider(not_found_stock_symbols, year, quarter, stock_holdings, stock_found, 'stock')
+            _search_by_spider(not_found_bond_symbols, year, quarter, bond_holdings, bond_found, 'bond')
 
-        _search_by_spider(not_found_stock_symbols, year, quarter, stock_holdings, stock_found, 'stock')
-        _search_by_spider(not_found_bond_symbols, year, quarter, bond_holdings, bond_found, 'bond')
+            logger.debug(f'Already found stock in spider ({year}Q{quarter}): {stock_found}')
+            logger.debug(f'Already found bond in spider ({year}Q{quarter}): {bond_found}')
 
-        logger.debug(f'Already found stock in spider ({year}Q{quarter}): {stock_found}')
-        logger.debug(f'Already found bond in spider ({year}Q{quarter}): {bond_found}')
+        year, quarter = get_one_quarter_before(year, quarter)
 
     not_found_stock_symbols = set(symbols) - stock_found
     not_found_bond_symbols = set(symbols) - bond_found
@@ -517,7 +535,6 @@ def get_fund_holding_relevance_data(fund_holding_data):
     def _decomposition(data):
         perplexity = min(30, data.shape[0] - 1)
         tsne = TSNE(n_components=2, perplexity=perplexity)
-        # pca = PCA(n_components=2)
         scaler = MinMaxScaler()
         pos = tsne.fit_transform(data)
         pos = scaler.fit_transform(pos)
