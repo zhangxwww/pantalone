@@ -36,6 +36,11 @@ async def position():
     logger.debug('frontend')
     return FileResponse('../frontend/dist/index.html')
 
+@app.get('/market')
+async def market():
+    logger.debug('frontend')
+    return FileResponse('../frontend/dist/index.html')
+
 app.mount('/', staticfiles.StaticFiles(directory='../frontend/dist/', html=True), name='static')
 
 

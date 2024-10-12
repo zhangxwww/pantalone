@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import MainPage from '../pages/MainPage.vue';
 import FundPosition from '../pages/FundPosition.vue';
+import Market from '../pages/Market.vue';
 
 const routes = [
     {
@@ -13,6 +14,11 @@ const routes = [
         name: 'FundPosition',
         component: FundPosition
     },
+    {
+        path: '/market',
+        name: 'Market',
+        component: Market
+    }
 ];
 
 const router = createRouter({
