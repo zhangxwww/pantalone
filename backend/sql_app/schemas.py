@@ -269,3 +269,28 @@ class HoldingNotFoundInSpiderHistory(HoldingNotFoundInSpiderHistoryBase):
 
     class Config:
         from_attributes = True
+
+
+# ********** KLine Data **********
+
+class KLineDataBase(BaseModel):
+    code: str
+    date: date
+    open: float
+    close: float
+    high: float
+    low: float
+    volume: float
+    period: str
+    market: str
+
+
+class KLineDataCreate(KLineDataBase):
+    pass
+
+
+class KLineData(KLineDataBase):
+    id: int
+
+    class Config:
+        from_attributes = True

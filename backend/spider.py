@@ -98,20 +98,38 @@ def get_fund_holding(symbol, year, type_):
     return res
 
 
+def get_kline(code, start_date, end_date, period='daily', market='index-CN'):
+    if market == 'index-CN':
+        df = ak.index_zh_a_hist(symbol=code, period=period, start_date=start_date, end_date=end_date)
+        res = []
+        for row in df.itertuples(index=False):
+            res.append({
+                'date': row.日期,
+                'open': row.开盘,
+                'close': row.收盘,
+                'high': row.最高,
+                'low': row.最低,
+                'volume': row.成交额
+            })
+        return res
+    else:
+        raise NotImplementedError
+
 
 if __name__ == '__main__':
     # get_china_bond_yield(datetime.datetime.now())
     # print(get_lpr())
     # print(get_close('000001', datetime.datetime.strptime('2024-09-20', '%Y-%m-%d')))
-    from itertools import product
-    from joblib import Parallel, delayed
+    # from itertools import product
+    # from joblib import Parallel, delayed
 
-    codes = [
-        '015716',
-        '007997', '000043', '015301', '270042'
-        ]
-    t = ['stock', 'bond']
+    # codes = [
+    #     '015716',
+    #     '007997', '000043', '015301', '270042'
+    #     ]
+    # t = ['stock', 'bond']
 
-    res = Parallel(n_jobs=4)(delayed(get_fund_holding)(symbol=c, year='2024', type_=t) for c, t in product(codes, t))
+    # res = Parallel(n_jobs=4)(delayed(get_fund_holding)(symbol=c, year='2024', type_=t) for c, t in product(codes, t))
 
-    print(res)
+    # print(res)
+    print(get_kline('000001', '2021-01-01', '2022-01-10', 'monthly'))

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Literal
 
 from pydantic import BaseModel
 
@@ -85,3 +85,9 @@ class GetFundHoldingData(BaseModel):
 
 class GetFundHoldingRelevanceData(BaseModel):
     holding: dict[str, dict[str, list]]
+
+
+class GetKLineData(BaseModel):
+    code: str
+    period: Literal['daily', 'weekly', 'monthly']
+    market: Literal['index-CN']

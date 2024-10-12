@@ -35,6 +35,12 @@ async function getFundHoldingRelevanceDataRequest (holding) {
     return res.data;
 }
 
+async function getKLineDataRequest (symbol, period, market) {
+    const res = await axios.post('/api/kline',
+        { 'code': symbol, 'period': period, 'market': market });
+    return res.data;
+}
+
 
 function uploadRequest (file, callback) {
 
@@ -99,5 +105,6 @@ export {
     getIndexCloseRequest,
     getRefreshedFundNetValueRequest,
     getFundHoldingDataRequest,
-    getFundHoldingRelevanceDataRequest
+    getFundHoldingRelevanceDataRequest,
+    getKLineDataRequest
 }

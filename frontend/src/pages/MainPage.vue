@@ -110,6 +110,12 @@
                                     基金仓位明细
                                 </router-link>
                             </el-dropdown-item>
+                            <el-dropdown-item>
+                                <router-link :to="{ path: '/market' }"
+                                    style="text-decoration-line: none; font: inherit">
+                                    行情看板
+                                </router-link>
+                            </el-dropdown-item>
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>

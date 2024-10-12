@@ -428,3 +428,43 @@ def find_holding_not_found_in_spider_history_data(
         models.HoldingNotFoundInSpiderHistory.year == year,
         models.HoldingNotFoundInSpiderHistory.quarter == quarter
     ).one_or_none()
+
+
+# ********** kline data **********
+
+def create_kline_data(
+    db: Session,
+    data: schemas.KLineDataCreate
+):
+    db_kline_data = models.KLineData(**data.model_dump())
+    db.add(db_kline_data)
+    db.commit()
+    db.refresh(db_kline_data)
+    return db_kline_data
+
+
+def create_kline_data_from_list(
+    db: Session,
+    data: list[dict],
+    code: str,
+    period: str,
+    market: str
+):
+    for d in data:
+        item = schemas.KLineDataCreate(**d, code=code, period=period, market=market)
+        item = models.KLineData(**item.model_dump())
+        db.add(item)
+    db.commit()
+
+
+def get_kline_data(
+    db: Session,
+    code: str,
+    period: str,
+    market: str
+):
+    return db.query(models.KLineData).filter(
+        models.KLineData.code == code,
+        models.KLineData.period == period,
+        models.KLineData.market == market
+    ).order_by(models.KLineData.date).all()

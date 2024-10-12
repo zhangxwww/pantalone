@@ -1,6 +1,6 @@
 import json
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 from joblib import Parallel, delayed
 import itertools
 
@@ -21,6 +21,12 @@ INDEX_CODES = [
     '000001',  # 上证指数
     '000012',  # 国债指数
 ]
+
+KLINE_START = {
+    'daily': '1997-01-01',
+    'weekly': '1997-01-01',
+    'monthly': '1997-01-01'
+}
 
 
 def get_china_bond_yield_data(db, dates):
@@ -550,3 +556,39 @@ def get_fund_holding_relevance_data(fund_holding_data):
         'allPos': all_pos,
         'order': list(fund_holding_data.keys())
     }
+
+
+def get_kline_data(db, query):
+    code = query.code
+    period = query.period
+    market = query.market
+
+    data_in_db = crud.get_kline_data(db, code, period, market)
+    res = [{
+        'date': data.date,
+        'open': data.open,
+        'close': data.close,
+        'high': data.high,
+        'low': data.low,
+        'volume': data.volume
+    } for data in data_in_db]
+
+    logger.debug(f'Found {len(res)} data in db')
+
+    if len(res) > 0:
+        last_date_in_db = res[-1]['date']
+        next_day_of_last_date = last_date_in_db + timedelta(days=1)
+        spider_start_date = next_day_of_last_date.strftime('%Y-%m-%d')
+    else:
+        spider_start_date = KLINE_START[period]
+    spider_end_date = datetime.now().date().strftime('%Y-%m-%d')
+
+    if spider_start_date != spider_end_date:
+        data_from_spider = spider.get_kline(code, spider_start_date, spider_end_date, period, market)
+        crud.create_kline_data_from_list(db, data_from_spider, code, period, market)
+
+        logger.debug(f'Found {len(data_from_spider)} data in spider')
+
+        res.extend(data_from_spider)
+
+    return res

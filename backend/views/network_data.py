@@ -70,3 +70,10 @@ async def get_holding_data(data: api_model.GetFundHoldingData, db: Session = Dep
 @timeit
 async def get_relevance_data(data: api_model.GetFundHoldingRelevanceData):
     return {'relevance': operation.get_fund_holding_relevance_data(data.holding)}
+
+
+@router.post('/kline')
+@log_request
+@timeit
+async def get_kline_data(data: api_model.GetKLineData, db: Session = Depends(get_db)):
+    return {'kline': operation.get_kline_data(db, data)}
