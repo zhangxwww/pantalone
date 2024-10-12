@@ -487,8 +487,6 @@ def get_fund_holding_data(db, symbols):
 def get_fund_holding_relevance_data(fund_holding_data):
     def _to_one_hot(data):
 
-        logger.debug(f'Data: {data}')
-
         all_data = set(item for sublist in data for item in sublist)
         all_data = [(s, ) for s in all_data]
 
@@ -502,7 +500,6 @@ def get_fund_holding_relevance_data(fund_holding_data):
             if len(d) == 0:
                 ret.append(np.zeros((1, len(all_data))))
                 continue
-            logger.debug(f'd: {d}')
 
             d = [tuple(d)]
             one_hot = encoder.transform(d)

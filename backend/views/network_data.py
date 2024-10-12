@@ -61,15 +61,12 @@ async def get_refresh_data(data: api_model.RefreshFundNetValueData):
 
 @router.post('/holding')
 @log_request
-@log_response
 @timeit
 async def get_holding_data(data: api_model.GetFundHoldingData, db: Session = Depends(get_db)):
     return {'holding': operation.get_fund_holding_data(db, data.symbols)}
 
 
 @router.post('/relevance')
-@log_request
-@log_response
 @timeit
 async def get_relevance_data(data: api_model.GetFundHoldingRelevanceData):
     return {'relevance': operation.get_fund_holding_relevance_data(data.holding)}
