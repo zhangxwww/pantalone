@@ -19,6 +19,16 @@
       <el-col :span="6" :offset="9">
         <span style="font-size: var(--el-font-size-large); font-weight: bold">基金持仓明细</span>
       </el-col>
+      <el-col :span="3" :offset="4">
+        <el-input v-model="searchFundCode" placeholder="请输入基金代码" @keyup.enter="searchFund" />
+      </el-col>
+      <el-col :span="1" style="margin-left: 10px;">
+        <el-button type="primary" @click="searchFund">
+          <el-icon>
+            <search />
+          </el-icon>
+        </el-button>
+      </el-col>
     </el-row>
     <el-row v-if="isReady" style="width: 70%; margin-left: 15%; margin-bottom: 15px">
       <el-collapse accordion style="width: 100%">
@@ -29,6 +39,14 @@
             </span>
             <span style="font-size: var(--el-font-size-base); margin-left: 20px">
               {{ holding.fundCode }}
+            </span>
+            <span style="font-size: var(--el-font-size-base); margin-left: 20px">
+              <el-tag v-if="holding.holdingState" color="#5470c6" size="small" round effect="dark" class="line">
+                {{ '已持有' }}
+              </el-tag>
+              <el-tag v-else color="#91cc75" size="small" round effect="light" style="color: black" class="line">
+                {{ '未持有' }}
+              </el-tag>
             </span>
           </template>
 
@@ -55,6 +73,7 @@
 </template>
 
 <script>
+import { Search } from '@element-plus/icons-vue';
 import {
   getFundHoldingDataRequest,
   getFundNameRequest,
@@ -71,8 +90,11 @@ export default {
   data () {
     return {
       holdingData: [],
+      holdingFunds: [],
+      notHoldingFunds: [],
 
       isReady: false,
+      searchFundCode: '',
 
       headers: {
         stock: [
@@ -91,6 +113,17 @@ export default {
     };
   },
   methods: {
+
+    async searchFund () {
+      if (this.searchFundCode === '') {
+        return;
+      }
+      this.drawEmptyRelevanceChart();
+      this.notHoldingFunds.push(this.searchFundCode);
+      this.searchFundCode = '';
+      const [holding, state] = await this.updateHoldings([...this.holdingFunds, ...this.notHoldingFunds]);
+      await this.drawRelevanceChart(holding, state);
+    },
 
     async updateHoldings (symbols) {
       this.isReady = false;
@@ -125,18 +158,28 @@ export default {
           });
         return {
           fundCode: fundCode,
+          holdingState: this.holdingFunds.includes(fundCode),
           fundName: await this.getFundName(fundCode),
           stockHoldings: stockHoldings.slice(0, 10),
           bondHoldings: bondHoldings.slice(0, 10)
         };
       });
       const results = await Promise.all(promises);
+      this.holdingData.splice(0, this.holdingData.length);
       this.holdingData.push(...results);
 
       console.log(this.holdingData);
       this.isReady = true;
 
-      return holding;
+      const holdingState = {};
+
+      for (const symbol of symbols) {
+        holdingState[symbol] = this.holdingFunds.includes(symbol);
+      }
+
+      console.log(holding, holdingState);
+
+      return [holding, holdingState];
     },
 
     async getFundName (symbol) {
@@ -162,16 +205,16 @@ export default {
       this.relBondGraph.hideLoading();
     },
 
-    async drawRelevanceChart (holding) {
+    async drawRelevanceChart (holding, state) {
       const data = await getFundHoldingRelevanceDataRequest(holding);
       console.log(data);
       const relevance = data.relevance;
       const promise = relevance.order.map(async code => await this.getFundName(code));
       relevance.name = await Promise.all(promise);
 
-      drawRelevanceScatterGraph(this.relStockGraph, relevance, '股票持仓', 'stockPos');
-      drawRelevanceScatterGraph(this.relBondGraph, relevance, '债券持仓', 'bondPos');
-      drawRelevanceScatterGraph(this.relAllGraph, relevance, '全部持仓', 'allPos');
+      drawRelevanceScatterGraph(this.relStockGraph, relevance, state, '股票持仓', 'stockPos');
+      drawRelevanceScatterGraph(this.relBondGraph, relevance, state, '债券持仓', 'bondPos');
+      drawRelevanceScatterGraph(this.relAllGraph, relevance, state, '全部持仓', 'allPos');
       this.setAllGraphUnloading();
     },
 
@@ -186,15 +229,19 @@ export default {
   },
   async mounted () {
     console.log(this.$route.query.symbols);
+    this.holdingFunds.push(...this.$route.query.symbols);
     this.initGraph();
     this.drawEmptyRelevanceChart();
-    const holding = await this.updateHoldings(this.$route.query.symbols);
-    await this.drawRelevanceChart(holding);
+    const [holding, state] = await this.updateHoldings(this.holdingFunds);
+    await this.drawRelevanceChart(holding, state);
   },
   unmounted () {
     this.relStockGraph.dispose();
     this.relBondGraph.dispose();
     this.relAllGraph.dispose();
+  },
+  components: {
+    Search
   }
 }
 </script>

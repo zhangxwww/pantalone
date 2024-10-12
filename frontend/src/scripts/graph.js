@@ -704,15 +704,15 @@ function drawRiskIndicatorLineGraph (chart, data) {
     return chart;
 }
 
-function drawRelevanceScatterGraph (chart, data, title, key) {
+function drawRelevanceScatterGraph (chart, data, states, title, key) {
     console.log(data);
 
-    const mergeDistance = 0.01;
+    const mergeDistance = 0.001;
 
-    // 计算点之间的距离并合并距离过近的点
-    function mergeClosePoints (points, names, threshold) {
+    function mergeClosePoints (points, states, names, symbols, threshold) {
         const mergedPoints = [];
         const mergedNames = [];
+        const mergedStates = []; // 1: holding, 2: not holding, 3: mixed
         const visited = new Array(points.length).fill(false);
 
         for (let i = 0; i < points.length; i++) {
@@ -724,6 +724,7 @@ function drawRelevanceScatterGraph (chart, data, title, key) {
             let sumY = points[i][1];
             let count = 1;
             let name = names[i];
+            let state = states[symbols[i]] ? 1 : 2;
 
             for (let j = i + 1; j < points.length; j++) {
                 if (visited[j]) {
@@ -740,21 +741,26 @@ function drawRelevanceScatterGraph (chart, data, title, key) {
                     count++;
                     visited[j] = true;
                     name += `<br>${names[j]}`;
+                    if (states[symbols[j]] !== states[symbols[i]]) {
+                        state = 3;
+                    }
                 }
             }
 
             mergedPoints.push([sumX / count, sumY / count]);
             mergedNames.push(name);
+            mergedStates.push(state);
             visited[i] = true;
         }
 
-        return [mergedPoints, mergedNames];
+        return [mergedPoints, mergedNames, mergedStates];
     }
 
-    const [mergedData, mergedNames] = mergeClosePoints(data[key], data.name, mergeDistance);
+    const [mergedData, mergedNames, mergedStates] = mergeClosePoints(data[key], states, data.name, data.order, mergeDistance);
 
     console.log(mergedData);
     console.log(mergedNames);
+    console.log(mergedStates);
 
     const option = {
         title: {
@@ -787,7 +793,16 @@ function drawRelevanceScatterGraph (chart, data, title, key) {
         series: [
             {
                 type: 'scatter',
-                data: mergedData,
+                data: mergedData.map((value, index) => {
+                    return {
+                        value: value,
+                        itemStyle: {
+                            color: mergedStates[index] === 1 ?
+                                '#5470c6' : mergedStates[index] === 2 ?
+                                    '#91cc75' : '#fc8452',
+                        }
+                    }
+                }),
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 5,
@@ -908,7 +923,8 @@ function drawEmptyRelevanceScatterGraph (chart, title, key) {
         name: []
     };
     data[key] = [];
-    return drawRelevanceScatterGraph(chart, data, title, key);
+    const state = {};
+    return drawRelevanceScatterGraph(chart, data, state, title, key);
 }
 
 
