@@ -54,9 +54,7 @@ def _find_latest_trade_day(date):
         date = date - timedelta(days=1)
     return date
 
-
-def trans_str_date_to_trade_date(date):
-    date = datetime.strptime(date, '%Y-%m-%d').date()
+def trans_date_to_trade_date(date):
     now = datetime.now()
     if date > now.date():
         date = now.date()
@@ -64,6 +62,10 @@ def trans_str_date_to_trade_date(date):
         date = date - timedelta(days=1)
     date = _find_latest_trade_day(date)
     return date
+
+def trans_str_date_to_trade_date(date):
+    date = datetime.strptime(date, '%Y-%m-%d').date()
+    return trans_date_to_trade_date(date)
 
 
 def trans_str_date_to_next_n_trade_date(date, n):

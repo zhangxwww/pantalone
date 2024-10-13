@@ -14,7 +14,7 @@ from sklearn.metrics.pairwise import pairwise_distances
 import spider
 import sql_app.schemas as schemas
 import sql_app.crud as crud
-from utils import trans_str_date_to_trade_date, get_one_quarter_before
+from utils import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
 
 
 INDEX_CODES = [
@@ -23,9 +23,9 @@ INDEX_CODES = [
 ]
 
 KLINE_START = {
-    'daily': '1997-01-01',
-    'weekly': '1997-01-01',
-    'monthly': '1997-01-01'
+    'daily': datetime.strptime('1997-01-01', '%Y-%m-%d').date(),
+    'weekly': datetime.strptime('1997-01-01', '%Y-%m-%d').date(),
+    'monthly': datetime.strptime('1997-01-01', '%Y-%m-%d').date(),
 }
 
 
@@ -578,12 +578,20 @@ async def get_kline_data(db, query):
     if len(res) > 0:
         last_date_in_db = res[-1]['date']
         next_day_of_last_date = last_date_in_db + timedelta(days=1)
-        spider_start_date = next_day_of_last_date.strftime('%Y-%m-%d')
+        spider_start_date = next_day_of_last_date
     else:
         spider_start_date = KLINE_START[period]
-    spider_end_date = datetime.now().date().strftime('%Y-%m-%d')
+    spider_end_date = datetime.now().date()
+    spider_end_date = trans_date_to_trade_date(spider_end_date)
 
-    if spider_start_date != spider_end_date:
+    if spider_start_date <= spider_end_date:
+
+        spider_start_date = spider_start_date.strftime('%Y-%m-%d')
+        spider_end_date = spider_end_date.strftime('%Y-%m-%d')
+
+        logger.debug(f'Spider start date: {spider_start_date}')
+        logger.debug(f'Spider end date: {spider_end_date}')
+
         data_from_spider = spider.get_kline(code, spider_start_date, spider_end_date, period, market)
         await crud.create_kline_data_from_list(db, data_from_spider, code, period, market)
 
