@@ -29,13 +29,13 @@ KLINE_START = {
 }
 
 
-def get_china_bond_yield_data(db, dates):
+async def get_china_bond_yield_data(db, dates):
     query_dates = [trans_str_date_to_trade_date(d) for d in dates]
 
     logger.debug('Query dates: ')
     logger.debug(query_dates)
 
-    db_data = crud.get_CN1YR_data(db, query_dates)
+    db_data = await crud.get_CN1YR_data(db, query_dates)
 
     db_data_list = [{'date': d.date, 'yield': d.yield_1yr} for d in db_data]
 
@@ -52,7 +52,7 @@ def get_china_bond_yield_data(db, dates):
         yield_1yr = spider.get_china_bond_yield(date)
         item = schemas.CN1YRDataCreate(date=date, yield_1yr=yield_1yr)
         not_found_dates_yield.append(item)
-    crud.create_CN1YR_data_from_list(db, not_found_dates_yield)
+    await crud.create_CN1YR_data_from_list(db, not_found_dates_yield)
 
     spider_data = [{'date': d.date, 'yield': d.yield_1yr} for d in not_found_dates_yield]
 
@@ -98,13 +98,13 @@ def _align_lpr_date(lpr_list, query_dates):
     return res
 
 
-def get_lpr_data(db, dates):
+async def get_lpr_data(db, dates):
     query_dates = [trans_str_date_to_trade_date(d) for d in dates]
 
     logger.debug('Query dates: ')
     logger.debug(query_dates)
 
-    db_data = crud.get_lpr_data(db, query_dates)
+    db_data = await crud.get_lpr_data(db, query_dates)
     db_data_list = [{'date': d.date, 'rate': d.lpr} for d in db_data]
 
     logger.debug('DB data: ')
@@ -133,7 +133,7 @@ def get_lpr_data(db, dates):
         logger.debug('Add to db: ')
         logger.debug(add_to_db_data)
 
-        crud.create_lpr_data_from_list(db, add_to_db_data)
+        await crud.create_lpr_data_from_list(db, add_to_db_data)
 
         data = aligned
     else:
@@ -142,13 +142,13 @@ def get_lpr_data(db, dates):
     return data
 
 
-def get_index_close_data(db, dates):
+async def get_index_close_data(db, dates):
     query_dates = [trans_str_date_to_trade_date(d) for d in dates]
 
     logger.debug('Query dates: ')
     logger.debug(query_dates)
 
-    db_data = crud.get_index_close_data(db, query_dates)
+    db_data = await crud.get_index_close_data(db, query_dates)
     db_data_list = [{'date': d.date, 'close': d.close, 'code': d.code} for d in db_data]
 
     logger.debug('DB data: ')
@@ -167,7 +167,7 @@ def get_index_close_data(db, dates):
 
     not_found_dates_close = Parallel(n_jobs=-1)(delayed(_f)(code, date) for code, date in not_found_data)
 
-    crud.create_index_close_data_from_list(db, not_found_dates_close)
+    await crud.create_index_close_data_from_list(db, not_found_dates_close)
 
     spider_data = [{'date': d.date, 'close': d.close, 'code': d.code} for d in not_found_dates_close]
 
@@ -193,31 +193,31 @@ def get_index_close_data(db, dates):
     return final_data
 
 
-def get_fund_name(db, symbol):
-    db_data = crud.get_fund_name(db, symbol)
+async def get_fund_name(db, symbol):
+    db_data = await crud.get_fund_name(db, symbol)
     if db_data is not None:
         logger.debug(f'Get fund name from db: {db_data.name}')
         return db_data.name
     else:
         name = spider.get_fund_name_from_symbol(symbol)
         item = schemas.FundNameDataCreate(symbol=symbol, name=name)
-        crud.create_fund_name(db, item)
+        await crud.create_fund_name(db, item)
         logger.debug(f'Get fund name from spider: {name}')
         return name
 
 
-def save_base64_data(db, data):
+async def save_base64_data(db, data):
     content = base64.b64decode(data)
     json_data = json.loads(content.decode('utf-8'))
-    crud.create_table_from_json(db, json_data)
+    await crud.create_table_from_json(db, json_data)
 
 
-def _get_cash_data_from_db(db):
+async def _get_cash_data_from_db(db):
     cash_data = []
-    all_data = crud.get_all_cash_data_history(db)
+    all_data = await crud.get_all_cash_data_history(db)
     for history in all_data:
         history_id = history.id
-        history_data = crud.get_cash_data_history_item_by_history_id(db, history_id)
+        history_data = await crud.get_cash_data_history_item_by_history_id(db, history_id)
 
         history_list = []
         for his in history_data:
@@ -233,12 +233,12 @@ def _get_cash_data_from_db(db):
         })
     return cash_data
 
-def _get_monetary_fund_data_from_db(db):
+async def _get_monetary_fund_data_from_db(db):
     monetary_data = []
-    all_data = crud.get_all_monetary_fund_data_history(db)
+    all_data = await crud.get_all_monetary_fund_data_history(db)
     for history in all_data:
         history_id = history.id
-        history_data = crud.get_monetary_fund_data_history_item_by_history_id(db, history_id)
+        history_data = await crud.get_monetary_fund_data_history_item_by_history_id(db, history_id)
 
         history_list = []
         for his in history_data:
@@ -260,12 +260,12 @@ def _get_monetary_fund_data_from_db(db):
         })
     return monetary_data
 
-def _get_fixed_deposit_data_from_db(db):
+async def _get_fixed_deposit_data_from_db(db):
     fixed_deposit_data = []
-    all_data = crud.get_all_fixed_deposit_data_history(db)
+    all_data = await crud.get_all_fixed_deposit_data_history(db)
     for history in all_data:
         history_id = history.id
-        history_data = crud.get_fixed_deposit_data_history_item_by_history_id(db, history_id)
+        history_data = await crud.get_fixed_deposit_data_history_item_by_history_id(db, history_id)
 
         history_list = []
         for his in history_data:
@@ -283,12 +283,12 @@ def _get_fixed_deposit_data_from_db(db):
         })
     return fixed_deposit_data
 
-def _get_fund_data_from_db(db):
+async def _get_fund_data_from_db(db):
     fund_data = []
-    all_data = crud.get_all_fund_data_history(db)
+    all_data = await crud.get_all_fund_data_history(db)
     for history in all_data:
         history_id = history.id
-        history_data = crud.get_fund_data_history_item_by_history_id(db, history_id)
+        history_data = await crud.get_fund_data_history_item_by_history_id(db, history_id)
 
         history_list = []
         for his in history_data:
@@ -309,21 +309,21 @@ def _get_fund_data_from_db(db):
     return fund_data
 
 
-def get_data_from_db(db):
+async def get_data_from_db(db):
     return {
-        'cashData': _get_cash_data_from_db(db),
-        'monetaryFundData': _get_monetary_fund_data_from_db(db),
-        'fixedDepositData': _get_fixed_deposit_data_from_db(db),
-        'fundData': _get_fund_data_from_db(db)
+        'cashData': await _get_cash_data_from_db(db),
+        'monetaryFundData': await _get_monetary_fund_data_from_db(db),
+        'fixedDepositData': await _get_fixed_deposit_data_from_db(db),
+        'fundData': await _get_fund_data_from_db(db)
     }
 
 
-def add_cash_history(db, data):
+async def add_cash_history(db, data):
     item = schemas.CashDataHistoryItemCreate(**data.content.model_dump(), beginningTime=datetime.now().date())
-    crud.create_cash_data_history_item(db, item, data.id)
+    await crud.create_cash_data_history_item(db, item, data.id)
 
 
-def add_monetary_fund_history(db, data):
+async def add_monetary_fund_history(db, data):
     content = data.content.model_dump()
 
     logger.debug(content)
@@ -333,25 +333,25 @@ def add_monetary_fund_history(db, data):
     content['currentTime'] = datetime.now().date()
     content['beginningShares'] = content['beginningAmount']
     item = schemas.MonetaryFundDataHistoryItemCreate(**content)
-    crud.create_monetary_fund_data_history_item(db, item, data.id)
+    await crud.create_monetary_fund_data_history_item(db, item, data.id)
 
 
-def add_fixed_deposit_history(db, data):
+async def add_fixed_deposit_history(db, data):
     content = data.content.model_dump()
     bg_time = content['beginningTime']
     content['beginningTime'] = datetime.strptime(bg_time, '%Y-%m-%d').date()
     item = schemas.FixedDepositDataHistoryItemCreate(**content)
-    crud.create_fixed_deposit_data_history_item(db, item, data.id)
+    await crud.create_fixed_deposit_data_history_item(db, item, data.id)
 
 
-def add_fund_history(db, data):
+async def add_fund_history(db, data):
     content = data.content.model_dump()
     content['currentTime'] = datetime.now().date()
     item = schemas.FundDataHistoryItemCreate(**content)
-    crud.create_fund_data_history_item(db, item, data.id)
+    await crud.create_fund_data_history_item(db, item, data.id)
 
 
-def get_refreshed_fund_net_value(symbols):
+async def get_refreshed_fund_net_value(symbols):
     def _f(symbol):
         net_value = spider.get_latest_net_value_of_fund(symbol)
         return {'symbol': symbol, 'value': net_value}
@@ -360,7 +360,7 @@ def get_refreshed_fund_net_value(symbols):
     return ret
 
 
-def get_fund_holding_data(db, symbols):
+async def get_fund_holding_data(db, symbols):
 
     now = datetime.now()
     current_year = now.year
@@ -369,9 +369,9 @@ def get_fund_holding_data(db, symbols):
 
     logger.debug(f'Current: {current_year}Q{current_quarter}')
 
-    def _search_in_db(symbols, year, quarter, holdings, found, type_):
+    async def _search_in_db(symbols, year, quarter, holdings, found, type_):
         for symbol in symbols:
-            holding = crud.get_fund_holding_data(db, year, quarter, symbol, type_)
+            holding = await crud.get_fund_holding_data(db, year, quarter, symbol, type_)
             if holding:
                 holdings[symbol] = [{
                     'fund_code': h.fund_code,
@@ -392,18 +392,18 @@ def get_fund_holding_data(db, symbols):
         return symbol, ret_holding, holding
 
 
-    def _skip_not_found_in_spider_symbols(symbols, year, quarter):
+    async def _skip_not_found_in_spider_symbols(symbols, year, quarter):
         res = set()
         for s in symbols:
-            if not crud.find_holding_not_found_in_spider_history_data(db, s, year, quarter):
+            if not await crud.find_holding_not_found_in_spider_history_data(db, s, year, quarter):
                 res.add(s)
             else:
                 logger.debug(f'Skip {s} in {year}Q{quarter}')
         return res
 
 
-    def _search_by_spider(symbols, year, quarter, holdings, found, type_):
-        symbols = _skip_not_found_in_spider_symbols(symbols, year, quarter)
+    async def _search_by_spider(symbols, year, quarter, holdings, found, type_):
+        symbols = await _skip_not_found_in_spider_symbols(symbols, year, quarter)
         spider_res = Parallel(n_jobs=-1)(delayed(_f)(symbol, year, quarter, type_) for symbol in symbols)
 
         for symbol, quarter_holding, all_holding in spider_res:
@@ -413,13 +413,13 @@ def get_fund_holding_data(db, symbols):
                 found.add(symbol)
             elif year != current_year or quarter != current_quarter:
                 item = schemas.HoldingNotFoundInSpiderHistoryCreate(code=symbol, year=year, quarter=quarter)
-                crud.create_holding_not_found_in_spider_history_data(db, item)
+                await crud.create_holding_not_found_in_spider_history_data(db, item)
 
                 logger.debug(f'Add {symbol} in {year}Q{quarter} to not found in spider history')
 
             for h in all_holding:
                 item = schemas.FundHoldingDataCreate(**h)
-                crud.create_fund_holding_data_if_not_exist(db, item)
+                await crud.create_fund_holding_data_if_not_exist(db, item)
 
         logger.debug(f'Spider result ({year}Q{quarter}): {holdings.keys()}')
 
@@ -446,8 +446,8 @@ def get_fund_holding_data(db, symbols):
         if len(not_found_stock_symbols) == 0 and len(not_found_bond_symbols) == 0:
             break
 
-        _search_in_db(not_found_stock_symbols, year, quarter, stock_holdings, stock_found, 'stock')
-        _search_in_db(not_found_bond_symbols, year, quarter, bond_holdings, bond_found, 'bond')
+        await _search_in_db(not_found_stock_symbols, year, quarter, stock_holdings, stock_found, 'stock')
+        await _search_in_db(not_found_bond_symbols, year, quarter, bond_holdings, bond_found, 'bond')
 
         logger.debug(f'Already found stock in db ({year}Q{quarter}): {stock_found}')
         logger.debug(f'Already found bond in db ({year}Q{quarter}): {bond_found}')
@@ -464,8 +464,8 @@ def get_fund_holding_data(db, symbols):
             if len(not_found_stock_symbols) == 0 and len(not_found_bond_symbols) == 0:
                 break
 
-            _search_by_spider(not_found_stock_symbols, year, quarter, stock_holdings, stock_found, 'stock')
-            _search_by_spider(not_found_bond_symbols, year, quarter, bond_holdings, bond_found, 'bond')
+            await _search_by_spider(not_found_stock_symbols, year, quarter, stock_holdings, stock_found, 'stock')
+            await _search_by_spider(not_found_bond_symbols, year, quarter, bond_holdings, bond_found, 'bond')
 
             logger.debug(f'Already found stock in spider ({year}Q{quarter}): {stock_found}')
             logger.debug(f'Already found bond in spider ({year}Q{quarter}): {bond_found}')
@@ -490,7 +490,7 @@ def get_fund_holding_data(db, symbols):
 
     return holdings
 
-def get_fund_holding_relevance_data(fund_holding_data):
+async def get_fund_holding_relevance_data(fund_holding_data):
     def _to_one_hot(data):
 
         all_data = set(item for sublist in data for item in sublist)
@@ -558,12 +558,12 @@ def get_fund_holding_relevance_data(fund_holding_data):
     }
 
 
-def get_kline_data(db, query):
+async def get_kline_data(db, query):
     code = query.code
     period = query.period
     market = query.market
 
-    data_in_db = crud.get_kline_data(db, code, period, market)
+    data_in_db = await crud.get_kline_data(db, code, period, market)
     res = [{
         'date': data.date,
         'open': data.open,
@@ -585,7 +585,7 @@ def get_kline_data(db, query):
 
     if spider_start_date != spider_end_date:
         data_from_spider = spider.get_kline(code, spider_start_date, spider_end_date, period, market)
-        crud.create_kline_data_from_list(db, data_from_spider, code, period, market)
+        await crud.create_kline_data_from_list(db, data_from_spider, code, period, market)
 
         logger.debug(f'Found {len(data_from_spider)} data in spider')
 

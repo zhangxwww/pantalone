@@ -21,9 +21,14 @@ logger.add(
     retention='1 week',
     compression='zip')
 
-models.Base.metadata.create_all(bind=engine)
-
 app = FastAPI()
+
+@app.on_event('startup')
+async def startup():
+    logger.debug('startup')
+    async with engine.begin() as conn:
+        await conn.run_sync(models.Base.metadata.create_all)
+
 
 app.include_router(statistic_router, prefix='/api')
 app.include_router(local_data_router, prefix='/api')

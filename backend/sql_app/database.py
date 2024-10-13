@@ -1,6 +1,6 @@
 import os
 
-from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -11,15 +11,14 @@ def get_db_path():
         os.makedirs(db_dir)
     return os.path.join(db_dir, 'pantalone.db')
 
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{get_db_path()}"
+SQLALCHEMY_DATABASE_URL = f"sqlite+aiosqlite:///{get_db_path()}"
 
-engine = create_engine(
+engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    pool_size=20,
-    max_overflow=10
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(
+    engine, class_=AsyncSession, expire_on_commit=False
+)
 
 Base = declarative_base()
