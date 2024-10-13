@@ -1,75 +1,79 @@
 <template>
-  <div>
-    <el-breadcrumb separator="/">
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>基金持仓明细</el-breadcrumb-item>
-    </el-breadcrumb>
-    <el-row justify="center" style="margin-top: 60px">
-      <el-col :span="7">
-        <div id="relevance-stock" style="width: 100%; height: 300px"></div>
-      </el-col>
-      <el-col :span="7">
-        <div id="relevance-bond" style="width: 100%; height: 300px"></div>
-      </el-col>
-      <el-col :span="7">
-        <div id="relevance-all" style="width: 100%; height: 300px"></div>
-      </el-col>
-    </el-row>
-    <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
-      <el-col :span="6" :offset="9">
-        <span style="font-size: var(--el-font-size-large); font-weight: bold">基金持仓明细</span>
-      </el-col>
-      <el-col :span="3" :offset="4">
-        <el-input v-model="searchFundCode" placeholder="请输入基金代码" @keyup.enter="searchFund" />
-      </el-col>
-      <el-col :span="1" style="margin-left: 10px;">
-        <el-button type="primary" @click="searchFund">
-          <el-icon>
-            <search />
-          </el-icon>
-        </el-button>
-      </el-col>
-    </el-row>
-    <el-row v-if="isReady" style="width: 70%; margin-left: 15%; margin-bottom: 15px">
-      <el-collapse accordion style="width: 100%">
-        <el-collapse-item v-for="holding in holdingData" :key="holding.fundCode" :name="holding.fundCode">
-          <template #title>
-            <span style="font-size: var(--el-font-size-medium); font-weight: bold">
-              {{ holding.fundName }}
-            </span>
-            <span style="font-size: var(--el-font-size-base); margin-left: 20px">
-              {{ holding.fundCode }}
-            </span>
-            <span style="font-size: var(--el-font-size-base); margin-left: 20px">
-              <el-tag v-if="holding.holdingState" color="#5470c6" size="small" round effect="dark" class="line">
-                {{ '已持有' }}
-              </el-tag>
-              <el-tag v-else color="#91cc75" size="small" round effect="light" style="color: black" class="line">
-                {{ '未持有' }}
-              </el-tag>
-            </span>
-          </template>
+  <el-container>
+    <el-header>
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item>基金持仓明细</el-breadcrumb-item>
+      </el-breadcrumb>
+    </el-header>
+    <el-main>
+      <el-row justify="center">
+        <el-col :span="7">
+          <div id="relevance-stock" style="width: 100%; height: 300px"></div>
+        </el-col>
+        <el-col :span="7">
+          <div id="relevance-bond" style="width: 100%; height: 300px"></div>
+        </el-col>
+        <el-col :span="7">
+          <div id="relevance-all" style="width: 100%; height: 300px"></div>
+        </el-col>
+      </el-row>
+      <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
+        <el-col :span="6" :offset="9">
+          <span style="font-size: var(--el-font-size-large); font-weight: bold">基金持仓明细</span>
+        </el-col>
+        <el-col :span="3" :offset="4">
+          <el-input v-model="searchFundCode" placeholder="请输入基金代码" @keyup.enter="searchFund" />
+        </el-col>
+        <el-col :span="1" style="margin-left: 10px;">
+          <el-button type="primary" @click="searchFund">
+            <el-icon>
+              <search />
+            </el-icon>
+          </el-button>
+        </el-col>
+      </el-row>
+      <el-row v-if="isReady" style="width: 70%; margin-left: 15%; margin-bottom: 15px">
+        <el-collapse accordion style="width: 100%">
+          <el-collapse-item v-for="holding in holdingData" :key="holding.fundCode" :name="holding.fundCode">
+            <template #title>
+              <span style="font-size: var(--el-font-size-medium); font-weight: bold">
+                {{ holding.fundName }}
+              </span>
+              <span style="font-size: var(--el-font-size-base); margin-left: 20px">
+                {{ holding.fundCode }}
+              </span>
+              <span style="font-size: var(--el-font-size-base); margin-left: 20px">
+                <el-tag v-if="holding.holdingState" color="#5470c6" size="small" round effect="dark" class="line">
+                  {{ '已持有' }}
+                </el-tag>
+                <el-tag v-else color="#91cc75" size="small" round effect="light" style="color: black" class="line">
+                  {{ '未持有' }}
+                </el-tag>
+              </span>
+            </template>
 
-          <el-row>
-            <el-col :span="12">
-              <el-table :data="holding.stockHoldings" table-layout="auto">
-                <el-table-column v-for="header in headers.stock" :key="header.prop" :prop="header.prop"
-                  :label="header.label" :width="header.width" :align="header.align" show-overflow-tooltip />
-              </el-table>
-            </el-col>
-            <el-col :span="12">
-              <el-table :data="holding.bondHoldings" table-layout="auto">
-                <el-table-column v-for="header in headers.bond" :key="header.prop" :prop="header.prop"
-                  :label="header.label" :width="header.width" :align="header.align" show-overflow-tooltip />
-              </el-table>
-            </el-col>
-          </el-row>
-        </el-collapse-item>
-      </el-collapse>
-    </el-row>
-    <el-skeleton v-else :rows="5" animated
-      style="width: 70%; margin-left: 15%; margin-bottom: 15px; margin-top: 30px; text-align: left;" />
-  </div>
+            <el-row>
+              <el-col :span="12">
+                <el-table :data="holding.stockHoldings" table-layout="auto">
+                  <el-table-column v-for="header in headers.stock" :key="header.prop" :prop="header.prop"
+                    :label="header.label" :width="header.width" :align="header.align" show-overflow-tooltip />
+                </el-table>
+              </el-col>
+              <el-col :span="12">
+                <el-table :data="holding.bondHoldings" table-layout="auto">
+                  <el-table-column v-for="header in headers.bond" :key="header.prop" :prop="header.prop"
+                    :label="header.label" :width="header.width" :align="header.align" show-overflow-tooltip />
+                </el-table>
+              </el-col>
+            </el-row>
+          </el-collapse-item>
+        </el-collapse>
+      </el-row>
+      <el-skeleton v-else :rows="5" animated
+        style="width: 70%; margin-left: 15%; margin-bottom: 15px; margin-top: 30px; text-align: left;" />
+    </el-main>
+  </el-container>
 </template>
 
 <script>

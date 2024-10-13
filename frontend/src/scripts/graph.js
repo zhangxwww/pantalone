@@ -821,12 +821,13 @@ function drawRelevanceScatterGraph (chart, data, states, title, key) {
 }
 
 
-function drawKLineGraph (chart, data, title) {
+function drawKLineGraph (chart, data, title, period) {
     const colorList = ['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '#ca8622', '#bda29a', '#6e7074', '#546570', '#c4ccd3'];
 
     const dates = data.map(d => d.date);
     const oclhv = data.map(d => [d.open, d.close, d.low, d.high, d.volume]);
     const volumes = data.map(d => d.volume);
+    const klineName = period === 'daily' ? '日K' : period === 'weekly' ? '周K' : '月K';
 
     const option = {
         animation: false,
@@ -837,7 +838,7 @@ function drawKLineGraph (chart, data, title) {
         },
         legend: {
             top: 270,
-            data: ['日K']
+            data: [klineName]
         },
         tooltip: {
             transitionDuration: 0,
@@ -1014,7 +1015,7 @@ function drawKLineGraph (chart, data, title) {
             },
             {
                 type: 'candlestick',
-                name: '日K',
+                name: klineName,
                 data: oclhv,
                 itemStyle: {
                     color: '#ef232a',

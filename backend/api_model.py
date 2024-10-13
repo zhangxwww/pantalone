@@ -90,4 +90,7 @@ class GetFundHoldingRelevanceData(BaseModel):
 class GetKLineData(BaseModel):
     code: str
     period: Literal['daily', 'weekly', 'monthly']
-    market: Literal['index-CN']
+    market: Literal[
+        'index-CN', 'index-HK', 'index-US', 'index-qvix',
+        'future-zh'
+    ]

@@ -4,6 +4,7 @@ import requests
 from loguru import logger
 from bs4 import BeautifulSoup
 import akshare as ak
+import pandas as pd
 
 
 
@@ -98,22 +99,76 @@ def get_fund_holding(symbol, year, type_):
     return res
 
 
+def _clip_date(df, start, end):
+    df = df[(df['date'] >= datetime.datetime.strptime(start, '%Y-%m-%d').date())
+            & (df['date'] <= datetime.datetime.strptime(end, '%Y-%m-%d').date())]
+    return df
+
+def _resample(daily_kline_df, period):
+    df = daily_kline_df.copy()
+    df['date'] = pd.to_datetime(df['date'])
+    df = df.set_index('date')
+    sample = 'W' if period == 'weekly' else 'M'
+    agg_df = df.resample(sample).agg({
+        'open': 'first',
+        'close': 'last',
+        'high': 'max',
+        'low': 'min',
+        'volume': 'sum'
+    }).dropna()
+    agg_df = agg_df.reset_index()
+    return agg_df
+
+
 def get_kline(code, start_date, end_date, period='daily', market='index-CN'):
+    need_clip = False
+    need_resample = False
+
     if market == 'index-CN':
         df = ak.index_zh_a_hist(symbol=code, period=period, start_date=start_date, end_date=end_date)
-        res = []
-        for row in df.itertuples(index=False):
-            res.append({
-                'date': row.日期,
-                'open': row.开盘,
-                'close': row.收盘,
-                'high': row.最高,
-                'low': row.最低,
-                'volume': row.成交额
-            })
-        return res
+        df = df.rename(columns={'日期': 'date', '开盘': 'open', '收盘': 'close', '最高': 'high', '最低': 'low', '成交额': 'volume'})
+
+    elif market == 'index-HK':
+        df = ak.stock_hk_index_daily_sina(symbol=code)
+        need_clip = need_resample = True
+
+    elif market == 'index-US':
+        df = ak.index_us_stock_sina(symbol=code)
+        need_clip = need_resample = True
+
+    elif market == 'index-qvix':
+        if code == '300ETF':
+            df = ak.index_option_300etf_qvix()
+        elif code == '50ETF':
+            df = ak.index_option_50etf_qvix()
+        df['volume'] = 0
+        need_clip = need_resample = True
+
+    elif market == 'future-zh':
+        df = ak.futures_zh_daily_sina(symbol=code)
+        df['date'] = pd.to_datetime(df['date']).dt.date
+        need_clip = need_resample = True
+
     else:
         raise NotImplementedError
+
+    if need_clip:
+        df = _clip_date(df, start_date, end_date)
+    if need_resample:
+        if period != 'daily':
+            df = _resample(df, period)
+
+    res = []
+    for row in df.itertuples(index=False):
+        res.append({
+            'date': row.date,
+            'open': row.open,
+            'close': row.close,
+            'high': row.high,
+            'low': row.low,
+            'volume': row.volume
+        })
+    return res
 
 
 if __name__ == '__main__':
