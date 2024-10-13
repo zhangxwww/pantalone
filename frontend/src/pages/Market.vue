@@ -110,7 +110,7 @@ export default {
           ]
         },
         {
-          category: '全球指数',
+          category: '美股指数',
           content: [
             {
               name: '纳斯达克综合指数',
@@ -131,17 +131,12 @@ export default {
               name: '纳斯达克100指数',
               code: '.NDX',
               market: 'index-US'
-            },
-            {
-              name: '50ETF期权波动率指数QVIX',
-              code: '50ETF',
-              market: 'index-qvix'
-            },
-            {
-              name: '300ETF期权波动率指数QVIX',
-              code: '300ETF',
-              market: 'index-qvix'
-            },
+            }
+          ]
+        },
+        {
+          category: '港股指数',
+          content: [
             {
               name: '恒生指数',
               code: 'HSI',
@@ -170,11 +165,22 @@ export default {
           ]
         },
         {
-          category: '板块',
-          content: []
+          category: '波动率指数',
+          content: [
+            {
+              name: '50ETF期权波动率指数QVIX',
+              code: '50ETF',
+              market: 'index-qvix'
+            },
+            {
+              name: '300ETF期权波动率指数QVIX',
+              code: '300ETF',
+              market: 'index-qvix'
+            }
+          ]
         },
         {
-          category: '债券',
+          category: '债券指数',
           content: [
             {
               name: '国债指数',

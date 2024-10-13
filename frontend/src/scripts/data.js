@@ -628,7 +628,7 @@ class Data {
             }
             data.push({
                 liquidity: last.residualMaturaty,
-                return: last.rate / last.maturity * 365,
+                return: last.rate,
                 amount: last.beginningAmount,
                 name: last.name
             })

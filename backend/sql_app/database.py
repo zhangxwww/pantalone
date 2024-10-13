@@ -14,7 +14,10 @@ def get_db_path():
 SQLALCHEMY_DATABASE_URL = f"sqlite:///{get_db_path()}"
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False},
+    pool_size=20,
+    max_overflow=10
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
