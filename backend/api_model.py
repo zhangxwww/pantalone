@@ -68,6 +68,7 @@ class _AddFundData(BaseModel):
     currentShares: float
     holding: bool
     lockupPeriod: int
+    dividendRatio: float
 
 
 class AddFundHistoryData(BaseModel):

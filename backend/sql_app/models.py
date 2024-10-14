@@ -59,6 +59,7 @@ class FundDataHistoryItem(Base):
     currentTime = Column(Date)
     holding = Column(Boolean)
     lockupPeriod = Column(Integer)
+    dividendRatio = Column(Float)
 
     fund_data_history_id = Column(Integer, ForeignKey('fund_data_history.id'))
     fund_data_history = relationship('FundDataHistory', back_populates='histories')

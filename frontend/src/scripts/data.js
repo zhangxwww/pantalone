@@ -108,10 +108,13 @@ class Data {
             for (let [i, uHis] of uData.history.entries()) {
                 uHis.currentTime = new Date(uHis.currentTime);
                 uHis.currentAmount = uHis.currentShares * uHis.currentNetValue;
+                uHis.currentDividend = uHis.dividendRatio * uHis.currentNetValue;
                 if (i === 0) {
                     uHis.annualizedReturnRate = 0;
                     uHis.cumInvest = uHis.currentAmount;
                     uHis.cumReturn = 0;
+                    uHis.cumDividendRatio = 0;
+                    uHis.cumDividend = 0;
                     uHis.cumReturnRate = 1;
                     uHis.latestReturnRate = 0;
                 } else {
@@ -119,13 +122,17 @@ class Data {
                     let latest = uData.history.slice().reverse().find(e => uHis.currentTime - e.currentTime >= 15 * 24 * 3600 * 1000);
                     latest = latest || uData.history[0];
                     const latestSpan = (latest.currentTime - first.currentTime) / (1000 * 3600 * 24);
-                    const currentRet = (uHis.currentNetValue - latest.currentNetValue) / latest.currentNetValue;
+
+                    uHis.cumDividendRatio = uHis.dividendRatio + latest.cumDividendRatio;
+                    uHis.cumDividend = uHis.currentDividend + latest.cumDividend;
+
+                    const currentRet = (uHis.currentNetValue - latest.currentNetValue + uHis.cumDividendRatio - latest.cumDividendRatio) / (latest.currentNetValue + latest.cumDividendRatio);
                     const currentSpan = (uHis.currentTime - latest.currentTime) / (1000 * 3600 * 24);
 
                     uHis.annualizedReturnRate = statistic.averageReturn(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan);
 
                     uHis.cumInvest = latest.cumInvest + (uHis.currentShares - latest.currentShares) * uHis.currentNetValue;
-                    uHis.cumReturn = uHis.currentAmount - uHis.cumInvest;
+                    uHis.cumReturn = uHis.currentAmount - uHis.cumInvest + uHis.cumDividend;
                     uHis.cumReturnRate = latest.cumReturnRate * (currentRet + 1);
 
                     uHis.latestReturnRate = currentRet / currentSpan * 365;
@@ -137,6 +144,7 @@ class Data {
                 uHis.cumInvestFmt = uHis.cumInvest.toFixed(2);
                 uHis.cumReturnFmt = uHis.cumReturn.toFixed(2);
                 uHis.latestReturnRateFmt = (uHis.latestReturnRate * 100).toFixed(2) + '%';
+                uHis.cumDividendFmt = uHis.cumDividend.toFixed(2);
 
                 const endingTime = new Date(uHis.currentTime);
                 endingTime.setDate(endingTime.getDate() + uHis.lockupPeriod);
@@ -264,6 +272,8 @@ class Data {
                 currentTime: last.currentTime,
                 cumInvest: last.cumInvest,
                 cumInvestFmt: last.cumInvestFmt,
+                cumDividend: last.cumDividend,
+                cumDividendFmt: last.cumDividendFmt,
                 cumReturn: last.cumReturn,
                 cumReturnFmt: last.cumReturnFmt,
                 lockupPeriod: last.lockupPeriod,

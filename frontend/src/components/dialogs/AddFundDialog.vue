@@ -27,6 +27,9 @@
             <el-form-item label="当期净值" prop="currentNetValue">
                 <el-input v-model="form.currentNetValue"></el-input>
             </el-form-item>
+            <el-form-item label="分红比例" prop="dividendRatio">
+                <el-input v-model="form.dividendRatio"></el-input>
+            </el-form-item>
             <el-form-item label="锁定期" prop="lockupPeriod">
                 <el-input v-model.number="form.lockupPeriod"></el-input>
             </el-form-item>
@@ -68,6 +71,7 @@ export default {
                 currentShares: 0,
                 currentNetValue: 0,
                 lockupPeriod: 180,
+                dividendRatio: 0.0,
                 holding: true
             },
             rules: {
@@ -84,6 +88,12 @@ export default {
                     { required: true, message: '请输入当期净值', trigger: 'blur' },
                     {
                         message: '当期净值必须为数字值', trigger: 'blur', validator: isNumberValidator
+                    }
+                ],
+                dividendRatio: [
+                    { required: true, message: '请输入分红比例', trigger: 'blur' },
+                    {
+                        message: '分红比例必须为数字值', trigger: 'blur', validator: isNumberValidator
                     }
                 ],
                 lockupPeriod: [
@@ -132,6 +142,7 @@ export default {
                 this.form.currentNetValue = row.currentNetValue;
                 this.form.lockupPeriod = row.residualLockupPeriod;
                 this.form.holding = row.holding;
+                this.form.dividendRatio = 0;
                 this.showDialog = true;
                 this.currentSymbolState = this.SearchSymbolState.FOUND;
             },
@@ -147,6 +158,7 @@ export default {
                 this.form.currentNetValue = 0;
                 this.form.currentShares = 0;
                 this.form.lockupPeriod = 180;
+                this.form.dividendRatio = 0.0;
                 this.form.holding = true;
             }
         }

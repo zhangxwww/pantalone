@@ -1,6 +1,7 @@
 from typing import Optional, Dict, Any, List
 from datetime import date
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from loguru import logger
@@ -238,14 +239,14 @@ async def create_fund_data_history_item(
 # ********** drop table **********
 
 async def drop_all_tables(db: AsyncSession):
-    await db.execute('DELETE FROM cash_data_history_item IF EXISTS')
-    await db.execute('DELETE FROM cash_data_history IF EXISTS')
-    await db.execute('DELETE FROM monetary_fund_data_history_item IF EXISTS')
-    await db.execute('DELETE FROM monetary_fund_data_history IF EXISTS')
-    await db.execute('DELETE FROM fixed_deposit_data_history_item IF EXISTS')
-    await db.execute('DELETE FROM fixed_deposit_data_history IF EXISTS')
-    await db.execute('DELETE FROM fund_data_history_item IF EXISTS')
-    await db.execute('DELETE FROM fund_data_history IF EXISTS')
+    await db.execute(text('DELETE FROM cash_data_history_item'))
+    await db.execute(text('DELETE FROM cash_data_history'))
+    await db.execute(text('DELETE FROM monetary_fund_data_history_item'))
+    await db.execute(text('DELETE FROM monetary_fund_data_history'))
+    await db.execute(text('DELETE FROM fixed_deposit_data_history_item'))
+    await db.execute(text('DELETE FROM fixed_deposit_data_history'))
+    await db.execute(text('DELETE FROM fund_data_history_item'))
+    await db.execute(text('DELETE FROM fund_data_history'))
     await db.commit()
 
 # ********** create from json **********
@@ -287,11 +288,17 @@ async def create_table_from_json(
         logger.debug(f'Table name: {table_name}')
         for item in table_data:
             history = item['history']
-            history_id = await create_history_func[table_name](db, history_schema[table_name]()).id
+            created = await create_history_func[table_name](db, history_schema[table_name]())
+            history_id = created.id
             logger.debug(f'history id: {history_id}')
 
             for his in history:
-                await create_item_func[table_name](db, item_schema[table_name](**his), history_id)
+                try:
+                    await create_item_func[table_name](db, item_schema[table_name](**his), history_id)
+                except Exception as e:
+                    logger.error(table_name)
+                    logger.error(his)
+                    raise e
 
 
 # ********** add CN1YR data **********

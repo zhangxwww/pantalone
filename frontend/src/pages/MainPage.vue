@@ -254,7 +254,8 @@ export default {
                     currentShares: form.currentShares,
                     currentNetValue: form.currentNetValue,
                     lockupPeriod: form.lockupPeriod,
-                    holding: form.holding
+                    holding: form.holding,
+                    dividendRatio: form.dividendRatio
                 }, this.editId);
             },
             onAddData: async (form, type) => {

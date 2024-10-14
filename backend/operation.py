@@ -299,7 +299,8 @@ async def _get_fund_data_from_db(db):
                 'currentShares': his.currentShares,
                 'currentTime': his.currentTime,
                 'holding': his.holding,
-                'lockupPeriod': his.lockupPeriod
+                'lockupPeriod': his.lockupPeriod,
+                'dividendRatio': his.dividendRatio
             }
             history_list.append(h)
         fund_data.append({

@@ -1,5 +1,5 @@
 <template>
-    <el-tabs type="border-card" style="width: 90%; margin-left: 5%; margin-bottom: 5%">
+    <el-tabs type="border-card" style="width: 96%; margin-left: 2%; margin-bottom: 5%">
         <el-tab-pane label="现金">
             <el-table :data="data.cashData" table-layout="auto" style="width: 100%">
                 <el-table-column v-for="header, i in headers.cash" :key="i" :prop="header.prop" :label="header.label"
@@ -180,13 +180,13 @@ export default {
                     {
                         prop: 'name',
                         label: '名称',
-                        width: '300',
+                        width: '280',
                         sortable: false
                     },
                     {
                         prop: 'symbol',
                         label: '代码',
-                        width: '85',
+                        width: '80',
                         sortable: false
                     },
                     {
@@ -204,6 +204,12 @@ export default {
                     {
                         prop: 'currentNetValueFmt',
                         label: '当前净值',
+                        width: '105',
+                        sortable: true
+                    },
+                    {
+                        prop: 'cumDividendFmt',
+                        label: '累计分红',
                         width: '105',
                         sortable: true
                     },

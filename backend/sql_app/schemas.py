@@ -130,6 +130,7 @@ class FundDataHistoryItemBase(BaseModel):
     currentTime: date
     holding: bool
     lockupPeriod: int
+    dividendRatio: float
 
 
 class FundDataHistoryItemCreate(FundDataHistoryItemBase):
