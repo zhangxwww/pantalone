@@ -108,7 +108,7 @@ class Data {
             for (let [i, uHis] of uData.history.entries()) {
                 uHis.currentTime = new Date(uHis.currentTime);
                 uHis.currentAmount = uHis.currentShares * uHis.currentNetValue;
-                uHis.currentDividend = uHis.dividendRatio * uHis.currentNetValue;
+                uHis.currentDividend = uHis.dividendRatio * uHis.currentShares;
                 if (i === 0) {
                     uHis.annualizedReturnRate = 0;
                     uHis.cumInvest = uHis.currentAmount;
@@ -316,7 +316,8 @@ class Data {
                 currentNetValue: newNetValue,
                 currentShares: u.currentShares,
                 holding: u.holding,
-                lockupPeriod: u.lockupPeriod - Math.max(Math.ceil(deltaTime), 2)
+                lockupPeriod: u.lockupPeriod - Math.max(Math.ceil(deltaTime), 2),
+                dividendRatio: 0
             }
             console.log(toBeAdded);
             await this._addData('fund', toBeAdded, u.id);
