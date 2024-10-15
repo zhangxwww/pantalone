@@ -51,7 +51,10 @@
 <script>
 import { Search, Loading, Check } from '@element-plus/icons-vue';
 import { isNumberValidator, isIntegerValidator } from '@/scripts/validator.js';
-import { getFundNameRequest } from '@/scripts/requests.js';
+import {
+    getFundNameRequest,
+    getRefreshedFundNetValueRequest
+} from '@/scripts/requests.js';
 
 
 export default {
@@ -112,10 +115,16 @@ export default {
                 this.currentSymbolState = this.SearchSymbolState.SEARCHING;
                 const data = await getFundNameRequest(this.form.symbol);
                 const fund_name = data.fund_name;
-
                 console.log(fund_name);
 
+                const netValueData = await getRefreshedFundNetValueRequest([this.form.symbol]);
+                console.log(netValueData);
+
+                const netValue = netValueData.refresh.find(item => item.symbol === this.form.symbol).value;
+                console.log(netValue);
+
                 this.form.name = fund_name;
+                this.form.currentNetValue = netValue;
                 this.currentSymbolState = this.SearchSymbolState.FOUND;
             },
 
