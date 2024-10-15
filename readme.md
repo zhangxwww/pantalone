@@ -1,15 +1,24 @@
+Frontend:
+
 ```bash
 cd frontend
 npm install
+npm run build
+```
 
-cd ../backend
+Backend:
+
+```bash
+cd backend
 conda create -n pantalone python=3.11
 conda activate pantalone
 pip install -r requirements.txt
 ```
 
+Start:
 
 ```bash
 conda activate pantalone
-uvicorn app:app --reload --host localhost --port 9876
+cd backend
+python app.py
 ```
