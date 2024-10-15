@@ -22,3 +22,5 @@ conda activate pantalone
 cd backend
 python app.py
 ```
+
+Open `http://localhost:9876/` in browser.
