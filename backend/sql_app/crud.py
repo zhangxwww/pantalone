@@ -24,6 +24,8 @@ def _retry_when_db_locked(retry_times: int = 3):
                     if 'database is locked' in str(e):
                         logger.warning(f'Error: {e}')
                         logger.warning(f'Retry {i + 1}/{retry_times}')
+                        db = args[0]
+                        await db.rollback()
                         await asyncio.sleep(random.uniform(1, 3))
                     else:
                         raise e
