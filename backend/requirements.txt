@@ -10,3 +10,5 @@ beautifulsoup4==4.12.3
 cachetools==5.5.0
 numpy==1.26.4
 scikit-learn==1.5.2
+aiosqlite==0.20.0
+akshare==1.14.80
