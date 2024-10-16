@@ -61,7 +61,7 @@ class Data {
                     mHis.latestReturnRate = mHis.annualizedReturnRate;
                     mHis.cumReturnRate = 1;
                 } else {
-                    let latest = mData.history.slice().reverse().find(e => mHis.currentTime - e.currentTime >= 15 * 24 * 3600 * 1000);
+                    let latest = mData.history.slice().reverse().find(e => mHis.currentTime - e.currentTime >= 24 * 3600 * 1000);
                     latest = latest || mData.history[0];
                     const latestSpan = (latest.currentTime - latest.beginningTime) / (1000 * 3600 * 24);
                     const currentRet = (mHis.currentNetValue - latest.currentNetValue) / latest.currentNetValue;
@@ -119,7 +119,7 @@ class Data {
                     uHis.latestReturnRate = 0;
                 } else {
                     const first = uData.history[0];
-                    let latest = uData.history.slice().reverse().find(e => uHis.currentTime - e.currentTime >= 15 * 24 * 3600 * 1000);
+                    let latest = uData.history.slice().reverse().find(e => uHis.currentTime - e.currentTime >= 24 * 3600 * 1000);
                     latest = latest || uData.history[0];
                     const latestSpan = (latest.currentTime - first.currentTime) / (1000 * 3600 * 24);
 
