@@ -3,6 +3,7 @@ import os
 from fastapi import FastAPI, staticfiles
 from fastapi.responses import FileResponse
 from loguru import logger
+from sqlalchemy import text
 
 from sql_app import models
 from sql_app.database import engine
@@ -28,6 +29,11 @@ async def startup():
     logger.debug('startup')
     async with engine.begin() as conn:
         await conn.run_sync(models.Base.metadata.create_all)
+        await conn.execute(text('PRAGMA journal_mode=WAL'))
+
+@app.on_event('shutdown')
+async def shutdown():
+    await engine.dispose()
 
 
 app.include_router(statistic_router, prefix='/api')

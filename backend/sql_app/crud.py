@@ -1,12 +1,35 @@
 from typing import Optional, Dict, Any, List
 from datetime import date
+from functools import wraps
+import asyncio
+import random
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.exc import OperationalError
 from loguru import logger
 
 from . import models, schemas
+
+
+def _retry_when_db_locked(retry_times: int = 3):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            for i in range(retry_times):
+                try:
+                    return await func(*args, **kwargs)
+                except OperationalError as e:
+                    if 'database is locked' in str(e):
+                        logger.warning(f'Error: {e}')
+                        logger.warning(f'Retry {i + 1}/{retry_times}')
+                        await asyncio.sleep(random.uniform(1, 3))
+                    else:
+                        raise e
+        return wrapper
+    return decorator
+
 
 # ********** get all history **********
 
@@ -303,6 +326,7 @@ async def create_table_from_json(
 
 # ********** add CN1YR data **********
 
+@_retry_when_db_locked(retry_times=3)
 async def create_CN1YR_data(
     db: AsyncSession,
     data: schemas.CN1YRDataCreate
@@ -314,6 +338,7 @@ async def create_CN1YR_data(
     return db_CN1YR_data
 
 
+@_retry_when_db_locked(retry_times=3)
 async def create_CN1YR_data_from_list(
     db: AsyncSession,
     data: List[schemas.CN1YRDataCreate]
@@ -335,6 +360,7 @@ async def get_CN1YR_data(
 
 # ********** add lpr data **********
 
+@_retry_when_db_locked(retry_times=3)
 async def create_lpr_data(
     db: AsyncSession,
     data: schemas.LPRDataCreate
@@ -346,6 +372,7 @@ async def create_lpr_data(
     return db_lpr_data
 
 
+@_retry_when_db_locked(retry_times=3)
 async def create_lpr_data_from_list(
     db: AsyncSession,
     data: List[schemas.LPRDataCreate]
@@ -367,6 +394,7 @@ async def get_lpr_data(
 
 # ********** save index close data **********
 
+@_retry_when_db_locked(retry_times=3)
 async def create_index_close_data(
     db: AsyncSession,
     data: schemas.IndexCloseDataCreate
@@ -378,6 +406,7 @@ async def create_index_close_data(
     return db_index_close_data
 
 
+@_retry_when_db_locked(retry_times=3)
 async def create_index_close_data_from_list(
     db: AsyncSession,
     data: List[schemas.IndexCloseDataCreate]
@@ -407,6 +436,7 @@ async def get_fund_name(
     return result.scalars().one_or_none()
 
 
+@_retry_when_db_locked(retry_times=3)
 async def create_fund_name(
     db: AsyncSession,
     data: schemas.FundNameDataCreate
@@ -439,6 +469,7 @@ async def get_fund_holding_data(
     return result.scalars().all()
 
 
+@_retry_when_db_locked(retry_times=3)
 async def create_fund_holding_data(
     db: AsyncSession,
     data: schemas.FundHoldingDataCreate
@@ -450,6 +481,7 @@ async def create_fund_holding_data(
     return db_fund_holding_data
 
 
+@_retry_when_db_locked(retry_times=3)
 async def create_fund_holding_data_if_not_exist(
     db: AsyncSession,
     data: schemas.FundHoldingDataCreate
@@ -500,6 +532,7 @@ async def find_holding_not_found_in_spider_history_data(
 
 # ********** kline data **********
 
+@_retry_when_db_locked(retry_times=3)
 async def create_kline_data(
     db: AsyncSession,
     data: schemas.KLineDataCreate
@@ -511,6 +544,7 @@ async def create_kline_data(
     return db_kline_data
 
 
+@_retry_when_db_locked(retry_times=3)
 async def create_kline_data_from_list(
     db: AsyncSession,
     data: list[dict],
