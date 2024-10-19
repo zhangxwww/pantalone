@@ -136,6 +136,7 @@
 </template>
 
 <script>
+import { ElNotification } from 'element-plus'
 import { Plus, Download, Upload, Refresh, More } from '@element-plus/icons-vue'
 import Data from '@/scripts/data.js'
 import {
@@ -161,6 +162,7 @@ import {
     drawEmptyRiskIndicatorLineGraph,
     drawEmptyDrawdownLineGraph
 } from '@/scripts/graph.js'
+import { getGitUpdatedRequest } from '../scripts/requests'
 
 import AddCashDialog from '@/components/dialogs/AddCashDialog'
 import AddMonetaryDialog from '@/components/dialogs/AddMonetaryDialog'
@@ -402,6 +404,25 @@ export default {
                 this.setMonthChangeGraphLoading();
                 await this.draw();
             },
+            checkGitStates: async () => {
+                const lastNotifyDateStr = localStorage.getItem("lastNotifyDate");
+                const lastNotifyDate = lastNotifyDateStr ? new Date(lastNotifyDateStr) : null;
+                const now = new Date();
+                if (!lastNotifyDate || now - lastNotifyDate >= 24 * 3600) {
+                    const res = await getGitUpdatedRequest();
+                    const updated = res.updated;
+                    if (updated) {
+                        ElNotification({
+                            title: "检查到新版本",
+                            message: "请执行<code>git pull</code>更新代码并<code>npm run build</code>重新部署",
+                            type: "info",
+                            dangerouslyUseHTMLString: true,
+                            duration: 0
+                        });
+                        localStorage.setItem("lastNotifyDate", now.toISOString());
+                    }
+                }
+            },
             dropdownMenus: [
                 {
                     command: 'cash',
@@ -451,6 +472,7 @@ export default {
     },
 
     async mounted () {
+        await this.checkGitStates();
         this.record = new Data();
         this.initGraph();
         this.drawEmpty();

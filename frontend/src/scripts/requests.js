@@ -93,6 +93,12 @@ async function getNormalIntervalRequest (p) {
 }
 
 
+async function getGitUpdatedRequest () {
+    const res = await axios.get('/api/git/updated');
+    return res.data;
+}
+
+
 export {
     getChinaBondYieldDataRequest,
     getLPRDataRequest,
@@ -106,5 +112,6 @@ export {
     getRefreshedFundNetValueRequest,
     getFundHoldingDataRequest,
     getFundHoldingRelevanceDataRequest,
-    getKLineDataRequest
+    getKLineDataRequest,
+    getGitUpdatedRequest
 }
