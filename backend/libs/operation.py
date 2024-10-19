@@ -540,19 +540,25 @@ async def get_fund_holding_relevance_data(fund_holding_data):
     logger.debug(f'All one hot: {all_one_hot.shape}')
 
     def _pairwise_relevance(data):
-        return pairwise_distances(data, metric='euclidean')
+        try:
+            return pairwise_distances(data, metric='euclidean')
+        except ValueError:
+            return np.zeros((data.shape[0], data.shape[0]))
 
     stock_relevance = _pairwise_relevance(stock_one_hot).tolist()
     bond_relevance = _pairwise_relevance(bond_one_hot).tolist()
     all_relevance = _pairwise_relevance(all_one_hot).tolist()
 
     def _decomposition(data):
-        perplexity = min(30, data.shape[0] - 1)
-        tsne = TSNE(n_components=2, perplexity=perplexity)
-        scaler = MinMaxScaler()
-        pos = tsne.fit_transform(data)
-        pos = scaler.fit_transform(pos)
-        return pos
+        try:
+            perplexity = min(30, data.shape[0] - 1)
+            tsne = TSNE(n_components=2, perplexity=perplexity)
+            scaler = MinMaxScaler()
+            pos = tsne.fit_transform(data)
+            pos = scaler.fit_transform(pos)
+            return pos
+        except ValueError:
+            return np.zeros((data.shape[0], 2))
 
     stock_pos = _decomposition(stock_one_hot).tolist()
     bond_pos = _decomposition(bond_one_hot).tolist()
