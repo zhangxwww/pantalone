@@ -822,6 +822,7 @@ function drawRelevanceScatterGraph (chart, data, states, title, key) {
 
 
 function drawKLineGraph (chart, data, title, period, indicator) {
+    console.log(title, period, indicator);
     const dates = data.map(d => d.date);
     const oclhv = data.map(d => [d.open, d.close, d.low, d.high, d.volume]);
     const volumes = data.map(d => d.volume);

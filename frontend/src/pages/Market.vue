@@ -381,17 +381,21 @@ export default {
         graph.hideLoading();
       },
 
-      drawOneChart: async (cat, item) => {
+      drawOneChart: async (cat, item, clear) => {
         const title = this.getGraphTitle(item.name, item.code);
         const graph = this.drawEmptyGraph(item.name, title, cat.isKLine);
         const key = this.getCacheKey(title, cat.isKLine);
+        const data = cat.isKLine
+          ? await this.getKLineData(key, item.code, item.market)
+          : await this.getMarketPriceData(key, item.instrument);
 
+        if (clear) {
+          graph.clear();
+        }
         if (cat.isKLine) {
-          const kline = await this.getKLineData(key, item.code, item.market);
-          this.drawKLineGraph(graph, kline, title);
+          this.drawKLineGraph(graph, data, title);
         } else {
-          const market = await this.getMarketPriceData(key, item.instrument);
-          this.drawMarketPriceLineGraph(graph, market, title);
+          this.drawMarketPriceLineGraph(graph, data, title);
         }
       },
 
@@ -403,7 +407,7 @@ export default {
           }
           for (const item of cat.content) {
             const promise = async (item) => {
-              await this.drawOneChart(cat, item);
+              await this.drawOneChart(cat, item, false);
             };
             promises.push(promise(item));
           }
@@ -427,7 +431,7 @@ export default {
             continue;
           }
           for (const item of cat.content) {
-            await this.drawOneChart(cat, item);
+            await this.drawOneChart(cat, item, true);
           }
         }
       }
