@@ -109,7 +109,8 @@ class Data {
                 uHis.currentTime = new Date(uHis.currentTime);
                 uHis.currentAmount = uHis.currentShares * uHis.currentNetValue;
                 uHis.currentDividend = uHis.dividendRatio * uHis.currentShares;
-                if (i === 0) {
+                const latest = uData.history.slice().reverse().find(e => uHis.currentTime - e.currentTime >= 24 * 3600 * 1000);
+                if (i === 0 || !latest) {
                     uHis.annualizedReturnRate = 0;
                     uHis.cumInvest = uHis.currentAmount;
                     uHis.cumReturn = 0;
@@ -119,8 +120,6 @@ class Data {
                     uHis.latestReturnRate = 0;
                 } else {
                     const first = uData.history[0];
-                    let latest = uData.history.slice().reverse().find(e => uHis.currentTime - e.currentTime >= 24 * 3600 * 1000);
-                    latest = latest || uData.history[0];
                     const latestSpan = (latest.currentTime - first.currentTime) / (1000 * 3600 * 24);
 
                     uHis.cumDividendRatio = uHis.dividendRatio + latest.cumDividendRatio;

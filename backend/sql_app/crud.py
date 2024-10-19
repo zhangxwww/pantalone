@@ -186,6 +186,29 @@ async def create_cash_data_history_item(
     await db.refresh(db_cash_data_history_item)
     return db_cash_data_history_item
 
+async def create_cash_data_history_item_if_not_exist(
+    db: AsyncSession,
+    cash_data_history_item: schemas.CashDataHistoryItemCreate,
+    cash_data_history_id: Optional[int] = None
+):
+    if cash_data_history_id is None:
+        existing_record = None
+    else:
+        query = select(models.CashDataHistoryItem).filter(
+            models.CashDataHistoryItem.name == cash_data_history_item.name,
+            models.CashDataHistoryItem.amount == cash_data_history_item.amount,
+            models.CashDataHistoryItem.beginningTime == cash_data_history_item.beginningTime,
+            models.CashDataHistoryItem.cash_data_history_id == cash_data_history_id
+        )
+        result = await db.execute(query)
+        existing_record = result.scalars().first()
+
+    if existing_record is None:
+        return await create_cash_data_history_item(db, cash_data_history_item, cash_data_history_id)
+    else:
+        logger.debug(f'cash data history item already exist: {existing_record}')
+        return existing_record
+
 async def create_monetary_fund_data_history_item(
     db: AsyncSession,
     monetary_fund_data_history_item: schemas.MonetaryFundDataHistoryItemCreate,
@@ -210,6 +233,35 @@ async def create_monetary_fund_data_history_item(
     await db.commit()
     await db.refresh(db_monetary_fund_data_history_item)
     return db_monetary_fund_data_history_item
+
+async def create_monetary_fund_data_history_item_if_not_exist(
+    db: AsyncSession,
+    monetary_fund_data_history_item: schemas.MonetaryFundDataHistoryItemCreate,
+    monetary_fund_data_history_id: Optional[int] = None
+):
+    if monetary_fund_data_history_id is None:
+        existing_record = None
+    else:
+        query = select(models.MonetaryFundDataHistoryItem).filter(
+            models.MonetaryFundDataHistoryItem.name == monetary_fund_data_history_item.name,
+            models.MonetaryFundDataHistoryItem.beginningAmount == monetary_fund_data_history_item.beginningAmount,
+            models.MonetaryFundDataHistoryItem.beginningTime == monetary_fund_data_history_item.beginningTime,
+            models.MonetaryFundDataHistoryItem.beginningShares == monetary_fund_data_history_item.beginningShares,
+            models.MonetaryFundDataHistoryItem.currentAmount == monetary_fund_data_history_item.currentAmount,
+            models.MonetaryFundDataHistoryItem.currentTime == monetary_fund_data_history_item.currentTime,
+            models.MonetaryFundDataHistoryItem.currentShares == monetary_fund_data_history_item.currentShares,
+            models.MonetaryFundDataHistoryItem.fastRedemption == monetary_fund_data_history_item.fastRedemption,
+            models.MonetaryFundDataHistoryItem.holding == monetary_fund_data_history_item.holding,
+            models.MonetaryFundDataHistoryItem.monetary_fund_data_history_id == monetary_fund_data_history_id
+        )
+        result = await db.execute(query)
+        existing_record = result.scalars().first()
+
+    if existing_record is None:
+        return await create_monetary_fund_data_history_item(db, monetary_fund_data_history_item, monetary_fund_data_history_id)
+    else:
+        logger.debug(f'monetary fund data history item already exist: {existing_record}')
+        return existing_record
 
 async def create_fixed_deposit_data_history_item(
     db: AsyncSession,
@@ -236,6 +288,31 @@ async def create_fixed_deposit_data_history_item(
     await db.refresh(db_fixed_deposit_data_history_item)
     return db_fixed_deposit_data_history_item
 
+async def create_fixed_deposit_data_history_item_if_not_exist(
+    db: AsyncSession,
+    fixed_deposit_data_history_item: schemas.FixedDepositDataHistoryItemCreate,
+    fixed_deposit_data_history_id: Optional[int] = None
+):
+    if fixed_deposit_data_history_id is None:
+        existing_record = None
+    else:
+        query = select(models.FixedDepositDataHistoryItem).filter(
+            models.FixedDepositDataHistoryItem.name == fixed_deposit_data_history_item.name,
+            models.FixedDepositDataHistoryItem.beginningAmount == fixed_deposit_data_history_item.beginningAmount,
+            models.FixedDepositDataHistoryItem.beginningTime == fixed_deposit_data_history_item.beginningTime,
+            models.FixedDepositDataHistoryItem.rate == fixed_deposit_data_history_item.rate,
+            models.FixedDepositDataHistoryItem.maturity == fixed_deposit_data_history_item.maturity,
+            models.FixedDepositDataHistoryItem.fixed_deposit_data_history_id == fixed_deposit_data_history_id
+        )
+        result = await db.execute(query)
+        existing_record = result.scalars().first()
+
+    if existing_record is None:
+        return await create_fixed_deposit_data_history_item(db, fixed_deposit_data_history_item, fixed_deposit_data_history_id)
+    else:
+        logger.debug(f'fixed deposit data history item already exist: {existing_record}')
+        return existing_record
+
 async def create_fund_data_history_item(
     db: AsyncSession,
     fund_data_history_item: schemas.FundDataHistoryItemCreate,
@@ -260,6 +337,34 @@ async def create_fund_data_history_item(
     await db.commit()
     await db.refresh(db_fund_data_history_item)
     return db_fund_data_history_item
+
+async def create_fund_data_history_item_if_not_exist(
+    db: AsyncSession,
+    fund_data_history_item: schemas.FundDataHistoryItemCreate,
+    fund_data_history_id: Optional[int] = None
+):
+    if fund_data_history_id is None:
+        existing_record = None
+    else:
+        query = select(models.FundDataHistoryItem).filter(
+            models.FundDataHistoryItem.name == fund_data_history_item.name,
+            models.FundDataHistoryItem.symbol == fund_data_history_item.symbol,
+            models.FundDataHistoryItem.currentNetValue == fund_data_history_item.currentNetValue,
+            models.FundDataHistoryItem.currentShares == fund_data_history_item.currentShares,
+            models.FundDataHistoryItem.currentTime == fund_data_history_item.currentTime,
+            models.FundDataHistoryItem.holding == fund_data_history_item.holding,
+            models.FundDataHistoryItem.lockupPeriod == fund_data_history_item.lockupPeriod,
+            models.FundDataHistoryItem.dividendRatio == fund_data_history_item.dividendRatio,
+            models.FundDataHistoryItem.fund_data_history_id == fund_data_history_id
+        )
+        result = await db.execute(query)
+        existing_record = result.scalars().first()
+
+    if existing_record is None:
+        return await create_fund_data_history_item(db, fund_data_history_item, fund_data_history_id)
+    else:
+        logger.debug(f'fund data history item already exist: {existing_record}')
+        return existing_record
 
 # ********** drop table **********
 
@@ -289,10 +394,10 @@ async def create_table_from_json(
         'fundData': create_fund_data_history
     }
     create_item_func = {
-        'cashData': create_cash_data_history_item,
-        'monetaryFundData': create_monetary_fund_data_history_item,
-        'fixedDepositData': create_fixed_deposit_data_history_item,
-        'fundData': create_fund_data_history_item
+        'cashData': create_cash_data_history_item_if_not_exist,
+        'monetaryFundData': create_monetary_fund_data_history_item_if_not_exist,
+        'fixedDepositData': create_fixed_deposit_data_history_item_if_not_exist,
+        'fundData': create_fund_data_history_item_if_not_exist
     }
     history_schema = {
         'cashData': schemas.CashDataHistoryCreate,

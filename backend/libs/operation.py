@@ -157,15 +157,9 @@ async def get_index_close_data(db, dates):
     db_data = await crud.get_index_close_data(db, query_dates)
     db_data_list = [{'date': d.date, 'close': d.close, 'code': d.code} for d in db_data]
 
-    logger.debug('DB data: ')
-    logger.debug(db_data_list)
-
     required_data = set(itertools.product(INDEX_CODES, query_dates))
 
     not_found_data = list(required_data - set((d.code, d.date) for d in db_data))
-
-    logger.debug('Not found data: ')
-    logger.debug(not_found_data)
 
     def _f(code, date):
         close = spider.get_close(code, date)
@@ -330,7 +324,7 @@ async def get_data_from_db(db):
 
 async def add_cash_history(db, data):
     item = schemas.CashDataHistoryItemCreate(**data.content.model_dump(), beginningTime=datetime.now().date())
-    await crud.create_cash_data_history_item(db, item, data.id)
+    await crud.create_cash_data_history_item_if_not_exist(db, item, data.id)
 
 
 async def add_monetary_fund_history(db, data):
@@ -343,7 +337,7 @@ async def add_monetary_fund_history(db, data):
     content['currentTime'] = datetime.now().date()
     content['beginningShares'] = content['beginningAmount']
     item = schemas.MonetaryFundDataHistoryItemCreate(**content)
-    await crud.create_monetary_fund_data_history_item(db, item, data.id)
+    await crud.create_monetary_fund_data_history_item_if_not_exist(db, item, data.id)
 
 
 async def add_fixed_deposit_history(db, data):
@@ -351,14 +345,14 @@ async def add_fixed_deposit_history(db, data):
     bg_time = content['beginningTime']
     content['beginningTime'] = datetime.strptime(bg_time, '%Y-%m-%d').date()
     item = schemas.FixedDepositDataHistoryItemCreate(**content)
-    await crud.create_fixed_deposit_data_history_item(db, item, data.id)
+    await crud.create_fixed_deposit_data_history_item_if_not_exist(db, item, data.id)
 
 
 async def add_fund_history(db, data):
     content = data.content.model_dump()
     content['currentTime'] = datetime.now().date()
     item = schemas.FundDataHistoryItemCreate(**content)
-    await crud.create_fund_data_history_item(db, item, data.id)
+    await crud.create_fund_data_history_item_if_not_exist(db, item, data.id)
 
 
 async def get_refreshed_fund_net_value(symbols):
