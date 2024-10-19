@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 from sql_app import models
 from sql_app.database import engine
-from utils import get_log_file_path
+from libs.utils import get_log_file_path
 
 from views.statistic import router as statistic_router
 from views.local_data import router as local_data_router

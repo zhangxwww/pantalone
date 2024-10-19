@@ -408,7 +408,7 @@ export default {
                 const lastNotifyDateStr = localStorage.getItem("lastNotifyDate");
                 const lastNotifyDate = lastNotifyDateStr ? new Date(lastNotifyDateStr) : null;
                 const now = new Date();
-                if (!lastNotifyDate || now - lastNotifyDate >= 24 * 3600) {
+                if (!lastNotifyDate || now - lastNotifyDate >= 24 * 3600 * 1000) {
                     const res = await getGitUpdatedRequest();
                     const updated = res.updated;
                     if (updated) {

@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from loguru import logger
 from scipy.stats import chi2, t, norm
 
-from utils import timeit, log_request, log_response
+from libs.utils import timeit, log_request, log_response
 
 
 router = APIRouter(prefix='/statistics', tags=['statistic'])

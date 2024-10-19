@@ -11,10 +11,10 @@ from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler
 from sklearn.manifold import TSNE
 from sklearn.metrics.pairwise import pairwise_distances
 
-import spider
+import libs.spider as spider
 import sql_app.schemas as schemas
 import sql_app.crud as crud
-from utils import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
+from libs.utils import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
 
 
 INDEX_CODES = [
@@ -233,6 +233,7 @@ async def _get_cash_data_from_db(db):
         })
     return cash_data
 
+
 async def _get_monetary_fund_data_from_db(db):
     monetary_data = []
     all_data = await crud.get_all_monetary_fund_data_history(db)
@@ -260,6 +261,7 @@ async def _get_monetary_fund_data_from_db(db):
         })
     return monetary_data
 
+
 async def _get_fixed_deposit_data_from_db(db):
     fixed_deposit_data = []
     all_data = await crud.get_all_fixed_deposit_data_history(db)
@@ -282,6 +284,7 @@ async def _get_fixed_deposit_data_from_db(db):
             'history': history_list
         })
     return fixed_deposit_data
+
 
 async def _get_fund_data_from_db(db):
     fund_data = []
@@ -490,6 +493,7 @@ async def get_fund_holding_data(db, symbols):
         }
 
     return holdings
+
 
 async def get_fund_holding_relevance_data(fund_holding_data):
     def _to_one_hot(data):
