@@ -276,6 +276,7 @@ export default {
           content: []
         }
       ],
+      cache: {},
 
       initGraph: () => {
         this.graphs = {};
@@ -297,10 +298,17 @@ export default {
               drawKLineGraph(graph, [], title, this.period);
               graph.showLoading();
 
-              const res = await getKLineDataRequest(item.code, this.period, item.market);
-              console.log(res);
-
-              drawKLineGraph(graph, res.kline, title, this.period);
+              const key = `${this.period}-${title}`;
+              let kline;
+              if (key in this.cache) {
+                kline = this.cache[key];
+              } else {
+                const res = await getKLineDataRequest(item.code, this.period, item.market);
+                console.log(res);
+                kline = res.kline;
+                this.cache[key] = kline;
+              }
+              drawKLineGraph(graph, kline, title, this.period);
               graph.hideLoading();
             }
             promises.push(promise(item));
