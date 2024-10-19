@@ -14,6 +14,7 @@ from sklearn.metrics.pairwise import pairwise_distances
 import libs.spider as spider
 import sql_app.schemas as schemas
 import sql_app.crud as crud
+from libs.indicator import list_dict_to_dataframe, dataframe_to_list_dict, boll
 from libs.utils import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
 
 
@@ -603,5 +604,10 @@ async def get_kline_data(db, query):
         logger.debug(f'Found {len(data_from_spider)} data in spider')
 
         res.extend(data_from_spider)
+
+    df = list_dict_to_dataframe(res)
+    df = boll(df, window=20, width=2)
+    df.fillna(0, inplace=True)
+    res = dataframe_to_list_dict(df)
 
     return res

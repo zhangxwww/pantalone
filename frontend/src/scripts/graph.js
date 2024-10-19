@@ -821,23 +821,30 @@ function drawRelevanceScatterGraph (chart, data, states, title, key) {
 }
 
 
-function drawKLineGraph (chart, data, title, period) {
-    const colorList = ['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '#ca8622', '#bda29a', '#6e7074', '#546570', '#c4ccd3'];
-
+function drawKLineGraph (chart, data, title, period, indicator) {
     const dates = data.map(d => d.date);
     const oclhv = data.map(d => [d.open, d.close, d.low, d.high, d.volume]);
     const volumes = data.map(d => d.volume);
+    const isUp = data.map((d, i) => {
+        if (i === 0) {
+            return true;
+        } else {
+            return d.close > data[i - 1].close;
+        }
+    });
+    const upColor = '#d12c2f';
+    const downColor = '#019f02';
+
     const klineName = period === 'daily' ? '日K' : period === 'weekly' ? '周K' : '月K';
 
     const option = {
         animation: false,
-        color: colorList,
         title: {
             left: 'center',
             text: title
         },
         legend: {
-            top: 270,
+            top: 460,
             data: [klineName]
         },
         tooltip: {
@@ -904,9 +911,9 @@ function drawKLineGraph (chart, data, title, period) {
                 type: 'slider',
                 xAxisIndex: [0, 1],
                 realtime: true,
-                top: 240,
+                top: 420,
                 height: 20,
-                startValue: data.length - 35,
+                startValue: data.length - 64,
                 endValue: data.length - 1
             },
         ],
@@ -979,13 +986,13 @@ function drawKLineGraph (chart, data, title, period) {
                 left: 20,
                 right: 20,
                 top: 50,
-                height: 120
+                height: 260
             },
             {
                 left: 20,
                 right: 20,
-                top: 190,
-                height: 40
+                top: 330,
+                height: 80
             }
         ],
         graphic: [
@@ -1004,36 +1011,75 @@ function drawKLineGraph (chart, data, title, period) {
                 xAxisIndex: 1,
                 yAxisIndex: 1,
                 itemStyle: {
-                    color: '#7fbe9e'
+                    color: params => isUp[params.dataIndex] ? '#ffffff' : downColor,
+                    borderWidth: 1
                 },
-                emphasis: {
-                    itemStyle: {
-                        color: '#140'
+                // emphasis: {
+                //     itemStyle: {
+                //         color: '#140'
+                //     }
+                // },
+                data: volumes.map((d, i) => {
+                    return {
+                        value: d,
+                        itemStyle: {
+                            borderColor: isUp[i] ? upColor : downColor,
+                        }
                     }
-                },
-                data: volumes
+                })
             },
             {
                 type: 'candlestick',
                 name: klineName,
                 data: oclhv,
                 itemStyle: {
-                    color: '#ef232a',
-                    color0: '#14b143',
-                    borderColor: '#ef232a',
-                    borderColor0: '#14b143'
+                    color: '#ffffff',
+                    color0: downColor,
+                    borderColor: upColor,
+                    borderColor0: downColor
                 },
-                emphasis: {
-                    itemStyle: {
-                        color: 'black',
-                        color0: '#444',
-                        borderColor: 'black',
-                        borderColor0: '#444'
-                    }
-                }
+                // emphasis: {
+                //     itemStyle: {
+                //         color: 'black',
+                //         color0: '#444',
+                //         borderColor: 'black',
+                //         borderColor0: '#444'
+                //     }
+                // }
             },
         ]
     };
+    if (indicator.value === 'boll') {
+        const bollColor = {
+            upper: '#fab842',
+            mid: '#272727',
+            lower: '#e624e1'
+        }
+        for (const line of ['upper', 'mid', 'lower']) {
+            const name = line.toUpperCase();
+            option.legend.data.push(name);
+            option.series.push({
+                name: name,
+                type: 'line',
+                data: data.map(d => d[line]),
+                smooth: true,
+                showSymbol: false,
+                lineStyle: {
+                    width: 1,
+                    color: bollColor[line]
+                },
+                itemStyle: {
+                    color: bollColor[line]
+                },
+                emphasis: {
+                    itemStyle: {
+                        color: 'transparent',
+                        borderColor: 'transparent'
+                    }
+                }
+            });
+        }
+    }
     chart.setOption(option);
     return chart;
 }

@@ -22,7 +22,8 @@
           </el-radio-group>
         </el-col>
         <el-col :span="5">
-          <el-select v-model="indicator" placeholder="选择技术指标" size="small" style="width: 45%">
+          <el-select v-model="indicator.value" @change="onIndicatorChange" placeholder="选择技术指标" size="small"
+            style="width: 45%">
             <el-option label="NONE" value="" />
             <el-option label="BOLL" value="boll" />
           </el-select>
@@ -33,7 +34,7 @@
         <el-tab-pane v-for="(c, i) in groupedConfig" :key="i" :label="c.category" :name="c.category">
           <el-row v-for="content in c.grouped" :key="content" justify="left" style="margin-bottom: 20px;">
             <el-col v-for="item in content" :key="item" :span="8">
-              <div :id="`${item.name}${item.code}`" style="width: 100%; height: 300px">
+              <div :id="`${item.name}${item.code}`" style="width: 100%; height: 500px">
               </div>
             </el-col>
           </el-row>
@@ -56,7 +57,15 @@ export default {
   data () {
     return {
       period: 'daily',
-      indicator: '',
+      indicator: {
+        value: '',
+        config: {
+          boll: {
+            window: 20,
+            width: 2
+          }
+        }
+      },
       category: '',
       config: [
         {
@@ -288,28 +297,60 @@ export default {
         }
       },
 
+      getGraph: (name) => {
+        return this.graphs[name];
+      },
+
+      getGraphTitle: (name, code) => {
+        return `${name}（${code}）`;
+      },
+
+      drawEmptyGraph: (name, title) => {
+        const graph = this.getGraph(name);
+        drawKLineGraph(graph, [], title, this.period, this.indicator);
+        graph.showLoading();
+        return graph;
+      },
+
+      getKLineCacheKey: (title) => {
+        return `${this.period}-${title}`;
+      },
+
+      getKLineData: async (key, code, market) => {
+        let kline;
+        if (key in this.cache) {
+          kline = this.cache[key];
+        } else {
+          const res = await getKLineDataRequest(code, this.period, market);
+          console.log(res);
+          kline = res.kline;
+          for (let i = 0; i < this.indicator.config.boll.window; i++) {
+            kline[i].mid = Number.NaN;
+            kline[i].lower = Number.NaN;
+            kline[i].upper = Number.NaN;
+          }
+          this.cache[key] = kline;
+        }
+        return kline;
+      },
+
+      drawKLineGraph: (graph, kline, title) => {
+        drawKLineGraph(graph, kline, title, this.period, this.indicator);
+        graph.hideLoading();
+      },
+
       updateGraph: async () => {
         const promises = [];
         for (const cat of this.config) {
           for (const item of cat.content) {
             const promise = async (item) => {
-              const graph = this.graphs[item.name];
-              const title = `${item.name}（${item.code}）`;
-              drawKLineGraph(graph, [], title, this.period);
-              graph.showLoading();
+              const title = this.getGraphTitle(item.name, item.code);
+              const graph = this.drawEmptyGraph(item.name, title);
 
-              const key = `${this.period}-${title}`;
-              let kline;
-              if (key in this.cache) {
-                kline = this.cache[key];
-              } else {
-                const res = await getKLineDataRequest(item.code, this.period, item.market);
-                console.log(res);
-                kline = res.kline;
-                this.cache[key] = kline;
-              }
-              drawKLineGraph(graph, kline, title, this.period);
-              graph.hideLoading();
+              const key = this.getKLineCacheKey(title);
+              const kline = await this.getKLineData(key, item.code, item.market);
+
+              this.drawKLineGraph(graph, kline, title);
             }
             promises.push(promise(item));
           }
@@ -324,13 +365,26 @@ export default {
           })
         }
         localStorage.setItem('market-category', this.category);
+      },
+
+      onIndicatorChange: async () => {
+        localStorage.setItem('market-indicator', this.indicator.value);
+        for (const cat of this.config) {
+          for (const item of cat.content) {
+            const title = this.getGraphTitle(item.name, item.code);
+            const key = this.getKLineCacheKey(title);
+            const kline = await this.getKLineData(key, item.code, item.market);
+            const graph = this.getGraph(item.name);
+            this.drawKLineGraph(graph, kline, title);
+          }
+        }
       }
 
     };
   },
   beforeMount () {
-    const category = localStorage.getItem('market-category') || 'A股指数';
-    this.category = category;
+    this.category = localStorage.getItem('market-category') || 'A股指数';
+    this.indicator.value = localStorage.getItem('market-indicator') || 'boll';
   },
   async mounted () {
     this.initGraph();
