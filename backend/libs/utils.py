@@ -44,6 +44,12 @@ def get_log_file_path():
     return log_dir
 
 
+def get_db_path():
+    db_dir = os.path.join(os.path.expanduser('~'), 'pantalone', 'db')
+    if not os.path.exists(db_dir):
+        os.makedirs(db_dir)
+    return os.path.join(db_dir, 'pantalone.db')
+
 
 def _is_trade_day(date):
     return is_workday(date) and date.isoweekday() < 6

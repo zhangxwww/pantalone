@@ -2,6 +2,8 @@ import sys
 import sqlite3
 import shutil
 
+from libs.utils import get_db_path
+
 
 if __name__ == '__main__':
     sql_file = sys.argv[1]
@@ -9,8 +11,8 @@ if __name__ == '__main__':
         sql = f.read()
     print(sql)
 
-    db_path = r'C:\Users\63113\pantalone\db\pantalone.db'
-    db_backup_path = r'C:\Users\63113\pantalone\db\pantalone.db.backup'
+    db_path = get_db_path()
+    db_backup_path = f'{db_path}.bak'
 
     shutil.copy(db_path, db_backup_path)
     print(f'Database backup to {db_backup_path}')

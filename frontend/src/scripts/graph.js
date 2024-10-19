@@ -1014,11 +1014,6 @@ function drawKLineGraph (chart, data, title, period, indicator) {
                     color: params => isUp[params.dataIndex] ? '#ffffff' : downColor,
                     borderWidth: 1
                 },
-                // emphasis: {
-                //     itemStyle: {
-                //         color: '#140'
-                //     }
-                // },
                 data: volumes.map((d, i) => {
                     return {
                         value: d,
@@ -1038,14 +1033,6 @@ function drawKLineGraph (chart, data, title, period, indicator) {
                     borderColor: upColor,
                     borderColor0: downColor
                 },
-                // emphasis: {
-                //     itemStyle: {
-                //         color: 'black',
-                //         color0: '#444',
-                //         borderColor: 'black',
-                //         borderColor0: '#444'
-                //     }
-                // }
             },
         ]
     };
