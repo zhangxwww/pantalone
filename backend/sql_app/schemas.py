@@ -295,3 +295,22 @@ class KLineData(KLineDataBase):
 
     class Config:
         from_attributes = True
+
+
+# ********** Market Data **********
+
+class MarketDataBase(BaseModel):
+    code: str
+    date: date
+    price: float
+
+
+class MarketDataCreate(MarketDataBase):
+    pass
+
+
+class MarketData(MarketDataBase):
+    id: int
+
+    class Config:
+        from_attributes = True

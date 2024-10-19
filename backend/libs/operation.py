@@ -1,3 +1,4 @@
+import math
 import json
 import base64
 from datetime import datetime, timedelta
@@ -27,6 +28,10 @@ KLINE_START = {
     'daily': datetime.strptime('1997-01-01', '%Y-%m-%d').date(),
     'weekly': datetime.strptime('1997-01-01', '%Y-%m-%d').date(),
     'monthly': datetime.strptime('1997-01-01', '%Y-%m-%d').date(),
+}
+
+INSTRUMENT_CODES = {
+    'LPR': ['lpr_1y', 'lpr_5y', 'short_term_rate', 'mid_term_rate'],
 }
 
 
@@ -609,5 +614,57 @@ async def get_kline_data(db, query):
     df = boll(df, window=20, width=2)
     df.fillna(0, inplace=True)
     res = dataframe_to_list_dict(df)
+
+    return res
+
+
+async def get_market_data(db, query):
+    instrument = query.instrument
+    codes = INSTRUMENT_CODES[instrument]
+
+    res = {}
+    for code in codes:
+        data_in_db = await crud.get_market_data(db, code)
+        res[code] = [{
+            'date': data.date,
+            'price': data.price,
+        } for data in data_in_db]
+
+    logger.debug(f'Found {len(res[codes[0]])} data in db')
+
+    if len(res[codes[0]]) > 0:
+        last_date_in_db = res[codes[0]][-1]['date']
+        next_day_of_last_date = last_date_in_db + timedelta(days=1)
+        spider_start_date = next_day_of_last_date
+    else:
+        spider_start_date = KLINE_START['daily']
+    spider_end_date = datetime.now().date()
+    spider_end_date = trans_date_to_trade_date(spider_end_date)
+
+    if spider_start_date <= spider_end_date:
+        spider_start_date = spider_start_date.strftime('%Y-%m-%d')
+        spider_end_date = spider_end_date.strftime('%Y-%m-%d')
+
+        logger.debug(f'Spider start date: {spider_start_date}')
+        logger.debug(f'Spider end date: {spider_end_date}')
+
+        data_from_spider = spider.get_market_data(instrument, spider_start_date, spider_end_date)
+
+        for code in codes:
+            data = [{
+                'date': d['date'],
+                'price': d[code],
+            } for d in data_from_spider]
+            await crud.create_market_data_from_list(db, data, code)
+
+            res[code].extend(data)
+
+        logger.debug(f'Found {len(data_from_spider)} data in spider')
+
+    for code in codes:
+        r_code = res[code]
+        for r in r_code:
+            if r['price'] is not None and math.isnan(r['price']):
+                r['price'] = None
 
     return res

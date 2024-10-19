@@ -76,3 +76,10 @@ async def get_relevance_data(data: api_model.GetFundHoldingRelevanceData):
 @timeit
 async def get_kline_data(data: api_model.GetKLineData, db: AsyncSession = Depends(get_db)):
     return {'kline': await operation.get_kline_data(db, data)}
+
+
+@router.post('/market')
+@log_request
+@timeit
+async def get_market_data(data: api_model.GetMarketData, db: AsyncSession = Depends(get_db)):
+    return {'market': await operation.get_market_data(db, data)}

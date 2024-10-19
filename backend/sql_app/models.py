@@ -164,3 +164,12 @@ class KLineData(Base):
     volume = Column(Float)
     period = Column(String)
     market = Column(String)
+
+
+class MarketData(Base):
+    __tablename__ = 'market_data'
+
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String)
+    date = Column(Date)
+    price = Column(Float)

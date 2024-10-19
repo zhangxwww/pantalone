@@ -95,3 +95,9 @@ class GetKLineData(BaseModel):
         'index-CN', 'index-HK', 'index-US', 'index-qvix',
         'future-zh'
     ]
+
+
+class GetMarketData(BaseModel):
+    instrument: Literal[
+        'LPR'
+    ]

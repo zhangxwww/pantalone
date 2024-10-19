@@ -41,6 +41,10 @@ async function getKLineDataRequest (symbol, period, market) {
     return res.data;
 }
 
+async function getMarketDataRequest (instrument) {
+    const res = await axios.post('/api/market', { 'instrument': instrument });
+    return res.data;
+}
 
 function uploadRequest (file, callback) {
 
@@ -113,5 +117,6 @@ export {
     getFundHoldingDataRequest,
     getFundHoldingRelevanceDataRequest,
     getKLineDataRequest,
-    getGitUpdatedRequest
+    getGitUpdatedRequest,
+    getMarketDataRequest
 }

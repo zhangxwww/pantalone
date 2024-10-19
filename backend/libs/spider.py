@@ -171,20 +171,32 @@ def get_kline(code, start_date, end_date, period='daily', market='index-CN'):
     return res
 
 
+def get_market_data(instrument, start_date, end_date):
+    need_clip = False
+
+    if instrument == 'LPR':
+        df = ak.macro_china_lpr()
+        df = df.rename(columns={'TRADE_DATE': 'date'})
+        extract_columns = {
+            'LPR1Y': 'lpr_1y',
+            'LPR5Y': 'lpr_5y',
+            'RATE_1': 'short_term_rate',
+            'RATE_2': 'mid_term_rate',
+        }
+        need_clip = True
+
+    if need_clip:
+        df = _clip_date(df, start_date, end_date)
+
+    res = []
+    for row in df.itertuples(index=False):
+        r = {'date': row.date}
+        for k, v in extract_columns.items():
+            r[v] = getattr(row, k)
+        res.append(r)
+    return res
+
+
+
 if __name__ == '__main__':
-    # get_china_bond_yield(datetime.datetime.now())
-    # print(get_lpr())
-    # print(get_close('000001', datetime.datetime.strptime('2024-09-20', '%Y-%m-%d')))
-    # from itertools import product
-    # from joblib import Parallel, delayed
-
-    # codes = [
-    #     '015716',
-    #     '007997', '000043', '015301', '270042'
-    #     ]
-    # t = ['stock', 'bond']
-
-    # res = Parallel(n_jobs=4)(delayed(get_fund_holding)(symbol=c, year='2024', type_=t) for c, t in product(codes, t))
-
-    # print(res)
-    print(get_kline('000001', '2021-01-01', '2022-01-10', 'monthly'))
+    print(get_market_data('LPR', '2021-01-01', '2022-01-10'))

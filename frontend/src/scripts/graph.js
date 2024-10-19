@@ -1071,6 +1071,139 @@ function drawKLineGraph (chart, data, title, period, indicator) {
     return chart;
 }
 
+function drawMarketPriceLineGraph (chart, data, title) {
+
+    const translation = {
+        'lpr_1y': '1年期LPR',
+        'lpr_5y': '5年期LPR',
+        'short_term_rate': '短期贷款利率',
+        'mid_term_rate': '中长期贷款利率',
+    }
+
+    const names = [];
+    const series = [];
+    let dates = [];
+    for (const [name, values] of Object.entries(data)) {
+        const translated = translation[name];
+        names.push(translated);
+        series.push({
+            name: translated,
+            type: 'line',
+            data: values.map(value => value.price),
+            smooth: true,
+            showSymbol: false
+        });
+        if (dates.length === 0) {
+            dates = values.map(value => value.date);
+        }
+    }
+    const option = {
+        animation: false,
+        title: {
+            text: title,
+            left: "center",
+        },
+        legend: {
+            top: 460,
+            data: names
+        },
+        tooltip: {
+            transitionDuration: 0,
+            confine: true,
+            borderRadius: 4,
+            borderWidth: 1,
+            borderColor: '#333',
+            backgroundColor: 'rgba(255,255,255,0.9)',
+            textStyle: {
+                fontSize: 12,
+                color: '#333'
+            },
+            position: function (pos, params, el, elRect, size) {
+                const obj = {
+                    top: 60
+                };
+                obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
+                return obj;
+            },
+            formatter: (param) => {
+                const index = Array.isArray(param) ? param[0].dataIndex : param.dataIndex;
+                let html = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${dates[index]}</b></td>
+                        </tr>
+                `
+                for (const s of series) {
+                    const value = s.data[index];
+                    const info = value ? `${value.toFixed(2)}%` : '暂无'
+                    html += `
+                    <tr>
+                        <td align="left"><b>${s.name}：</b></td>
+                        <td align="right">${info}</td>
+                    </tr>
+                    `
+                }
+                html += `
+                    </tbody >
+                </table >
+                `
+                return html;
+            }
+        },
+        dataZoom: [
+            {
+                type: 'slider',
+                realtime: true,
+                top: 420,
+                height: 20,
+                startValue: dates.length - 64,
+                endValue: dates.length - 1
+            },
+        ],
+        xAxis: {
+            type: 'category',
+            data: dates,
+            boundaryGap: false,
+            axisLabel: {
+                formatter: function (value) {
+                    return echarts.time.format(value, '{MM}-{dd}');
+                }
+            },
+            min: 'dataMin',
+            max: 'dataMax',
+            axisPointer: {
+                show: true
+            },
+        },
+        yAxis: {
+            scale: true,
+            axisLine: { lineStyle: { color: '#777' } },
+            axisLabel: {
+                inside: true,
+                formatter: '{value}%\n'
+            },
+            type: "value"
+        },
+        grid: {
+            left: 20,
+            right: 20,
+            top: 50,
+            height: 355
+        },
+        graphic: {
+            type: 'group',
+            left: 'center',
+            top: 70,
+            width: 400,
+            bounding: 'raw',
+        },
+        series: series
+    }
+    chart.setOption(option);
+    return chart;
+}
+
 function drawEmptyAssetChangeLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
@@ -1181,6 +1314,10 @@ function drawEmptyRelevanceScatterGraph (chart, title, key) {
     return drawRelevanceScatterGraph(chart, data, state, title, key);
 }
 
+function drawEmptyMarketPriceLineGraph (chart, title) {
+    const data = {};
+    return drawMarketPriceLineGraph(chart, data, title);
+}
 
 export {
     initGraph,
@@ -1196,6 +1333,7 @@ export {
     drawRiskIndicatorLineGraph,
     drawRelevanceScatterGraph,
     drawKLineGraph,
+    drawMarketPriceLineGraph,
 
     drawEmptyAssetChangeLineGraph,
     drawEmptyAssetDeltaChangeBarGraph,
@@ -1206,5 +1344,6 @@ export {
     drawEmptyCumulativeReturnLineGraph,
     drawEmptyDrawdownLineGraph,
     drawEmptyRiskIndicatorLineGraph,
-    drawEmptyRelevanceScatterGraph
+    drawEmptyRelevanceScatterGraph,
+    drawEmptyMarketPriceLineGraph
 }

@@ -15,7 +15,7 @@
       </el-row>
       <el-row justify="center">
         <el-col :span="5">
-          <el-radio-group v-model="period" @change="updateGraph" size="small">
+          <el-radio-group v-model="period" @change="updateGraph(true)" size="small">
             <el-radio-button label="日K" value="daily" />
             <el-radio-button label="周K" value="weekly" />
             <el-radio-button label="月K" value="monthly" />
@@ -47,10 +47,13 @@
 <script>
 import {
   initGraph,
-  drawKLineGraph
+  drawKLineGraph,
+  drawMarketPriceLineGraph,
+  drawEmptyMarketPriceLineGraph
 } from '../scripts/graph';
 import {
-  getKLineDataRequest
+  getKLineDataRequest,
+  getMarketDataRequest
 } from '../scripts/requests'
 
 export default {
@@ -70,6 +73,7 @@ export default {
       config: [
         {
           category: 'A股指数',
+          isKLine: true,
           content: [
             {
               name: '上证综指',
@@ -120,6 +124,7 @@ export default {
         },
         {
           category: '美股指数',
+          isKLine: true,
           content: [
             {
               name: '纳斯达克综合指数',
@@ -145,6 +150,7 @@ export default {
         },
         {
           category: '港股指数',
+          isKLine: true,
           content: [
             {
               name: '恒生指数',
@@ -175,6 +181,7 @@ export default {
         },
         {
           category: '波动率指数',
+          isKLine: true,
           content: [
             {
               name: '50ETF期权波动率指数QVIX',
@@ -190,6 +197,7 @@ export default {
         },
         {
           category: '债券指数',
+          isKLine: true,
           content: [
             {
               name: '国债指数',
@@ -210,6 +218,7 @@ export default {
         },
         {
           category: '商品期货',
+          isKLine: true,
           content: [
             {
               name: '黄金连续',
@@ -235,6 +244,7 @@ export default {
         },
         {
           category: '股指期货',
+          isKLine: true,
           content: [
             {
               name: '沪深300指数期货',
@@ -255,6 +265,7 @@ export default {
         },
         {
           category: '国债期货',
+          isKLine: true,
           content: [
             {
               name: '5年期国债期货',
@@ -270,18 +281,28 @@ export default {
         },
         {
           category: '利率',
-          content: []
+          isKLine: false,
+          content: [
+            {
+              name: 'LPR品种',
+              code: '',
+              instrument: 'LPR'
+            }
+          ]
         },
         {
           category: '外汇',
+          isKLine: false,
           content: []
         },
         {
           category: '宏观',
+          isKLine: false,
           content: []
         },
         {
           category: '全球宏观',
+          isKLine: false,
           content: []
         }
       ],
@@ -302,18 +323,22 @@ export default {
       },
 
       getGraphTitle: (name, code) => {
-        return `${name}（${code}）`;
+        return code ? `${name}（${code}）` : name;
       },
 
-      drawEmptyGraph: (name, title) => {
+      drawEmptyGraph: (name, title, isKLine) => {
         const graph = this.getGraph(name);
-        drawKLineGraph(graph, [], title, this.period, this.indicator);
+        if (isKLine) {
+          drawKLineGraph(graph, [], title, this.period, this.indicator);
+        } else {
+          drawEmptyMarketPriceLineGraph(graph, title);
+        }
         graph.showLoading();
         return graph;
       },
 
-      getKLineCacheKey: (title) => {
-        return `${this.period}-${title}`;
+      getCacheKey: (title, isKLine) => {
+        return isKLine ? `${this.period}-${title}` : title;
       },
 
       getKLineData: async (key, code, market) => {
@@ -334,24 +359,52 @@ export default {
         return kline;
       },
 
+      getMarketPriceData: async (key, instrument) => {
+        let data;
+        if (key in this.cache) {
+          data = this.cache[key];
+        } else {
+          const res = await getMarketDataRequest(instrument);
+          data = res.market;
+          this.cache[key] = data;
+        }
+        return data;
+      },
+
       drawKLineGraph: (graph, kline, title) => {
         drawKLineGraph(graph, kline, title, this.period, this.indicator);
         graph.hideLoading();
       },
 
-      updateGraph: async () => {
+      drawMarketPriceLineGraph: (graph, data, title) => {
+        drawMarketPriceLineGraph(graph, data, title);
+        graph.hideLoading();
+      },
+
+      drawOneChart: async (cat, item) => {
+        const title = this.getGraphTitle(item.name, item.code);
+        const graph = this.drawEmptyGraph(item.name, title, cat.isKLine);
+        const key = this.getCacheKey(title, cat.isKLine);
+
+        if (cat.isKLine) {
+          const kline = await this.getKLineData(key, item.code, item.market);
+          this.drawKLineGraph(graph, kline, title);
+        } else {
+          const market = await this.getMarketPriceData(key, item.instrument);
+          this.drawMarketPriceLineGraph(graph, market, title);
+        }
+      },
+
+      updateGraph: async (skipNotKLine) => {
         const promises = [];
         for (const cat of this.config) {
+          if (skipNotKLine && !cat.isKLine) {
+            continue;
+          }
           for (const item of cat.content) {
             const promise = async (item) => {
-              const title = this.getGraphTitle(item.name, item.code);
-              const graph = this.drawEmptyGraph(item.name, title);
-
-              const key = this.getKLineCacheKey(title);
-              const kline = await this.getKLineData(key, item.code, item.market);
-
-              this.drawKLineGraph(graph, kline, title);
-            }
+              await this.drawOneChart(cat, item);
+            };
             promises.push(promise(item));
           }
         }
@@ -370,12 +423,11 @@ export default {
       onIndicatorChange: async () => {
         localStorage.setItem('market-indicator', this.indicator.value);
         for (const cat of this.config) {
+          if (!cat.isKLine) {
+            continue;
+          }
           for (const item of cat.content) {
-            const title = this.getGraphTitle(item.name, item.code);
-            const key = this.getKLineCacheKey(title);
-            const kline = await this.getKLineData(key, item.code, item.market);
-            const graph = this.getGraph(item.name);
-            this.drawKLineGraph(graph, kline, title);
+            await this.drawOneChart(cat, item);
           }
         }
       }
@@ -388,7 +440,7 @@ export default {
   },
   async mounted () {
     this.initGraph();
-    await this.updateGraph();
+    await this.updateGraph(false);
   },
   computed: {
     groupedConfig () {
