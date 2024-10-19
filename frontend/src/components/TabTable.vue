@@ -1,5 +1,6 @@
 <template>
-    <el-tabs type="border-card" style="width: 96%; margin-left: 2%; margin-bottom: 5%">
+    <el-tabs v-model="tabName" @tab-change="onTabChange" type="border-card"
+        style="width: 96%; margin-left: 2%; margin-bottom: 5%">
         <el-tab-pane label="现金">
             <el-table :data="data.cashData" table-layout="auto" style="width: 100%">
                 <el-table-column v-for="header, i in headers.cash" :key="i" :prop="header.prop" :label="header.label"
@@ -92,8 +93,12 @@ export default {
     name: 'TabTable',
     data () {
         return {
+            tabName: '',
             edit: (row, type) => {
                 this.$emit('edit', row, type);
+            },
+            onTabChange: () => {
+                localStorage.setItem("tabtable", this.tabName);
             },
             headers: {
                 cash: [
@@ -307,6 +312,9 @@ export default {
     },
     props: {
         data: Object
+    },
+    beforeMount () {
+        this.tabName = localStorage.getItem('tabtable') || '现金';
     }
 }
 </script>

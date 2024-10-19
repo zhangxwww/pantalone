@@ -57,7 +57,7 @@ export default {
     return {
       period: 'daily',
       indicator: '',
-      category: 'A股指数',
+      category: '',
       config: [
         {
           category: 'A股指数',
