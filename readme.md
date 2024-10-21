@@ -1,4 +1,6 @@
-Frontend:
+## Setup
+
+### Frontend:
 
 ```bash
 cd frontend
@@ -6,7 +8,7 @@ npm install
 npm run build
 ```
 
-Backend:
+### Backend:
 
 ```bash
 cd backend
@@ -15,7 +17,7 @@ conda activate pantalone
 pip install -r requirements.txt
 ```
 
-Start:
+### Start:
 
 ```bash
 conda activate pantalone
@@ -24,3 +26,11 @@ python app.py
 ```
 
 Open `http://localhost:9876/` in browser.
+
+
+## TODO list
+
+- major
+  - percentile of the current asset price in historical prices
+- minor
+  - market data
