@@ -19,6 +19,10 @@ class QueryFundNameData(BaseModel):
     symbol: str
 
 
+class LatestCurrencyRateData(BaseModel):
+    symbol: str
+
+
 class UploadData(BaseModel):
     file: str
 
@@ -39,6 +43,8 @@ class _AddMonetaryFundData(BaseModel):
     beginningTime: str
     currentAmount: float
     currentShares: float
+    currency: str
+    currencyRate: float
     fastRedemption: bool
     holding: bool
 

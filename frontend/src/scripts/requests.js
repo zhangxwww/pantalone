@@ -46,6 +46,11 @@ async function getMarketDataRequest (instrument) {
     return res.data;
 }
 
+async function getLatestCurrencyRate (symbol) {
+    const res = await axios.post('/api/latest-currency-rate', { 'symbol': symbol });
+    return res.data;
+}
+
 function uploadRequest (file, callback) {
 
     const reader = new FileReader();
@@ -118,5 +123,6 @@ export {
     getFundHoldingRelevanceDataRequest,
     getKLineDataRequest,
     getGitUpdatedRequest,
-    getMarketDataRequest
+    getMarketDataRequest,
+    getLatestCurrencyRate,
 }

@@ -34,6 +34,10 @@ INSTRUMENT_CODES = {
     'LPR': ['lpr_1y', 'lpr_5y', 'short_term_rate', 'mid_term_rate'],
 }
 
+CURRENCY_DICT = {
+    'USD': '美元'
+}
+
 
 async def get_china_bond_yield_data(db, dates):
     query_dates = [trans_str_date_to_trade_date(d) for d in dates]
@@ -193,6 +197,20 @@ async def get_index_close_data(db, dates):
     return final_data
 
 
+async def get_latest_currency_rate(db, symbol):
+    if symbol == 'CNY':
+        return 1.0
+    date = datetime.now().date()
+    working_date_str = trans_date_to_trade_date(date).strftime('%Y%m%d')
+    current_date_str = date.strftime('%Y%m%d')
+    logger.debug(working_date_str)
+
+    res = spider.get_currency_rate(CURRENCY_DICT[symbol], start_date=working_date_str, end_date=current_date_str)
+    logger.debug(res)
+
+    return res[-1]['rate']
+
+
 async def get_fund_name(db, symbol):
     db_data = await crud.get_fund_name(db, symbol)
     if db_data is not None:
@@ -251,6 +269,8 @@ async def _get_monetary_fund_data_from_db(db):
                 'currentAmount': his.currentAmount,
                 'currentTime': his.currentTime,
                 'currentShares': his.currentShares,
+                'currency': his.currency,
+                'currencyRate': his.currencyRate,
                 'fastRedemption': his.fastRedemption,
                 'holding': his.holding
             }

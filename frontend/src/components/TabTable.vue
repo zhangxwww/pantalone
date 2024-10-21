@@ -154,6 +154,20 @@ export default {
                         sort_method: sortByFmtFloat
                     },
                     {
+                        prop: 'currency',
+                        label: '币种',
+                        width: '80',
+                        sortable: false,
+                        sort_method: placeHolder
+                    },
+                    {
+                        prop: 'referenceAmountFmt',
+                        label: '参考金额',
+                        width: '105',
+                        sortable: true,
+                        sort_method: sortByFmtFloat
+                    },
+                    {
                         prop: 'annualizedReturnRateFmt',
                         label: '年化收益',
                         width: '105',

@@ -17,6 +17,29 @@
             <el-form-item label="累计投入金额" prop="currentShares">
                 <el-input v-model="form.currentShares"></el-input>
             </el-form-item>
+            <el-form-item label="币种" prop="currency">
+                <el-select v-model="form.currency">
+                    <el-option label="CNY" value="CNY" />
+                    <el-option label="USD" value="USD" />
+                </el-select>
+            </el-form-item>
+            <el-form-item v-if="form.currency !== 'CNY'" label="现汇买入价" prop="currencyRate">
+                <el-input v-model="form.currencyRate">
+                    <template #append>
+                        <el-button @click="onSearchClick" v-if="currentSymbolState === SearchSymbolState.INIT">
+                            <el-icon>
+                                <search />
+                            </el-icon>
+                        </el-button>
+                        <el-icon v-else-if="currentSymbolState === SearchSymbolState.SEARCHING">
+                            <loading />
+                        </el-icon>
+                        <el-icon v-else>
+                            <check />
+                        </el-icon>
+                    </template>
+                </el-input>
+            </el-form-item>
             <el-form-item label="快速赎回" prop="fastRedemption">
                 <el-switch v-model="form.fastRedemption"></el-switch>
             </el-form-item>
@@ -36,8 +59,10 @@
 </template>
 
 <script>
+import { Search, Loading, Check } from '@element-plus/icons-vue';
 import { isNumberValidator } from '@/scripts/validator.js'
 import { timeFormat } from '@/scripts/formatter';
+import { getLatestCurrencyRate } from '@/scripts/requests';
 
 export default {
     name: "AddMonetaryDialog",
@@ -50,9 +75,17 @@ export default {
                 beginningTime: '',
                 currentAmount: 0,
                 currentShares: 0,
+                currency: 'CNY',
+                currencyRate: 1.0,
                 fastRedemption: false,
                 holding: true
             },
+            SearchSymbolState: {
+                INIT: 'init',
+                SEARCHING: 'searching',
+                FOUND: 'found',
+            },
+            currentSymbolState: 'init',
             rules: {
                 name: [
                     { required: true, message: '请输入名称', trigger: 'blur' }
@@ -77,11 +110,25 @@ export default {
                     {
                         message: '当期金额必须为数字值', trigger: 'blur', validator: isNumberValidator
                     }
+                ],
+                currencyRate: [
+                    { required: true, message: '请输入现汇买入价', trigger: 'blur' },
+                    {
+                        message: '现汇买入价必须为数字值', trigger: 'blur', validator: isNumberValidator
+                    }
                 ]
+            },
+
+            onSearchClick: async () => {
+                this.currentSymbolState = this.SearchSymbolState.SEARCHING;
+                const resp = await getLatestCurrencyRate(this.form.currency);
+                this.form.currencyRate = resp.rate;
+                this.currentSymbolState = this.SearchSymbolState.FOUND;
             },
 
             onCancel: () => {
                 this.showDialog = false;
+                this.currentSymbolState = this.SearchSymbolState.INIT;
             },
 
             onConfirmAdd: () => {
@@ -90,6 +137,7 @@ export default {
                         this.form.beginningTime = timeFormat(this.form.beginningTime);
                         this.$emit('add', this.form, 'monetary-fund');
                         this.showDialog = false;
+                        this.currentSymbolState = this.SearchSymbolState.INIT;
                     }
                 });
             },
@@ -101,13 +149,17 @@ export default {
                 this.form.beginningTime = row.beginningTime;
                 this.form.currentAmount = row.currentAmount;
                 this.form.currentShares = row.currentShares;
+                this.form.currency = row.currency;
+                this.form.currencyRate = row.currencyRate;
                 this.form.fastRedemption = row.fastRedemption;
                 this.form.holding = row.holding;
                 this.showDialog = true;
+                this.currentSymbolState = this.SearchSymbolState.FOUND;
             },
 
             show: () => {
                 this.showDialog = true;
+                this.currentSymbolState = this.SearchSymbolState.INIT;
             },
 
             reset: () => {
@@ -116,11 +168,18 @@ export default {
                 this.form.beginningTime = '';
                 this.form.currentAmount = 0;
                 this.form.currentShares = 0;
+                this.form.currency = 'CNY';
+                this.form.currencyRate = 1.0;
                 this.form.fastRedemption = false;
                 this.form.holding = true;
             }
         }
     },
+    components: {
+        Search,
+        Loading,
+        Check
+    }
 }
 
 

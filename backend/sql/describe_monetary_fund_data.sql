@@ -1,0 +1,1 @@
+PRAGMA table_info(monetary_fund_data_history_item);

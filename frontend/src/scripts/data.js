@@ -77,6 +77,12 @@ class Data {
                 }
                 mHis.cumReturn = mHis.currentAmount - mHis.currentShares;
 
+                mHis.referenceAmount = mHis.currentAmount;
+                if (mHis.currency !== 'CNY') {
+                    mHis.referenceAmount *= mHis.currencyRate;
+                }
+                mHis.referenceAmountFmt = mHis.referenceAmount.toFixed(2);
+
                 mHis.beginningTimeFmt = timeFormat(mHis.beginningTime);
                 mHis.annualizedReturnRateFmt = (mHis.annualizedReturnRate * 100).toFixed(2) + '%';
                 mHis.latestReturnRateFmt = (mHis.latestReturnRate * 100).toFixed(2) + '%';
@@ -216,6 +222,9 @@ class Data {
                 currentShares: last.currentShares,
                 currentSharesFmt: last.currentSharesFmt,
                 currentTime: last.currentTime,
+                currency: last.currency,
+                referenceAmount: last.referenceAmount,
+                referenceAmountFmt: last.referenceAmountFmt,
                 fastRedemption: last.fastRedemption,
                 fastRedemptionFmt: last.fastRedemptionFmt,
                 annualizedReturnRate: last.annualizedReturnRate,

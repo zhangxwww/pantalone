@@ -20,5 +20,9 @@ if __name__ == '__main__':
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    cursor.execute(sql)
-    conn.commit()
+    for s in sql.split(';'):
+        if s:
+            cursor.execute(s)
+            conn.commit()
+            res = cursor.fetchall()
+            print(res)

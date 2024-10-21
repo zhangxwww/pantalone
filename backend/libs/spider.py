@@ -65,6 +65,17 @@ def get_fund_name_from_symbol(symbol):
     return ak.fund_individual_basic_info_xq(symbol=symbol).loc[1, 'value']
 
 
+def get_currency_rate(currency, start_date, end_date):
+    df = ak.currency_boc_sina(symbol=currency, start_date=start_date, end_date=end_date)
+    res = []
+    for row in df.itertuples(index=False):
+        res.append({
+            'date': row.日期,
+            'rate': round(row.中行汇买价 / 100, 4)
+        })
+    return res
+
+
 def get_latest_net_value_of_fund(symbol):
     return ak.fund_open_fund_info_em(symbol=symbol, indicator="单位净值走势")['单位净值'].iloc[-1]
 

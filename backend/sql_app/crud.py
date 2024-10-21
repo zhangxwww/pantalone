@@ -250,6 +250,8 @@ async def create_monetary_fund_data_history_item_if_not_exist(
             models.MonetaryFundDataHistoryItem.currentAmount == monetary_fund_data_history_item.currentAmount,
             models.MonetaryFundDataHistoryItem.currentTime == monetary_fund_data_history_item.currentTime,
             models.MonetaryFundDataHistoryItem.currentShares == monetary_fund_data_history_item.currentShares,
+            models.MonetaryFundDataHistoryItem.currency == monetary_fund_data_history_item.currency,
+            models.MonetaryFundDataHistoryItem.currencyRate == monetary_fund_data_history_item.currencyRate,
             models.MonetaryFundDataHistoryItem.fastRedemption == monetary_fund_data_history_item.fastRedemption,
             models.MonetaryFundDataHistoryItem.holding == monetary_fund_data_history_item.holding,
             models.MonetaryFundDataHistoryItem.monetary_fund_data_history_id == monetary_fund_data_history_id
