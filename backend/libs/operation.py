@@ -17,26 +17,7 @@ import sql_app.schemas as schemas
 import sql_app.crud as crud
 from libs.indicator import list_dict_to_dataframe, dataframe_to_list_dict, boll
 from libs.utils import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
-
-
-INDEX_CODES = [
-    '000001',  # 上证指数
-    '000012',  # 国债指数
-]
-
-KLINE_START = {
-    'daily': datetime.strptime('1997-01-01', '%Y-%m-%d').date(),
-    'weekly': datetime.strptime('1997-01-01', '%Y-%m-%d').date(),
-    'monthly': datetime.strptime('1997-01-01', '%Y-%m-%d').date(),
-}
-
-INSTRUMENT_CODES = {
-    'LPR': ['lpr_1y', 'lpr_5y', 'short_term_rate', 'mid_term_rate'],
-}
-
-CURRENCY_DICT = {
-    'USD': '美元'
-}
+from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START
 
 
 async def get_china_bond_yield_data(db, dates):
@@ -617,8 +598,8 @@ async def get_kline_data(db, query):
 
     if spider_start_date <= spider_end_date:
 
-        spider_start_date = spider_start_date.strftime('%Y-%m-%d')
-        spider_end_date = spider_end_date.strftime('%Y-%m-%d')
+        spider_start_date = spider_start_date.strftime('%Y%m%d')
+        spider_end_date = spider_end_date.strftime('%Y%m%d')
 
         logger.debug(f'Spider start date: {spider_start_date}')
         logger.debug(f'Spider end date: {spider_end_date}')
@@ -662,8 +643,8 @@ async def get_market_data(db, query):
     spider_end_date = trans_date_to_trade_date(spider_end_date)
 
     if spider_start_date <= spider_end_date:
-        spider_start_date = spider_start_date.strftime('%Y-%m-%d')
-        spider_end_date = spider_end_date.strftime('%Y-%m-%d')
+        spider_start_date = spider_start_date.strftime('%Y%m%d')
+        spider_end_date = spider_end_date.strftime('%Y%m%d')
 
         logger.debug(f'Spider start date: {spider_start_date}')
         logger.debug(f'Spider end date: {spider_end_date}')

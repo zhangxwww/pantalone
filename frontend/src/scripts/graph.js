@@ -1073,13 +1073,33 @@ function drawKLineGraph (chart, data, title, period, indicator) {
 }
 
 function drawMarketPriceLineGraph (chart, data, title) {
+    console.log(data);
 
     const translation = {
         'lpr_1y': '1年期LPR',
         'lpr_5y': '5年期LPR',
         'short_term_rate': '短期贷款利率',
         'mid_term_rate': '中长期贷款利率',
-    }
+        '美元': 'USD/CNY',
+        '欧元': 'EUR/CNY',
+        '日元': 'JPY/CNY',
+        '英镑': 'GBP/CNY',
+        '港币': 'HKD/CNY',
+        '泰国铢': 'THB/CNY',
+    };
+
+    const showPercent = {
+        '1年期LPR': true,
+        '5年期LPR': true,
+        '短期贷款利率': true,
+        '中长期贷款利率': true,
+        'USD/CNY': false,
+        'EUR/CNY': false,
+        'JPY/CNY': false,
+        'GBP/CNY': false,
+        'HKD/CNY': false,
+        'THB/CNY': false,
+    };
 
     const names = [];
     const series = [];
@@ -1098,6 +1118,7 @@ function drawMarketPriceLineGraph (chart, data, title) {
             dates = values.map(value => value.date);
         }
     }
+
     const option = {
         animation: false,
         title: {
@@ -1137,7 +1158,7 @@ function drawMarketPriceLineGraph (chart, data, title) {
                 `
                 for (const s of series) {
                     const value = s.data[index];
-                    const info = value ? `${value.toFixed(2)}%` : '暂无'
+                    const info = value ? `${value.toFixed(2)}${showPercent[s.name] ? '%' : ''}` : '暂无'
                     html += `
                     <tr>
                         <td align="left"><b>${s.name}：</b></td>
@@ -1182,7 +1203,7 @@ function drawMarketPriceLineGraph (chart, data, title) {
             axisLine: { lineStyle: { color: '#777' } },
             axisLabel: {
                 inside: true,
-                formatter: '{value}%\n'
+                formatter: `{value}${showPercent[names[0]] ? '%' : ''}\n`
             },
             type: "value"
         },

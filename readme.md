@@ -32,5 +32,7 @@ Open `http://localhost:9876/` in browser.
 
 - major
   - percentile of the current asset price in historical prices
+  - embedding for relevant holdings
 - minor
+  - cache with expiration
   - market data

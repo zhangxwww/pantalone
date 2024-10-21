@@ -293,7 +293,38 @@ export default {
         {
           category: '外汇',
           isKLine: false,
-          content: []
+          content: [
+            {
+              name: '美元',
+              code: 'USD/CNY',
+              instrument: 'USD'
+            },
+            {
+              name: '欧元',
+              code: 'EUR/CNY',
+              instrument: 'EUR'
+            },
+            {
+              name: '日元',
+              code: 'JPY/CNY',
+              instrument: 'JPY'
+            },
+            {
+              name: '英镑',
+              code: 'GBP/CNY',
+              instrument: 'GBP'
+            },
+            {
+              name: '港币',
+              code: 'HKD/CNY',
+              instrument: 'HKD'
+            },
+            {
+              name: '泰国铢',
+              code: 'THB/CNY',
+              instrument: 'THB'
+            }
+          ]
         },
         {
           category: '宏观',

@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import akshare as ak
 import pandas as pd
 
+from libs.constant import CURRENCY_DICT
 
 
 def get_china_bond_yield(date):
@@ -111,8 +112,8 @@ def get_fund_holding(symbol, year, type_):
 
 
 def _clip_date(df, start, end):
-    df = df[(df['date'] >= datetime.datetime.strptime(start, '%Y-%m-%d').date())
-            & (df['date'] <= datetime.datetime.strptime(end, '%Y-%m-%d').date())]
+    df = df[(df['date'] >= datetime.datetime.strptime(start, '%Y%m%d').date())
+            & (df['date'] <= datetime.datetime.strptime(end, '%Y%m%d').date())]
     return df
 
 def _resample(daily_kline_df, period):
@@ -184,6 +185,7 @@ def get_kline(code, start_date, end_date, period='daily', market='index-CN'):
 
 def get_market_data(instrument, start_date, end_date):
     need_clip = False
+    logger.debug(f'Get market data of {instrument} from {start_date} to {end_date}')
 
     if instrument == 'LPR':
         df = ak.macro_china_lpr()
@@ -195,6 +197,17 @@ def get_market_data(instrument, start_date, end_date):
             'RATE_2': 'mid_term_rate',
         }
         need_clip = True
+    elif instrument in CURRENCY_DICT:
+        currency = CURRENCY_DICT[instrument]
+        df = ak.currency_boc_sina(symbol=currency, start_date=start_date, end_date=end_date)
+        df = df.rename(columns={'日期': 'date', '中行汇买价': 'rate'})
+        df['rate'] = df['rate'] / 100
+        extract_columns = {
+            'rate': currency
+        }
+
+    else:
+        raise NotImplementedError
 
     if need_clip:
         df = _clip_date(df, start_date, end_date)
@@ -205,6 +218,7 @@ def get_market_data(instrument, start_date, end_date):
         for k, v in extract_columns.items():
             r[v] = getattr(row, k)
         res.append(r)
+
     return res
 
 
