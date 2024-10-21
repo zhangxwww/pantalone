@@ -474,13 +474,13 @@ export default {
     },
 
     async mounted () {
-        await this.checkGitStates();
         this.record = new Data();
         this.initGraph();
         this.drawEmpty();
         await this.record.load();
         this.data = this.record.getData();
         await this.draw();
+        await this.checkGitStates();
     },
 
     unmounted () {
