@@ -223,6 +223,7 @@ class Data {
                 currentSharesFmt: last.currentSharesFmt,
                 currentTime: last.currentTime,
                 currency: last.currency,
+                currencyRate: last.currencyRate,
                 referenceAmount: last.referenceAmount,
                 referenceAmountFmt: last.referenceAmountFmt,
                 fastRedemption: last.fastRedemption,

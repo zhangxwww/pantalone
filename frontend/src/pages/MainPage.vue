@@ -230,6 +230,7 @@ export default {
                 }, this.editId);
             },
             addMonetaryFundData: async (form) => {
+                console.log(form.currencyRate);
                 await this.record.addData('monetary-fund', {
                     name: form.name,
                     beginningAmount: form.beginningAmount,
@@ -263,6 +264,7 @@ export default {
                 }, this.editId);
             },
             onAddData: async (form, type) => {
+                console.log(form.currencyRate);
                 switch (type) {
                     case 'cash':
                         await this.addCashData(form);

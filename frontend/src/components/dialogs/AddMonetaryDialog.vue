@@ -135,6 +135,8 @@ export default {
                 this.$refs.form.validate((valid) => {
                     if (valid) {
                         this.form.beginningTime = timeFormat(this.form.beginningTime);
+
+                        console.log(this.form);
                         this.$emit('add', this.form, 'monetary-fund');
                         this.showDialog = false;
                         this.currentSymbolState = this.SearchSymbolState.INIT;
@@ -163,6 +165,7 @@ export default {
             },
 
             reset: () => {
+                console.log('reset');
                 this.form.name = '';
                 this.form.beginningAmount = 0;
                 this.form.beginningTime = '';
