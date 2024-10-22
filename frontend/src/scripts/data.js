@@ -391,6 +391,8 @@ class Data {
         console.log(dates);
 
         for (let date of dates) {
+            console.log(date);
+
             let cash = 0;
             for (let cData of this.data.cashData) {
                 const candidate = cData.history.filter(h => h.beginningTime <= date);
@@ -403,20 +405,25 @@ class Data {
 
             let monetaryFund = 0;
             for (let mData of this.data.monetaryFundData) {
-                const first = mData.history[0];
+                // const first = mData.history[0];
                 let add = 0;
-                if (first.beginningTime < date) {
-                    add = first.beginningAmount;
-                }
+                // NOTE: I don't know what this is for, just leave it here
+
+                // if (first.beginningTime < date) {
+                //     add = first.beginningAmount;
+                // }
 
                 const candidate = mData.history.filter(h => h.currentTime <= date);
                 const d = candidate[candidate.length - 1];
                 if (d && d.holding && d.currentAmount > 0) {
                     add = d.currentAmount;
+                    console.log(d.name, d.currentTime, d.currentAmount);
                 }
                 monetaryFund += add;
             }
             monetaryFundData.push(monetaryFund);
+
+            console.log(monetaryFundData.slice());
 
             let fixedDeposit = 0;
             for (let fData of this.data.fixedDepositData) {
