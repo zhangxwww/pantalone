@@ -49,8 +49,19 @@ class Data {
             for (let [i, mHis] of mData.history.entries()) {
                 mHis.beginningTime = new Date(mHis.beginningTime);
                 mHis.currentTime = new Date(mHis.currentTime);
-                mHis.beginningNetValue = mHis.beginningAmount / mHis.beginningShares;
-                mHis.currentNetValue = mHis.currentAmount / mHis.currentShares;
+
+                mHis.beginningReferenceAmount = mHis.beginningAmount;
+                mHis.referenceAmount = mHis.currentAmount;
+                if (mHis.currency !== 'CNY') {
+                    mHis.referenceAmount *= mHis.currencyRate;
+                    mHis.beginningReferenceAmount *= mHis.beginningCurrencyRate;
+                    // beginningShares is denominated in foreign currency
+                    // currentShares is denominated in local currency
+                    mHis.beginningShares *= mHis.beginningCurrencyRate;
+                }
+
+                mHis.beginningNetValue = mHis.beginningReferenceAmount / mHis.beginningShares;
+                mHis.currentNetValue = mHis.referenceAmount / mHis.currentShares;
 
                 if (i === 0) {
                     const ret = (mHis.currentNetValue - mHis.beginningNetValue) / mHis.beginningNetValue;
@@ -75,12 +86,9 @@ class Data {
                     mHis.latestReturnRate = currentRet / currentSpan * 365;
                     mHis.cumReturnRate = latest.cumReturnRate * (currentRet + 1);
                 }
-                mHis.cumReturn = mHis.currentAmount - mHis.currentShares;
+                mHis.cumReturn = mHis.referenceAmount - mHis.currentShares;
 
-                mHis.referenceAmount = mHis.currentAmount;
-                if (mHis.currency !== 'CNY') {
-                    mHis.referenceAmount *= mHis.currencyRate;
-                }
+
                 mHis.referenceAmountFmt = mHis.referenceAmount.toFixed(2);
 
                 mHis.beginningTimeFmt = timeFormat(mHis.beginningTime);
@@ -224,6 +232,7 @@ class Data {
                 currentTime: last.currentTime,
                 currency: last.currency,
                 currencyRate: last.currencyRate,
+                beginningCurrencyRate: last.beginningCurrencyRate,
                 referenceAmount: last.referenceAmount,
                 referenceAmountFmt: last.referenceAmountFmt,
                 fastRedemption: last.fastRedemption,
@@ -416,8 +425,7 @@ class Data {
                 const candidate = mData.history.filter(h => h.currentTime <= date);
                 const d = candidate[candidate.length - 1];
                 if (d && d.holding && d.currentAmount > 0) {
-                    add = d.currentAmount;
-                    console.log(d.name, d.currentTime, d.currentAmount);
+                    add = d.referenceAmount;
                 }
                 monetaryFund += add;
             }

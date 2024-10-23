@@ -252,6 +252,7 @@ async def _get_monetary_fund_data_from_db(db):
                 'currentShares': his.currentShares,
                 'currency': his.currency,
                 'currencyRate': his.currencyRate,
+                'beginningCurrencyRate': his.beginningCurrencyRate,
                 'fastRedemption': his.fastRedemption,
                 'holding': his.holding
             }

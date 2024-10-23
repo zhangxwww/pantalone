@@ -1,0 +1,1 @@
+ALTER TABLE monetary_fund_data_history_item ADD beginningCurrencyRate FLOAT DEFAULT 1;

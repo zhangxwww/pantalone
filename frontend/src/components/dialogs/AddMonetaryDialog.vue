@@ -4,17 +4,17 @@
             <el-form-item label="名称" prop="name">
                 <el-input v-model="form.name"></el-input>
             </el-form-item>
-            <el-form-item label="期初金额" prop="beginningAmount">
+            <el-form-item label="期初金额（外币）" prop="beginningAmount">
                 <el-input v-model="form.beginningAmount"></el-input>
             </el-form-item>
             <el-form-item label="期初时间" prop="beginningTime">
                 <el-date-picker v-model="form.beginningTime" type="date" placeholder="选择日期">
                 </el-date-picker>
             </el-form-item>
-            <el-form-item label="当期金额" prop="currentAmount">
+            <el-form-item label="当期金额（外币）" prop="currentAmount">
                 <el-input v-model="form.currentAmount"></el-input>
             </el-form-item>
-            <el-form-item label="累计投入金额" prop="currentShares">
+            <el-form-item label="累计投入金额（本币）" prop="currentShares">
                 <el-input v-model="form.currentShares"></el-input>
             </el-form-item>
             <el-form-item label="币种" prop="currency">
@@ -22,6 +22,9 @@
                     <el-option label="CNY" value="CNY" />
                     <el-option label="USD" value="USD" />
                 </el-select>
+            </el-form-item>
+            <el-form-item v-if="form.currency !== 'CNY'" label="期初现汇买入价" prop="beginningCurrencyRate">
+                <el-input v-model="form.beginningCurrencyRate" />
             </el-form-item>
             <el-form-item v-if="form.currency !== 'CNY'" label="现汇买入价" prop="currencyRate">
                 <el-input v-model="form.currencyRate">
@@ -77,6 +80,7 @@ export default {
                 currentShares: 0,
                 currency: 'CNY',
                 currencyRate: 1.0,
+                beginningCurrencyRate: 1.0,
                 fastRedemption: false,
                 holding: true
             },
@@ -116,6 +120,12 @@ export default {
                     {
                         message: '现汇买入价必须为数字值', trigger: 'blur', validator: isNumberValidator
                     }
+                ],
+                beginningCurrencyRate: [
+                    { required: true, message: '请输入期初现汇买入价', trigger: 'blur' },
+                    {
+                        message: '期初现汇买入价必须为数字值', trigger: 'blur', validator: isNumberValidator
+                    }
                 ]
             },
 
@@ -153,6 +163,7 @@ export default {
                 this.form.currentShares = row.currentShares;
                 this.form.currency = row.currency;
                 this.form.currencyRate = row.currencyRate;
+                this.form.beginningCurrencyRate = row.beginningCurrencyRate;
                 this.form.fastRedemption = row.fastRedemption;
                 this.form.holding = row.holding;
                 this.showDialog = true;
@@ -173,6 +184,7 @@ export default {
                 this.form.currentShares = 0;
                 this.form.currency = 'CNY';
                 this.form.currencyRate = 1.0;
+                this.form.beginningCurrencyRate = 1.0;
                 this.form.fastRedemption = false;
                 this.form.holding = true;
             }

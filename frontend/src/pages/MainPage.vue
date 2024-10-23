@@ -239,6 +239,7 @@ export default {
                     currentShares: form.currentShares,
                     currency: form.currency,
                     currencyRate: form.currencyRate,
+                    beginningCurrencyRate: form.beginningCurrencyRate,
                     fastRedemption: form.fastRedemption,
                     holding: form.holding
                 }, this.editId);

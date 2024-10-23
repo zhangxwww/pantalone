@@ -134,21 +134,21 @@ export default {
                     },
                     {
                         prop: 'currentAmountFmt',
-                        label: '当期金额',
+                        label: '当期金额（外币）',
                         width: '105',
                         sortable: true,
                         sort_method: sortByFmtFloat
                     },
                     {
                         prop: 'currentSharesFmt',
-                        label: '累计投入',
+                        label: '累计投入（本币）',
                         width: '105',
                         sortable: true,
                         sort_method: sortByFmtFloat
                     },
                     {
                         prop: 'cumReturnFmt',
-                        label: '累计收益',
+                        label: '累计收益（本币）',
                         width: '105',
                         sortable: true,
                         sort_method: sortByFmtFloat
@@ -162,7 +162,7 @@ export default {
                     },
                     {
                         prop: 'referenceAmountFmt',
-                        label: '参考金额',
+                        label: '参考金额（本币）',
                         width: '105',
                         sortable: true,
                         sort_method: sortByFmtFloat

@@ -31,8 +31,12 @@ Open `http://localhost:9876/` in browser.
 ## TODO list
 
 - major
-  - percentile of the current asset price in historical prices
+  - percentile of the current asset price in historical prices [https://echarts.apache.org/examples/zh/editor.html?c=scatter-single-axis]()
   - embedding for relevant holdings
+  - holding relationship [https://echarts.apache.org/examples/zh/editor.html?c=graph-label-overlap]()
 - minor
   - cache with expiration
   - market data
+  - y axis pointer [https://echarts.apache.org/examples/zh/editor.html?c=confidence-band]()
+- further
+  - push news summary
