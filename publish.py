@@ -49,13 +49,11 @@ class Selection:
 
     def render_menu(self) -> Layout:
         table = Table(show_header=False, box=None)
-        if self.running:
-            for i, item in enumerate(self.items):
-                if i == self.selected_index:
-                    table.add_row(f"[b green]-> {item:<5}[/] ({self.get_next_version(i)})")
-                else:
-                    table.add_row(f"   [cyan]{item:<5}[/]")
-
+        for i, item in enumerate(self.items):
+            if i == self.selected_index:
+                table.add_row(f"[b green]-> {item:<5}[/] ({self.get_next_version(i)})")
+            else:
+                table.add_row(f"   [cyan]{item:<5}[/]")
         return table
 
     def on_key_event(self, event) -> None:
@@ -66,12 +64,15 @@ class Selection:
         elif event.name == "enter":
             self.running = False
 
-    def run(self) -> None:
-        keyboard.on_press(self.on_key_event)
+    def run(self, suppress) -> None:
+        keyboard.on_press_key("up", self.on_key_event, suppress=suppress)
+        keyboard.on_press_key("down", self.on_key_event, suppress=suppress)
+        keyboard.on_press_key("enter", self.on_key_event, suppress=suppress)
         with Live(self.render_menu(), refresh_per_second=60, console=self.console) as live:
             while self.running:
                 live.update(self.render_menu())
-            live.update(self.render_menu())
+            live.update(None)
+        keyboard.unhook_all()
 
     def get_selected(self) -> str:
         return self.get_next_version(self.selected_index)
@@ -87,10 +88,10 @@ class Selection:
         return f'{v1}.{v2}.{v3}'
 
 
-def select_version(which: str, version: str) -> str:
+def select_version(which: str, version: str, suppress: bool) -> str:
     items = ['Major', 'Minor', 'Patch', 'None']
     selection = Selection(which, version, items)
-    selection.run()
+    selection.run(suppress=suppress)
     selected = selection.get_selected()
     return selected
 
@@ -98,11 +99,11 @@ def select_version(which: str, version: str) -> str:
 if __name__ == "__main__":
 
     backend_version = get_backend_version()
-    backend_version = select_version('backend', backend_version)
+    backend_version = select_version('backend', backend_version, suppress=False)
     set_backend_version(backend_version)
 
     frontend_version = get_frontend_version()
-    frontend_version = select_version('frontend', frontend_version)
+    frontend_version = select_version('frontend', frontend_version, suppress=True)
     set_frontend_version(frontend_version)
 
     set_git_tag(frontend_version, backend_version)
