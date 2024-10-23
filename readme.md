@@ -37,6 +37,5 @@ Open `http://localhost:9876/` in browser.
 - minor
   - cache with expiration
   - market data
-  - y axis pointer [https://echarts.apache.org/examples/zh/editor.html?c=confidence-band]()
 - further
   - push news summary

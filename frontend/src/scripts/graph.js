@@ -866,6 +866,19 @@ function drawKLineGraph (chart, data, title, period, indicator) {
                 obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
                 return obj;
             },
+            axisPointer: {
+                type: 'cross',
+                animation: false,
+                label: {
+                    backgroundColor: '#ccc',
+                    borderColor: '#aaa',
+                    borderWidth: 1,
+                    shadowBlur: 0,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 0,
+                    color: '#222'
+                }
+            },
             formatter: (param) => {
                 const index = Array.isArray(param) ? param[0].dataIndex : param.dataIndex;
                 const html = `
@@ -1146,6 +1159,19 @@ function drawMarketPriceLineGraph (chart, data, title) {
                 };
                 obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
                 return obj;
+            },
+            axisPointer: {
+                type: 'cross',
+                animation: false,
+                label: {
+                    backgroundColor: '#ccc',
+                    borderColor: '#aaa',
+                    borderWidth: 1,
+                    shadowBlur: 0,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 0,
+                    color: '#222'
+                }
             },
             formatter: (param) => {
                 const index = Array.isArray(param) ? param[0].dataIndex : param.dataIndex;
