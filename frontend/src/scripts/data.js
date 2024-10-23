@@ -556,32 +556,38 @@ class Data {
 
     getExpectedReturnData () {
         const expectedReturn = [
-            { name: "<1%", amount: 0 },
+            { name: "<0%", amount: 0 },
+            { name: "0-1%", amount: 0 },
             { name: "1%-2%", amount: 0 },
             { name: "2%-5%", amount: 0 },
             { name: "5%-10%", amount: 0 },
-            { name: ">10%", amount: 0 }
+            { name: "10%-20%", amount: 0 },
+            { name: ">20%", amount: 0 },
         ]
 
         for (let cData of this.data.cashData) {
             const last = cData.history[cData.history.length - 1];
-            expectedReturn[0].amount += last.amount;
+            expectedReturn[1].amount += last.amount;
         }
         for (let mData of this.data.monetaryFundData) {
             const last = mData.history[mData.history.length - 1];
             if (!last.holding) {
                 continue;
             }
-            if (last.annualizedReturnRate < 0.01) {
+            if (last.annualizedReturnRate < 0) {
                 expectedReturn[0].amount += last.currentAmount;
-            } else if (last.annualizedReturnRate < 0.02) {
+            } else if (last.annualizedReturnRate < 0.01) {
                 expectedReturn[1].amount += last.currentAmount;
-            } else if (last.annualizedReturnRate < 0.05) {
+            } else if (last.annualizedReturnRate < 0.02) {
                 expectedReturn[2].amount += last.currentAmount;
-            } else if (last.annualizedReturnRate < 0.1) {
+            } else if (last.annualizedReturnRate < 0.05) {
                 expectedReturn[3].amount += last.currentAmount;
-            } else {
+            } else if (last.annualizedReturnRate < 0.1) {
                 expectedReturn[4].amount += last.currentAmount;
+            } else if (last.annualizedReturnRate < 0.2) {
+                expectedReturn[5].amount += last.currentAmount;
+            } else {
+                expectedReturn[6].amount += last.currentAmount;
             }
         }
         for (let fData of this.data.fixedDepositData) {
@@ -589,16 +595,20 @@ class Data {
             if (last.residualMaturaty < 0) {
                 continue;
             }
-            if (last.rate < 0.01) {
+            if (last.rate < 0) {
                 expectedReturn[0].amount += last.beginningAmount;
-            } else if (last.rate < 0.02) {
+            } else if (last.rate < 0.01) {
                 expectedReturn[1].amount += last.beginningAmount;
-            } else if (last.rate < 0.05) {
+            } else if (last.rate < 0.02) {
                 expectedReturn[2].amount += last.beginningAmount;
-            } else if (last.rate < 0.1) {
+            } else if (last.rate < 0.05) {
                 expectedReturn[3].amount += last.beginningAmount;
-            } else {
+            } else if (last.rate < 0.1) {
                 expectedReturn[4].amount += last.beginningAmount;
+            } else if (last.rate < 0.2) {
+                expectedReturn[5].amount += last.beginningAmount;
+            } else {
+                expectedReturn[6].amount += last.beginningAmount;
             }
         }
         for (let uData of this.data.fundData) {
@@ -606,16 +616,20 @@ class Data {
             if (!last.holding) {
                 continue;
             }
-            if (last.annualizedReturnRate < 0.01) {
+            if (last.annualizedReturnRate < 0) {
                 expectedReturn[0].amount += last.currentAmount;
-            } else if (last.annualizedReturnRate < 0.02) {
+            } else if (last.annualizedReturnRate < 0.01) {
                 expectedReturn[1].amount += last.currentAmount;
-            } else if (last.annualizedReturnRate < 0.05) {
+            } else if (last.annualizedReturnRate < 0.02) {
                 expectedReturn[2].amount += last.currentAmount;
-            } else if (last.annualizedReturnRate < 0.1) {
+            } else if (last.annualizedReturnRate < 0.05) {
                 expectedReturn[3].amount += last.currentAmount;
-            } else {
+            } else if (last.annualizedReturnRate < 0.1) {
                 expectedReturn[4].amount += last.currentAmount;
+            } else if (last.annualizedReturnRate < 0.2) {
+                expectedReturn[5].amount += last.currentAmount;
+            } else {
+                expectedReturn[6].amount += last.currentAmount;
             }
         }
         expectedReturn.forEach(item => {
