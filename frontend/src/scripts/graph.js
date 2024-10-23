@@ -650,29 +650,27 @@ function drawRiskIndicatorLineGraph (chart, data) {
                 smooth: true,
             },
             {
-                type: "bar",
+                type: "line",
                 data: help.sharpeRatio,
-                barWidth: 3,
-                itemStyle: {
-                    normal: {
-                        barBorderColor: 'rgba(0,0,0,0)',
-                        color: 'rgba(0,0,0,0)'
-                    },
-                    emphasis: {
-                        barBorderColor: 'rgba(0,0,0,0)',
-                        color: 'rgba(0,0,0,0)'
-                    }
+                lineStyle: {
+                    opacity: 0
                 },
                 stack: "confidence-sharpe",
+                symbol: "none",
+                smooth: true
             },
             {
-                type: "bar",
+                type: "line",
                 data: interval.sharpeRatio,
-                barWidth: 3,
-                itemStyle: {
-                    color: 'rgba(220,220,220,0.8)'
+                lineStyle: {
+                    opacity: 0
+                },
+                areaStyle: {
+                    color: "#eaeaea"
                 },
                 stack: "confidence-sharpe",
+                symbol: "none",
+                smooth: true
             }
         ],
         tooltip: {
