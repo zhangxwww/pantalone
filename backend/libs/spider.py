@@ -205,7 +205,21 @@ def get_market_data(instrument, start_date, end_date):
         extract_columns = {
             'rate': currency
         }
-
+    elif instrument == 'leverage-CN':
+        df = ak.macro_cnbs()
+        df['date'] = df['年份'].apply(lambda x: f'{x}-01')
+        df['date'] = pd.to_datetime(df['date']).dt.date
+        extract_columns = {
+            '居民部门': 'leverage_resident',
+            '非金融企业部门': 'leverage_non_financial',
+            '政府部门': 'leverage_government',
+            '中央政府': 'leverage_central_government',
+            '地方政府': 'leverage_local_government',
+            '实体经济部门': 'leverage_real_economy',
+            '金融部门资产方': 'leverage_financial_assets',
+            '金融部门负债方': 'leverage_financial_liabilities',
+        }
+        need_clip = True
     else:
         raise NotImplementedError
 
@@ -224,4 +238,4 @@ def get_market_data(instrument, start_date, end_date):
 
 
 if __name__ == '__main__':
-    print(get_market_data('LPR', '2021-01-01', '2022-01-10'))
+    print(get_market_data('leverage-CN', '20210101', '20220110'))

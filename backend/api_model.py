@@ -106,5 +106,5 @@ class GetKLineData(BaseModel):
 
 class GetMarketData(BaseModel):
     instrument: Literal[
-        'LPR', 'USD', 'EUR', 'JPY', 'GBP', 'HKD', 'THB'
+        'LPR', 'USD', 'EUR', 'JPY', 'GBP', 'HKD', 'THB', 'leverage-CN'
     ]

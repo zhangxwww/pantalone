@@ -23,5 +23,11 @@ CURRENCY_DICT = {
 
 INSTRUMENT_CODES = {
     'LPR': ['lpr_1y', 'lpr_5y', 'short_term_rate', 'mid_term_rate'],
-    **{k: [v] for k, v in CURRENCY_DICT.items()}
+    **{k: [v] for k, v in CURRENCY_DICT.items()},
+    'leverage-CN': [
+        'leverage_resident', 'leverage_non_financial', 'leverage_government',
+        'leverage_central_government', 'leverage_local_government',
+        'leverage_real_economy', 'leverage_financial_assets',
+        'leverage_financial_liabilities'
+    ]
 }

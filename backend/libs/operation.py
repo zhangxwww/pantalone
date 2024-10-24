@@ -620,8 +620,7 @@ async def get_kline_data(db, query):
     return res
 
 
-async def get_market_data(db, query):
-    instrument = query.instrument
+async def get_market_data(db, instrument):
     codes = INSTRUMENT_CODES[instrument]
 
     res = {}

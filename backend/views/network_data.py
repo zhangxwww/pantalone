@@ -82,7 +82,7 @@ async def get_kline_data(data: api_model.GetKLineData, db: AsyncSession = Depend
 @log_request
 @timeit
 async def get_market_data(data: api_model.GetMarketData, db: AsyncSession = Depends(get_db)):
-    return {'market': await operation.get_market_data(db, data)}
+    return {'market': await operation.get_market_data(db, data.instrument)}
 
 
 @router.post('/latest-currency-rate')

@@ -1097,6 +1097,14 @@ function drawMarketPriceLineGraph (chart, data, title) {
         '英镑': 'GBP/CNY',
         '港币': 'HKD/CNY',
         '泰国铢': 'THB/CNY',
+        'leverage_resident': '居民部门',
+        'leverage_non_financial': '非金融企业部门',
+        'leverage_government': '政府部门',
+        'leverage_central_government': '中央政府',
+        'leverage_local_government': '地方政府',
+        'leverage_real_economy': '实体经济部门',
+        'leverage_financial_assets': '金融部门资产方',
+        'leverage_financial_liabilities': '金融部门负债方',
     };
 
     const showPercent = {
@@ -1110,6 +1118,14 @@ function drawMarketPriceLineGraph (chart, data, title) {
         'GBP/CNY': false,
         'HKD/CNY': false,
         'THB/CNY': false,
+        '居民部门': true,
+        '非金融企业部门': true,
+        '政府部门': true,
+        '中央政府': true,
+        '地方政府': true,
+        '实体经济部门': true,
+        '金融部门资产方': true,
+        '金融部门负债方': true,
     };
 
     const names = [];
@@ -1137,7 +1153,7 @@ function drawMarketPriceLineGraph (chart, data, title) {
             left: "center",
         },
         legend: {
-            top: 460,
+            top: 455,
             data: names
         },
         tooltip: {
