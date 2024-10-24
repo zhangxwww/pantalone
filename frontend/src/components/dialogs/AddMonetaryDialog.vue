@@ -4,17 +4,17 @@
             <el-form-item label="名称" prop="name">
                 <el-input v-model="form.name"></el-input>
             </el-form-item>
-            <el-form-item label="期初金额（外币）" prop="beginningAmount">
+            <el-form-item :label="`期初金额${form.currency === 'CNY' ? '' : '（外币）'}`" prop="beginningAmount">
                 <el-input v-model="form.beginningAmount"></el-input>
             </el-form-item>
             <el-form-item label="期初时间" prop="beginningTime">
                 <el-date-picker v-model="form.beginningTime" type="date" placeholder="选择日期">
                 </el-date-picker>
             </el-form-item>
-            <el-form-item label="当期金额（外币）" prop="currentAmount">
+            <el-form-item :label="`当期金额${form.currency === 'CNY' ? '' : '（外币）'}`" prop="currentAmount">
                 <el-input v-model="form.currentAmount"></el-input>
             </el-form-item>
-            <el-form-item label="累计投入金额（本币）" prop="currentShares">
+            <el-form-item :label="`累计投入金额${form.currency === 'CNY' ? '' : '（外币）'}`" prop="currentShares">
                 <el-input v-model="form.currentShares"></el-input>
             </el-form-item>
             <el-form-item label="币种" prop="currency">
