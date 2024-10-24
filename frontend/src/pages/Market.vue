@@ -41,10 +41,14 @@
         </el-tab-pane>
       </el-tabs>
     </el-main>
+    <el-footer>
+      <VersionFooter />
+    </el-footer>
   </el-container>
 </template>
 
 <script>
+import VersionFooter from '../components/VersionFooter.vue';
 import {
   initGraph,
   drawKLineGraph,
@@ -493,6 +497,9 @@ export default {
       return con;
     },
   },
+  components: {
+    VersionFooter
+  }
 };
 
 </script>

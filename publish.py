@@ -9,7 +9,7 @@ import keyboard
 
 
 def get_backend_version() -> str:
-    with open('backend/__init__.py', 'r') as f:
+    with open('backend/__version__.py', 'r') as f:
         lines = f.readline().strip()
     version = lines.split('=')[1].strip().strip('\'')
     Console().print(f"Current backend version is [b]{version}[/]")
@@ -18,7 +18,7 @@ def get_backend_version() -> str:
 def set_backend_version(version) -> None:
     Console().print(f"Set backend version to [b]{version}[/]")
     line = f"__version__ = '{version}'\n"
-    with open('backend/__init__.py', 'w') as f:
+    with open('backend/__version__.py', 'w') as f:
         f.write(line)
 
 def get_frontend_version() -> str:

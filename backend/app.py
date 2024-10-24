@@ -14,6 +14,7 @@ from views.local_data import router as local_data_router
 from views.network_data import router as network_data_router
 from views.file import router as file_router
 from views.git_state import router as git_state_router
+from views.version import router as version_router
 
 
 logger.add(
@@ -42,6 +43,7 @@ app.include_router(local_data_router, prefix='/api')
 app.include_router(network_data_router, prefix='/api')
 app.include_router(file_router, prefix='/api')
 app.include_router(git_state_router, prefix='/api')
+app.include_router(version_router, prefix='/api')
 
 
 @app.get('/position')

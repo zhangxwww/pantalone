@@ -1,138 +1,145 @@
 <template>
-    <div>
-        <el-row style="margin-top: 60px">
-            <el-col :span="12">
-                <div id="asset-change-line-graph" style="width: 100%; height: 300px"></div>
-            </el-col>
-            <el-col :span="12">
-                <div id="asset-delta-change-bar-graph" style="width: 100%; height: 300px"></div>
-            </el-col>
-        </el-row>
-        <el-row style="margin-top: 60px">
-            <el-col :span="12">
-                <div id="average-return-line-graph" style="width: 100%; height: 300px"></div>
-            </el-col>
-            <el-col :span="12">
-                <div id="rick-indicator-line-graph" style="width: 100%; height: 300px"></div>
-            </el-col>
-        </el-row>
-        <el-row style="margin-top: 60px">
-            <el-col :span="12">
-                <div id="cumulative-return-line-graph" style="width: 100%; height: 300px"></div>
-            </el-col>
-            <el-col :span="12">
-                <div id="drawdown-line-graph" style="width: 100%; height: 300px"></div>
-            </el-col>
-        </el-row>
-        <el-row justify="center" style="margin-top: 20px;">
-            <el-radio-group v-model="drawMonths" @change="onDrawMonthsChange">
-                <el-radio-button v-for="radio in drawMonthsRadio" :key="radio.value" :label="radio.label"
-                    :value="radio.value" />
-            </el-radio-group>
-        </el-row>
-        <el-row style="margin-top: 60px">
-            <el-col :span="12">
-                <div id="liquidity-return-position-scatter-graph" style="width: 100%; height: 300px"></div>
-            </el-col>
-            <el-col :span="6">
-                <div id="residual-maturity-pie-graph" style="width: 100%00px; height: 300px"></div>
-            </el-col>
-            <el-col :span="6">
-                <div id="expected-return-pie-graph" style="width: 100%; height: 300px"></div>
-            </el-col>
-        </el-row>
-        <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px; ">
-            <el-col :span="6" :offset="9">
-                <span style="font-size: var(--el-font-size-large); font-weight: bold">项目明细</span>
-            </el-col>
-            <el-col :span="1" :offset="3">
-                <el-dropdown trigger="hover" v-on:command="onAddSelect">
-                    <el-button type="primary">
-                        <el-icon>
-                            <plus />
-                        </el-icon>
-                    </el-button>
-                    <template #dropdown>
-                        <el-dropdown-menu>
-                            <el-dropdown-item v-for="menu in dropdownMenus" :key="menu.command" :command="menu.command">
-                                {{ menu.label }}
-                            </el-dropdown-item>
-                        </el-dropdown-menu>
-                    </template>
-                </el-dropdown>
-            </el-col>
-
-            <el-col :span="1" style="margin-left: 10px">
-                <el-button @click="onDownload">
-                    <el-icon>
-                        <download />
-                    </el-icon>
-                </el-button>
-            </el-col>
-
-            <el-col :span="1" style="margin-left: 10px">
-                <el-upload ref="upload" :on-change="onUpload" :auto-upload="false" :show-file-list="false" :limit="1">
-                    <template #trigger>
-                        <el-button>
+    <el-container style="margin-top: -100px;">
+        <el-main>
+            <el-row style="margin-top: 60px">
+                <el-col :span="12">
+                    <div id="asset-change-line-graph" style="width: 100%; height: 300px"></div>
+                </el-col>
+                <el-col :span="12">
+                    <div id="asset-delta-change-bar-graph" style="width: 100%; height: 300px"></div>
+                </el-col>
+            </el-row>
+            <el-row style="margin-top: 60px">
+                <el-col :span="12">
+                    <div id="average-return-line-graph" style="width: 100%; height: 300px"></div>
+                </el-col>
+                <el-col :span="12">
+                    <div id="rick-indicator-line-graph" style="width: 100%; height: 300px"></div>
+                </el-col>
+            </el-row>
+            <el-row style="margin-top: 60px">
+                <el-col :span="12">
+                    <div id="cumulative-return-line-graph" style="width: 100%; height: 300px"></div>
+                </el-col>
+                <el-col :span="12">
+                    <div id="drawdown-line-graph" style="width: 100%; height: 300px"></div>
+                </el-col>
+            </el-row>
+            <el-row justify="center" style="margin-top: 20px;">
+                <el-radio-group v-model="drawMonths" @change="onDrawMonthsChange">
+                    <el-radio-button v-for="radio in drawMonthsRadio" :key="radio.value" :label="radio.label"
+                        :value="radio.value" />
+                </el-radio-group>
+            </el-row>
+            <el-row style="margin-top: 60px">
+                <el-col :span="12">
+                    <div id="liquidity-return-position-scatter-graph" style="width: 100%; height: 300px"></div>
+                </el-col>
+                <el-col :span="6">
+                    <div id="residual-maturity-pie-graph" style="width: 100%00px; height: 300px"></div>
+                </el-col>
+                <el-col :span="6">
+                    <div id="expected-return-pie-graph" style="width: 100%; height: 300px"></div>
+                </el-col>
+            </el-row>
+            <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px; ">
+                <el-col :span="6" :offset="9">
+                    <span style="font-size: var(--el-font-size-large); font-weight: bold">项目明细</span>
+                </el-col>
+                <el-col :span="1" :offset="3">
+                    <el-dropdown trigger="hover" v-on:command="onAddSelect">
+                        <el-button type="primary">
                             <el-icon>
-                                <upload />
+                                <plus />
                             </el-icon>
                         </el-button>
-                    </template>
-                </el-upload>
-            </el-col>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item v-for="menu in dropdownMenus" :key="menu.command"
+                                    :command="menu.command">
+                                    {{ menu.label }}
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                </el-col>
 
-            <el-col :span="1" style="margin-left: 10px">
-                <el-button @click="onRefresh" v-if="!refreshing">
-                    <el-icon>
-                        <refresh />
-                    </el-icon>
-                </el-button>
-                <el-button v-else disabled>
-                    <el-icon>
-                        <refresh />
-                    </el-icon>
-                </el-button>
-            </el-col>
-
-            <el-col :span="1" style="margin-left: 10px">
-                <el-dropdown>
-                    <el-button>
+                <el-col :span="1" style="margin-left: 10px">
+                    <el-button @click="onDownload">
                         <el-icon>
-                            <more />
+                            <download />
                         </el-icon>
                     </el-button>
-                    <template #dropdown>
-                        <el-dropdown-menu>
-                            <el-dropdown-item>
-                                <router-link :to="{ path: '/position', query: { symbols: getFundSymbols() } }"
-                                    style="text-decoration-line: none; font: inherit">
-                                    基金仓位明细
-                                </router-link>
-                            </el-dropdown-item>
-                            <el-dropdown-item>
-                                <router-link :to="{ path: '/market' }"
-                                    style="text-decoration-line: none; font: inherit">
-                                    行情看板
-                                </router-link>
-                            </el-dropdown-item>
-                        </el-dropdown-menu>
-                    </template>
-                </el-dropdown>
-            </el-col>
-        </el-row>
-        <el-row>
-            <tab-table :data="data" @edit="handleEdit"></tab-table>
-        </el-row>
+                </el-col>
 
-        <add-cash-dialog ref="addCashDialog" @add="onAddData"></add-cash-dialog>
+                <el-col :span="1" style="margin-left: 10px">
+                    <el-upload ref="upload" :on-change="onUpload" :auto-upload="false" :show-file-list="false"
+                        :limit="1">
+                        <template #trigger>
+                            <el-button>
+                                <el-icon>
+                                    <upload />
+                                </el-icon>
+                            </el-button>
+                        </template>
+                    </el-upload>
+                </el-col>
 
-        <add-monetary-dialog ref="addMonetaryDialog" @add="onAddData"></add-monetary-dialog>
+                <el-col :span="1" style="margin-left: 10px">
+                    <el-button @click="onRefresh" v-if="!refreshing">
+                        <el-icon>
+                            <refresh />
+                        </el-icon>
+                    </el-button>
+                    <el-button v-else disabled>
+                        <el-icon>
+                            <refresh />
+                        </el-icon>
+                    </el-button>
+                </el-col>
 
-        <add-fixed-dialog ref="addFixedDialog" @add="onAddData"></add-fixed-dialog>
+                <el-col :span="1" style="margin-left: 10px">
+                    <el-dropdown>
+                        <el-button>
+                            <el-icon>
+                                <more />
+                            </el-icon>
+                        </el-button>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item>
+                                    <router-link :to="{ path: '/position', query: { symbols: getFundSymbols() } }"
+                                        style="text-decoration-line: none; font: inherit">
+                                        基金仓位明细
+                                    </router-link>
+                                </el-dropdown-item>
+                                <el-dropdown-item>
+                                    <router-link :to="{ path: '/market' }"
+                                        style="text-decoration-line: none; font: inherit">
+                                        行情看板
+                                    </router-link>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                </el-col>
+            </el-row>
+            <el-row>
+                <tab-table :data="data" @edit="handleEdit"></tab-table>
+            </el-row>
 
-        <add-fund-dialog ref="addFundDialog" @add="onAddData"></add-fund-dialog>
-    </div>
+            <add-cash-dialog ref="addCashDialog" @add="onAddData"></add-cash-dialog>
+
+            <add-monetary-dialog ref="addMonetaryDialog" @add="onAddData"></add-monetary-dialog>
+
+            <add-fixed-dialog ref="addFixedDialog" @add="onAddData"></add-fixed-dialog>
+
+            <add-fund-dialog ref="addFundDialog" @add="onAddData"></add-fund-dialog>
+        </el-main>
+        <el-footer>
+            <version-footer />
+        </el-footer>
+    </el-container>
 </template>
 
 <script>
@@ -169,6 +176,7 @@ import AddMonetaryDialog from '@/components/dialogs/AddMonetaryDialog'
 import AddFixedDialog from '@/components/dialogs/AddFixedDialog.vue'
 import AddFundDialog from '@/components/dialogs/AddFundDialog.vue'
 import TabTable from '@/components/TabTable.vue'
+import VersionFooter from '../components/VersionFooter.vue'
 
 
 export default {
@@ -474,6 +482,7 @@ export default {
         AddFixedDialog,
         AddFundDialog,
         TabTable,
+        VersionFooter
     },
 
     async mounted () {

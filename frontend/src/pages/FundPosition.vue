@@ -73,11 +73,15 @@
       <el-skeleton v-else :rows="5" animated
         style="width: 70%; margin-left: 15%; margin-bottom: 15px; margin-top: 30px; text-align: left;" />
     </el-main>
+    <el-footer>
+      <version-footer />
+    </el-footer>
   </el-container>
 </template>
 
 <script>
 import { Search } from '@element-plus/icons-vue';
+import VersionFooter from '../components/VersionFooter.vue';
 import {
   getFundHoldingDataRequest,
   getFundNameRequest,
@@ -245,7 +249,8 @@ export default {
     this.relAllGraph.dispose();
   },
   components: {
-    Search
+    Search,
+    VersionFooter
   }
 }
 </script>

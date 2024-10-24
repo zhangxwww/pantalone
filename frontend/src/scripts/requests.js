@@ -107,6 +107,11 @@ async function getGitUpdatedRequest () {
     return res.data;
 }
 
+async function getBackendVersionRequest () {
+    const res = await axios.get('/api/version');
+    return res.data;
+}
+
 
 export {
     getChinaBondYieldDataRequest,
@@ -125,4 +130,5 @@ export {
     getGitUpdatedRequest,
     getMarketDataRequest,
     getLatestCurrencyRate,
+    getBackendVersionRequest
 }
