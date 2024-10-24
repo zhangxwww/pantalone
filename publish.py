@@ -5,18 +5,25 @@ from rich.console import Console
 from rich.live import Live
 from rich.table import Table
 from rich.layout import Layout
+from rich.prompt import Prompt
 import keyboard
 
+
+def print_current_version(version, which) -> None:
+    Console().print(f"[cyan]Current {which} version is[/] [b green]{version}[/]")
+
+def print_set_version(version, which) -> None:
+    Console().print(f"[cyan]Set {which} version to[/] [b green]{version}[/]")
 
 def get_backend_version() -> str:
     with open('backend/__version__.py', 'r') as f:
         lines = f.readline().strip()
     version = lines.split('=')[1].strip().strip('\'')
-    Console().print(f"Current backend version is [b]{version}[/]")
+    print_current_version(version, 'backend')
     return version
 
 def set_backend_version(version) -> None:
-    Console().print(f"Set backend version to [b]{version}[/]")
+    print_set_version(version, 'backend')
     line = f"__version__ = '{version}'\n"
     with open('backend/__version__.py', 'w') as f:
         f.write(line)
@@ -24,11 +31,11 @@ def set_backend_version(version) -> None:
 def get_frontend_version() -> str:
     j = json.load(open('frontend/package.json'))
     version = j['version']
-    Console().print(f"Current frontend version is [b]{version}[/]")
+    print_current_version(version, 'frontend')
     return version
 
 def set_frontend_version(version) -> None:
-    Console().print(f"Set frontend version to [b]{version}[/]")
+    print_set_version(version, 'frontend')
     j = json.load(open('frontend/package.json'))
     j['version'] = version
     with open('frontend/package.json', 'w') as f:
@@ -36,6 +43,10 @@ def set_frontend_version(version) -> None:
 
 def set_git_tag(frontend_version, backend_version) -> None:
     subprocess.run(['git', 'tag', f'v{frontend_version}-{backend_version}'])
+
+def git_commit(info) -> None:
+    subprocess.run(['git', 'add', '.'])
+    subprocess.run(['git', 'commit', '-m', info])
 
 
 class Selection:
@@ -98,6 +109,8 @@ def select_version(which: str, version: str, suppress: bool) -> str:
 
 if __name__ == "__main__":
 
+    info = Prompt.ask("[cyan]Please enter the commit message[/]")
+
     backend_version = get_backend_version()
     backend_version = select_version('backend', backend_version, suppress=False)
     set_backend_version(backend_version)
@@ -106,4 +119,5 @@ if __name__ == "__main__":
     frontend_version = select_version('frontend', frontend_version, suppress=True)
     set_frontend_version(frontend_version)
 
+    git_commit(info)
     set_git_tag(frontend_version, backend_version)
