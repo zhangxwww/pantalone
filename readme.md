@@ -37,6 +37,7 @@ Open `http://localhost:9876/` in browser.
 - minor
   - cache with expiration
   - market data
+    - dual y axis for YoY and MoM data
 - further
   - push news summary
   - charts panel, select data and draw

@@ -220,6 +220,41 @@ def get_market_data(instrument, start_date, end_date):
             '金融部门负债方': 'leverage_financial_liabilities',
         }
         need_clip = True
+    elif instrument == 'unemployment-rate-CN':
+        df = ak.macro_china_urban_unemployment()
+        df['date'] = df['date'].apply(lambda x: f'{x[:4]}-{x[4:6]}-01')
+        df['date'] = pd.to_datetime(df['date']).dt.date
+        replace = {
+            '31个大城市城镇调查失业率': '三十一个大城市城镇调查失业率',
+            '全国城镇16—24岁劳动力失业率': '全国城镇十六至二十四岁劳动力失业率',
+            '全国城镇25—59岁劳动力失业率': '全国城镇二十五至五十九岁劳动力失业率',
+            '全国城镇不包含在校生的16—24岁劳动力失业率': '全国城镇不包含在校生的十六至二十四岁劳动力失业率',
+            '全国城镇不包含在校生的25—29岁劳动力失业率': '全国城镇不包含在校生的二十五至二十九岁劳动力失业率',
+            '全国城镇不包含在校生的30—59岁劳动力失业率': '全国城镇不包含在校生的三十至五十九岁劳动力失业率',
+        }
+        extract_columns = {
+            '全国城镇调查失业率': 'national_urban_unemployment_rate',
+            '三十一个大城市城镇调查失业率': '31_major_cities_urban_unemployment_rate',
+            '全国城镇本地户籍劳动力失业率': 'national_urban_local_unemployment_rate',
+            '全国城镇外来户籍劳动力失业率': 'national_urban_migrant_unemployment_rate',
+            '全国城镇十六至二十四岁劳动力失业率': '16_24_urban_unemployment_rate',
+            '全国城镇二十五至五十九岁劳动力失业率': '25_59_urban_unemployment_rate',
+            '全国城镇不包含在校生的十六至二十四岁劳动力失业率': '16_24_urban_unemployment_rate_excluding_students',
+            '全国城镇不包含在校生的二十五至二十九岁劳动力失业率': '25_29_urban_unemployment_rate_excludng_students',
+            '全国城镇不包含在校生的三十至五十九岁劳动力失业率': '30_59_urban_unemployment_rate_excludng_students',
+        }
+        dfs = []
+        for col in df['item'].unique():
+            df_col = df[df['item'] == col].copy()
+            col = replace[col] if col in replace else col
+            df_col[col] = df_col['value']
+            df_col = df_col[['date', col]]
+            dfs.append(df_col)
+        merged = dfs[0]
+        for df in dfs[1:]:
+            merged = pd.merge(merged, df, on='date', how='outer')
+        df = merged.sort_values('date')
+        need_clip = True
     else:
         raise NotImplementedError
 
@@ -238,4 +273,4 @@ def get_market_data(instrument, start_date, end_date):
 
 
 if __name__ == '__main__':
-    print(get_market_data('leverage-CN', '20210101', '20220110'))
+    print(get_market_data('unemployment-rate-CN', '20210101', '20220110'))

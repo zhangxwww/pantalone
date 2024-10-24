@@ -262,6 +262,11 @@ const FOLLOWED_DATA = [
                 name: '宏观杠杆率',
                 code: '',
                 instrument: 'leverage-CN'
+            },
+            {
+                name: '失业率',
+                code: '',
+                instrument: 'unemployment-rate-CN'
             }
         ]
     },

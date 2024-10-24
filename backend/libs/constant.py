@@ -29,5 +29,16 @@ INSTRUMENT_CODES = {
         'leverage_central_government', 'leverage_local_government',
         'leverage_real_economy', 'leverage_financial_assets',
         'leverage_financial_liabilities'
+    ],
+    'unemployment-rate-CN': [
+        'national_urban_unemployment_rate',
+        '31_major_cities_urban_unemployment_rate',
+        'national_urban_local_unemployment_rate',
+        'national_urban_migrant_unemployment_rate',
+        '16_24_urban_unemployment_rate',
+        '25_59_urban_unemployment_rate',
+        '16_24_urban_unemployment_rate_excluding_students',
+        '25_29_urban_unemployment_rate_excludng_students',
+        '30_59_urban_unemployment_rate_excludng_students',
     ]
 }

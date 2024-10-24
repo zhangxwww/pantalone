@@ -1105,6 +1105,15 @@ function drawMarketPriceLineGraph (chart, data, title) {
         'leverage_real_economy': '实体经济部门',
         'leverage_financial_assets': '金融部门资产方',
         'leverage_financial_liabilities': '金融部门负债方',
+        'national_urban_unemployment_rate': '全国城镇',
+        '31_major_cities_urban_unemployment_rate': '31个大城市',
+        'national_urban_local_unemployment_rate': '本地户籍',
+        'national_urban_migrant_unemployment_rate': '外来户籍',
+        '16_24_urban_unemployment_rate': '16-24岁',
+        '25_59_urban_unemployment_rate': '25-59岁',
+        '16_24_urban_unemployment_rate_excluding_students': '16-24岁不含在校生',
+        '25_29_urban_unemployment_rate_excludng_students': '25-29岁不含在校生',
+        '30_59_urban_unemployment_rate_excludng_students': '30-59岁不含在校生',
     };
 
     const showPercent = {
@@ -1126,6 +1135,15 @@ function drawMarketPriceLineGraph (chart, data, title) {
         '实体经济部门': true,
         '金融部门资产方': true,
         '金融部门负债方': true,
+        '全国城镇': true,
+        '31个大城市': true,
+        '本地户籍': true,
+        '外来户籍': true,
+        '16-24岁': true,
+        '25-59岁': true,
+        '16-24岁不含在校生': true,
+        '25-29岁不含在校生': true,
+        '30-59岁不含在校生': true,
     };
 
     const names = [];
