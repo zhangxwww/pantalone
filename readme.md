@@ -39,3 +39,4 @@ Open `http://localhost:9876/` in browser.
   - market data
 - further
   - push news summary
+  - charts panel, select data and draw
