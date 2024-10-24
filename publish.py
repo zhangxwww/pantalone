@@ -92,8 +92,11 @@ class Selection:
         v1, v2, v3 = self.version.split('.')
         if index == 0:
             v1 = str(int(v1) + 1)
+            v2 = '0'
+            v3 = '0'
         elif index == 1:
             v2 = str(int(v2) + 1)
+            v3 = '0'
         elif index == 2:
             v3 = str(int(v3) + 1)
         return f'{v1}.{v2}.{v3}'
