@@ -36,6 +36,7 @@ Open `http://localhost:9876/` in browser.
   - holding relationship [https://echarts.apache.org/examples/zh/editor.html?c=graph-label-overlap]()
 - minor
   - cache with expiration
+  - footer divider, margin top
   - market data
     - dual y axis for YoY and MoM data
 - further
