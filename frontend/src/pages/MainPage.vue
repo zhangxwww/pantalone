@@ -119,6 +119,12 @@
                                         行情看板
                                     </router-link>
                                 </el-dropdown-item>
+                                <el-dropdown-item>
+                                    <router-link :to="{ path: '/percentile' }"
+                                        style="text-decoration-line: none; font: inherit">
+                                        百分位分析
+                                    </router-link>
+                                </el-dropdown-item>
                             </el-dropdown-menu>
                         </template>
                     </el-dropdown>
