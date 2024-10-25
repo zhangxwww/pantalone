@@ -10,12 +10,14 @@ import {
     MarkPointComponent,
     MarkLineComponent,
     MarkAreaComponent,
-    GraphicComponent
+    GraphicComponent,
+    SingleAxisComponent
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { LabelLayout, UniversalTransition } from "echarts/features";
 
 import { timeFormat } from "@/scripts/formatter";
+import { PERCENTILE_CHART_TRANSLATION } from "./constant";
 
 echarts.use([
     TitleComponent,
@@ -27,15 +29,16 @@ echarts.use([
     MarkPointComponent,
     MarkLineComponent,
     MarkAreaComponent,
+    SingleAxisComponent,
+    GraphicComponent,
     LineChart,
     PieChart,
     ScatterChart,
     BarChart,
+    CandlestickChart,
     CanvasRenderer,
     LabelLayout,
     UniversalTransition,
-    GraphicComponent,
-    CandlestickChart
 ]);
 
 function initGraph (domId) {
@@ -527,7 +530,6 @@ function drawCumulativeReturnLineGraph (chart, data) {
     return chart;
 }
 
-
 function drawDrawdownLineGraph (chart, data) {
     console.log(data);
     const option = {
@@ -817,7 +819,6 @@ function drawRelevanceScatterGraph (chart, data, states, title, key) {
     chart.setOption(option);
     return chart;
 }
-
 
 function drawKLineGraph (chart, data, title, period, indicator) {
     console.log(title, period, indicator);
@@ -1284,6 +1285,59 @@ function drawMarketPriceLineGraph (chart, data, title) {
     return chart;
 }
 
+function drawPercentileGraph (chart, data) {
+    const title = [];
+    const singleAxis = [];
+    const series = [];
+    const nLines = data.length;
+    const axis = Array.from({ length: 101 }, (_, i) => i);
+    data.forEach((d, idx) => {
+        title.push({
+            textBaseline: 'middle',
+            top: ((idx + 0.5) * 100) / nLines + '%',
+            text: `${PERCENTILE_CHART_TRANSLATION[d.period]}价格（${d.window > 0 ? d.window + '年' : '至今'}）`
+        });
+        singleAxis.push({
+            left: 150,
+            type: 'value',
+            boundaryGap: false,
+            data: axis,
+            min: 0,
+            max: 100,
+            top: (idx * 100) / nLines + 5 + '%',
+            height: 100 / nLines - 10 + '%',
+            axisLabel: {
+                interval: 10
+            }
+        });
+        const seriesData = [];
+        for (const [name, value] of Object.entries(d.percentile)) {
+            seriesData.push([value, name]);
+        }
+        series.push({
+            singleAxisIndex: idx,
+            coordinateSystem: 'singleAxis',
+            type: 'scatter',
+            data: seriesData,
+            symbolSize: 30,
+        });
+    })
+    const option = {
+        tooltip: {
+            position: 'top',
+            formatter: function (params) {
+                return `<b>${params.value[1]}</b>: ${params.value[0]}`;
+            }
+        },
+        title: title,
+        singleAxis: singleAxis,
+        series: series
+    };
+    console.log(option);
+    chart.setOption(option);
+    return chart;
+}
+
 function drawEmptyAssetChangeLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
@@ -1414,6 +1468,7 @@ export {
     drawRelevanceScatterGraph,
     drawKLineGraph,
     drawMarketPriceLineGraph,
+    drawPercentileGraph,
 
     drawEmptyAssetChangeLineGraph,
     drawEmptyAssetDeltaChangeBarGraph,
