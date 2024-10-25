@@ -5,7 +5,6 @@ from rich.console import Console
 from rich.live import Live
 from rich.table import Table
 from rich.layout import Layout
-from rich.prompt import Prompt
 import keyboard
 
 
@@ -43,10 +42,11 @@ def set_frontend_version(version) -> None:
 
 def set_git_tag(frontend_version, backend_version) -> None:
     subprocess.run(['git', 'tag', f'v{frontend_version}-{backend_version}'])
+    subprocess.run(['git', 'push', 'origin', f'v{frontend_version}-{backend_version}'])
 
-def git_commit(info) -> None:
+def git_commit() -> None:
     subprocess.run(['git', 'add', '.'])
-    subprocess.run(['git', 'commit', '-m', info])
+    subprocess.run(['git', 'commit', '--amend', '--no-edit'])
 
 
 class Selection:
@@ -112,8 +112,6 @@ def select_version(which: str, version: str, suppress: bool) -> str:
 
 if __name__ == "__main__":
 
-    info = Prompt.ask("[cyan]Please enter the commit message[/]")
-
     backend_version = get_backend_version()
     backend_version = select_version('backend', backend_version, suppress=False)
     set_backend_version(backend_version)
@@ -122,5 +120,5 @@ if __name__ == "__main__":
     frontend_version = select_version('frontend', frontend_version, suppress=True)
     set_frontend_version(frontend_version)
 
-    git_commit(info)
+    git_commit()
     set_git_tag(frontend_version, backend_version)
