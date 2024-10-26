@@ -31,32 +31,38 @@ export default {
   data () {
     return {
       graph: null,
-      percentileData: [],
+      percentileData: PERCENTILE_PERIOD_WINDOW.map(item => ({
+        period: item.period,
+        window: item.window,
+        percentile: {}
+      })),
 
-      prepareEmptyData: () => {
-        return PERCENTILE_PERIOD_WINDOW.map(item => ({
-          period: item.period,
-          window: item.window,
-          percentile: {}
-        }));
-      },
-      prepareData: async () => {
+      prepareData: async (pw) => {
         const data = await getPricePercentileRequest({
-          'period_window': PERCENTILE_PERIOD_WINDOW,
+          'period_window': pw,
           'data': FOLLOWED_DATA.filter(item => !item.skipPercentile)
         });
-        this.percentileData = data.data;
+        for (const item of data.data) {
+          const index = this.percentileData.findIndex(p => p.period === item.period && p.window === item.window);
+          this.percentileData[index].percentile = item.percentile;
+        }
         console.log(this.percentileData);
       },
       initPercentileGraph: () => {
         this.graph = initGraph('percentile-chart');
       },
       drawEmptyPercentileGraph: () => {
-        drawPercentileGraph(this.graph, this.prepareEmptyData());
+        drawPercentileGraph(this.graph, this.percentileData);
         this.graph.showLoading();
       },
       drawPercentileGraph: async () => {
         drawPercentileGraph(this.graph, this.percentileData);
+      },
+      draw: async () => {
+        for (const periodWindow of PERCENTILE_PERIOD_WINDOW) {
+          await this.prepareData([periodWindow]);
+          await this.drawPercentileGraph();
+        }
         this.graph.hideLoading();
       }
     }
@@ -64,8 +70,7 @@ export default {
   async mounted () {
     this.initPercentileGraph();
     this.drawEmptyPercentileGraph();
-    await this.prepareData();
-    await this.drawPercentileGraph();
+    await this.draw();
   },
   components: {
     VersionFooter
