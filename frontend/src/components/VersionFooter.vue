@@ -1,7 +1,10 @@
 <template>
-  <span style="font-size: var(--el-font-size-extra-small);">
-    Backend: v{{ backendVersion }} | Frontend: v{{ frontendVersion }}
-  </span>
+  <div style="margin-bottom: 30px;">
+    <el-divider style="width: 20%; margin-left: 40%; margin-bottom: 10px;" />
+    <span style="font-size: var(--el-font-size-extra-small);">
+      Backend: v{{ backendVersion }} | Frontend: v{{ frontendVersion }}
+    </span>
+  </div>
 </template>
 
 <script>
