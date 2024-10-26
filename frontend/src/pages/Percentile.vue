@@ -31,92 +31,15 @@ export default {
   data () {
     return {
       graph: null,
-
-      moke: [
-        {
-          'period': 'daily',
-          'window': 1,
-          'percentile': {
-            'A': 10,
-            'B': 20,
-            'C': 30,
-          }
-        },
-        {
-          'period': 'daily',
-          'window': 3,
-          'percentile': {
-            'A': 20,
-            'B': 30,
-            'C': 40,
-          }
-        },
-        {
-          'period': 'daily',
-          'window': -1,
-          'percentile': {
-            'A': 20,
-            'B': 30,
-            'C': 40,
-          }
-        },
-        {
-          'period': 'weekly',
-          'window': 1,
-          'percentile': {
-            'A': 10,
-            'B': 20,
-            'C': 30,
-          }
-        },
-        {
-          'period': 'weekly',
-          'window': 3,
-          'percentile': {
-            'A': 20,
-            'B': 30,
-            'C': 40,
-          }
-        },
-        {
-          'period': 'weekly',
-          'window': -1,
-          'percentile': {
-            'A': 20,
-            'B': 30,
-            'C': 40,
-          }
-        },
-        {
-          'period': 'monthly',
-          'window': 1,
-          'percentile': {
-            'A': 10,
-            'B': 20,
-            'C': 30,
-          }
-        },
-        {
-          'period': 'monthly',
-          'window': 3,
-          'percentile': {
-            'A': 20,
-            'B': 30,
-            'C': 40,
-          }
-        },
-        {
-          'period': 'monthly',
-          'window': -1,
-          'percentile': {
-            'A': 20,
-            'B': 30,
-            'C': 40,
-          }
-        },
-      ],
       percentileData: [],
 
+      prepareEmptyData: () => {
+        return PERCENTILE_PERIOD_WINDOW.map(item => ({
+          period: item.period,
+          window: item.window,
+          percentile: {}
+        }));
+      },
       prepareData: async () => {
         const data = await getPricePercentileRequest({
           'period_window': PERCENTILE_PERIOD_WINDOW,
@@ -129,7 +52,7 @@ export default {
         this.graph = initGraph('percentile-chart');
       },
       drawEmptyPercentileGraph: () => {
-        drawPercentileGraph(this.graph, []);
+        drawPercentileGraph(this.graph, this.prepareEmptyData());
         this.graph.showLoading();
       },
       drawPercentileGraph: async () => {
