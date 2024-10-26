@@ -1,4 +1,5 @@
 import os
+import asyncio
 from datetime import datetime, timedelta
 import functools
 import time
@@ -90,3 +91,12 @@ def get_one_quarter_before(year, quarter):
         return year, quarter - 1
     else:
         return year - 1, 4
+
+
+def run_async_task(func, *args):
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    loop.create_task(func(*args))

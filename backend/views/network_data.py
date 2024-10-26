@@ -91,3 +91,10 @@ async def get_market_data(data: api_model.GetMarketData, db: AsyncSession = Depe
 @timeit
 async def get_latest_currency_rate(data: api_model.LatestCurrencyRateData, db: AsyncSession = Depends(get_db)):
     return {'rate': await operation.get_latest_currency_rate(db, data.symbol)}
+
+
+@router.post('/price-percentile')
+@log_request
+@timeit
+async def get_price_percentile(data: api_model.PercentileRequestData, db: AsyncSession = Depends(get_db)):
+    return {'data': await operation.get_percentile(db, data)}

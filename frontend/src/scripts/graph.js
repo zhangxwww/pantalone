@@ -1326,7 +1326,7 @@ function drawPercentileGraph (chart, data) {
         tooltip: {
             position: 'top',
             formatter: function (params) {
-                return `<b>${params.value[1]}</b>: ${params.value[0]}`;
+                return `<b>${params.value[1]}</b>: ${params.value[0].toFixed(2)}`;
             }
         },
         title: title,

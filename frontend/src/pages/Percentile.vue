@@ -23,6 +23,8 @@
 <script>
 import VersionFooter from '../components/VersionFooter.vue';
 import { initGraph, drawPercentileGraph } from '../scripts/graph';
+import { getPricePercentileRequest } from '../scripts/requests';
+import { FOLLOWED_DATA, PERCENTILE_PERIOD_WINDOW } from '../scripts/constant';
 
 export default {
   name: 'Percentile',
@@ -113,7 +115,16 @@ export default {
           }
         },
       ],
+      percentileData: [],
 
+      prepareData: async () => {
+        const data = await getPricePercentileRequest({
+          'period_window': PERCENTILE_PERIOD_WINDOW,
+          'data': FOLLOWED_DATA.filter(item => !item.skipPercentile)
+        });
+        this.percentileData = data.data;
+        console.log(this.percentileData);
+      },
       initPercentileGraph: () => {
         this.graph = initGraph('percentile-chart');
       },
@@ -122,7 +133,7 @@ export default {
         this.graph.showLoading();
       },
       drawPercentileGraph: async () => {
-        drawPercentileGraph(this.graph, this.moke);
+        drawPercentileGraph(this.graph, this.percentileData);
         this.graph.hideLoading();
       }
     }
@@ -130,6 +141,7 @@ export default {
   async mounted () {
     this.initPercentileGraph();
     this.drawEmptyPercentileGraph();
+    await this.prepareData();
     await this.drawPercentileGraph();
   },
   components: {

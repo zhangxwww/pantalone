@@ -109,3 +109,33 @@ class GetMarketData(BaseModel):
         'LPR', 'USD', 'EUR', 'JPY', 'GBP', 'HKD', 'THB',
         'leverage-CN', 'unemployment-rate-CN'
     ]
+
+
+class _KLinePercentileContentData(BaseModel):
+    name: str
+    code: str
+    market: str
+
+
+class _MarketPercentileContentData(BaseModel):
+    name: str
+    code: str
+    instrument: str
+
+
+class _PercentileData(BaseModel):
+    isKLine: bool
+    content: list[_KLinePercentileContentData | _MarketPercentileContentData]
+
+    class Config:
+        extra = 'ignore'
+
+
+class _PercentilePeriodWindowData(BaseModel):
+    period: Literal['daily', 'weekly', 'monthly']
+    window: int
+
+
+class PercentileRequestData(BaseModel):
+    period_window: list[_PercentilePeriodWindowData]
+    data: list[_PercentileData]

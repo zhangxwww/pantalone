@@ -218,7 +218,7 @@ const FOLLOWED_DATA = [
     {
         category: '利率',
         isKLine: false,
-        skipPercentile: false,
+        skipPercentile: true,
         content: [
             {
                 name: 'LPR品种',
@@ -289,6 +289,45 @@ const FOLLOWED_DATA = [
     }
 ]
 
+const PERCENTILE_PERIOD_WINDOW = [
+    {
+        'period': 'daily',
+        'window': 1
+    },
+    {
+        'period': 'daily',
+        'window': 3
+    },
+    {
+        'period': 'daily',
+        'window': -1
+    },
+    {
+        'period': 'weekly',
+        'window': 1
+    },
+    {
+        'period': 'weekly',
+        'window': 5
+    },
+    {
+        'period': 'weekly',
+        'window': -1
+    },
+    {
+        'period': 'monthly',
+        'window': 3
+    },
+    {
+        'period': 'monthly',
+        'window': 10
+    },
+    {
+        'period': 'monthly',
+        'window': -1
+    }
+]
+
 const PERCENTILE_CHART_TRANSLATION = {
     'daily': '当日',
     'weekly': '当周',
@@ -297,5 +336,6 @@ const PERCENTILE_CHART_TRANSLATION = {
 
 export {
     FOLLOWED_DATA,
+    PERCENTILE_PERIOD_WINDOW,
     PERCENTILE_CHART_TRANSLATION
 }

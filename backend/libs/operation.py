@@ -4,19 +4,22 @@ import base64
 from datetime import datetime, timedelta
 from joblib import Parallel, delayed
 import itertools
+from collections import defaultdict
 
 from loguru import logger
 
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler
 from sklearn.manifold import TSNE
 from sklearn.metrics.pairwise import pairwise_distances
 
+import api_model
 import libs.spider as spider
 import sql_app.schemas as schemas
 import sql_app.crud as crud
 from libs.indicator import list_dict_to_dataframe, dataframe_to_list_dict, boll
-from libs.utils import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
+from libs.utils import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date, run_async_task
 from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START
 
 
@@ -667,5 +670,73 @@ async def get_market_data(db, instrument):
         for r in r_code:
             if r['price'] is not None and math.isnan(r['price']):
                 r['price'] = None
+
+    return res
+
+
+async def get_percentile(db, query: api_model.PercentileRequestData):
+
+    def _resample(daily_df, period):
+        df = daily_df.copy()
+        if period == 'daily':
+            return df
+        df['date'] = pd.to_datetime(df['date'])
+        df = df.set_index('date')
+        sample = 'W' if period == 'weekly' else 'ME'
+        agg_df = df.resample(sample).agg({
+            'value': 'last'
+        }).dropna()
+        agg_df = agg_df.reset_index()
+        agg_df['date'] = agg_df['date'].dt.date
+        return agg_df
+
+    def _cut_by_window(df, window):
+        if window == -1:
+            return df.copy()
+        current_data = pd.Timestamp.now()
+        start_date = current_data - pd.DateOffset(year=window)
+        filtered = df[df['date'] >= start_date.date()]
+        return filtered
+
+    def _percentile(df):
+        last_value = df['value'].iloc[-1]
+        percentile = (df['value'] < last_value).sum() / df.shape[0] * 100
+        return percentile
+
+    async def _load_data(db, item, is_kline, p):
+        if is_kline:
+            logger.debug(f'Get kline data: {item.code} {item.market} {p}')
+            d = await crud.get_kline_data(db, item.code, p, item.market)
+            d = [{'date': dd.date, 'value': dd.close} for dd in d]
+        else:
+            logger.debug(f'Get market data: {item.code} {item.instrument} {p}')
+            d = await crud.get_market_data(db, INSTRUMENT_CODES[item.instrument][0])
+            d = [{'date': dd.date, 'value': dd.price} for dd in d]
+        return d
+
+    def _calculate_pct(name, is_kline, p, w, d):
+        logger.debug(f'Calculate pct of {name} {p} {w}')
+        df = pd.DataFrame(d)
+        if not is_kline:
+            df = _resample(df, p)
+        df = _cut_by_window(df, w)
+        pct = _percentile(df)
+        return pct
+
+    data = query.data
+    period_window = query.period_window
+
+    res = []
+    for pw in period_window:
+        p, w = pw.period, pw.window
+
+        r = {'period': p, 'window': w, 'percentile': {}}
+        for cat in data:
+            is_kline = cat.isKLine
+            for item in cat.content:
+                d = await _load_data(db, item, is_kline, p)
+                pct = _calculate_pct(item.name, is_kline, p, w, d)
+                r['percentile'][item.name] = pct
+        res.append(r)
 
     return res

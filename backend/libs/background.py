@@ -1,18 +1,10 @@
-import asyncio
 from typing import Callable, List
 from datetime import datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from libs.utils import trans_str_date_to_next_n_trade_date, trans_date_to_str
+from libs.utils import trans_str_date_to_next_n_trade_date, trans_date_to_str, run_async_task
 
-def run_async_task(func, *args):
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-    loop.create_task(func(*args))
 
 async def async_add_data_after_n_days_to_db(func: Callable, db: AsyncSession, dates: List[str], n: int):
     dates = [trans_str_date_to_next_n_trade_date(date, n) for date in dates]

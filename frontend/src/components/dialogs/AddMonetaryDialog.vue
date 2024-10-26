@@ -65,7 +65,7 @@
 import { Search, Loading, Check } from '@element-plus/icons-vue';
 import { isNumberValidator } from '@/scripts/validator.js'
 import { timeFormat } from '@/scripts/formatter';
-import { getLatestCurrencyRate } from '@/scripts/requests';
+import { getLatestCurrencyRateRequest } from '../../scripts/requests';
 
 export default {
     name: "AddMonetaryDialog",
@@ -131,7 +131,7 @@ export default {
 
             onSearchClick: async () => {
                 this.currentSymbolState = this.SearchSymbolState.SEARCHING;
-                const resp = await getLatestCurrencyRate(this.form.currency);
+                const resp = await getLatestCurrencyRateRequest(this.form.currency);
                 this.form.currencyRate = resp.rate;
                 this.currentSymbolState = this.SearchSymbolState.FOUND;
             },

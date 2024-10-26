@@ -46,8 +46,13 @@ async function getMarketDataRequest (instrument) {
     return res.data;
 }
 
-async function getLatestCurrencyRate (symbol) {
+async function getLatestCurrencyRateRequest (symbol) {
     const res = await axios.post('/api/latest-currency-rate', { 'symbol': symbol });
+    return res.data;
+}
+
+async function getPricePercentileRequest (data) {
+    const res = await axios.post('/api/price-percentile', data);
     return res.data;
 }
 
@@ -129,6 +134,7 @@ export {
     getKLineDataRequest,
     getGitUpdatedRequest,
     getMarketDataRequest,
-    getLatestCurrencyRate,
-    getBackendVersionRequest
+    getLatestCurrencyRateRequest,
+    getBackendVersionRequest,
+    getPricePercentileRequest
 }
