@@ -105,10 +105,7 @@ class GetKLineData(BaseModel):
 
 
 class GetMarketData(BaseModel):
-    instrument: Literal[
-        'LPR', 'USD', 'EUR', 'JPY', 'GBP', 'HKD', 'THB',
-        'leverage-CN', 'unemployment-rate-CN'
-    ]
+    instrument: str
 
 
 class _KLinePercentileContentData(BaseModel):

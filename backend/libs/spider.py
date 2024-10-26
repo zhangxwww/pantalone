@@ -255,6 +255,130 @@ def get_market_data(instrument, start_date, end_date):
             merged = pd.merge(merged, df, on='date', how='outer')
         df = merged.sort_values('date')
         need_clip = True
+    elif instrument == 'AFRE-CN':
+        df = ak.macro_china_shrzgm()
+        df['date'] = df['月份'].apply(lambda x: f'{x[:4]}-{x[4:6]}-01')
+        df['date'] = pd.to_datetime(df['date']).dt.date
+        df = df.rename(columns={
+            '其中-人民币贷款': '人民币贷款',
+            '其中-委托贷款外币贷款': '委托贷款外币贷款',
+            '其中-委托贷款': '委托贷款',
+            '其中-信托贷款': '信托贷款',
+            '其中-未贴现银行承兑汇票': '未贴现银行承兑汇票',
+            '其中-企业债券': '企业债券',
+            '其中-非金融企业境内股票融资': '非金融企业境内股票融资',
+        })
+        extract_columns = {
+            '社会融资规模增量': 'aggregate_financing_to_the_real_economy',
+            '人民币贷款': 'renminbi_loan',
+            '委托贷款外币贷款': 'entrusted_foreign_currency_loan',
+            '委托贷款': 'entrusted_loan',
+            '信托贷款': 'trust_loan',
+            '未贴现银行承兑汇票': 'undiscounted_bank_acceptance_bill',
+            '企业债券': 'corporate_bonds',
+            '非金融企业境内股票融资': 'domestic_stock_financing_for_non_financial_enterprises',
+        }
+        need_clip = True
+    elif instrument == 'GDP-CN':
+        df = ak.macro_china_gdp_yearly()
+        df['date'] = pd.to_datetime(df['日期']).dt.date
+        extract_columns = {
+            '今值': 'gdp_cn_current',
+            '预测值': 'gdp_cn_predict',
+            '前值': 'gdp_cn_previous'
+        }
+        need_clip = True
+    elif instrument == 'CPI-yearly-CN':
+        df = ak.macro_china_cpi_yearly()
+        df['date'] = pd.to_datetime(df['日期']).dt.date
+        extract_columns = {
+            '今值': 'cpi_yearly_cn_current',
+            '预测值': 'cpi_yearly_cn_predict',
+            '前值': 'cpi_yearly_cn_previous'
+        }
+        need_clip = True
+    elif instrument == 'CPI-monthly-CN':
+        df = ak.macro_china_cpi_monthly()
+        df['date'] = pd.to_datetime(df['日期']).dt.date
+        extract_columns = {
+            '今值': 'cpi_monthly_cn_current',
+            '预测值': 'cpi_monthly_cn_predict',
+            '前值': 'cpi_monthly_cn_previous'
+        }
+        need_clip = True
+    elif instrument == 'PPI-CN':
+        df = ak.macro_china_ppi_yearly()
+        df['date'] = pd.to_datetime(df['日期']).dt.date
+        extract_columns = {
+            '今值': 'ppi_cn_current',
+            '预测值': 'ppi_cn_predict',
+            '前值': 'ppi_cn_previous'
+        }
+        need_clip = True
+    elif instrument == 'EXP-CN':
+        df = ak.macro_china_exports_yoy()
+        df['date'] = pd.to_datetime(df['日期']).dt.date
+        extract_columns = {
+            '今值': 'exp_cn_current',
+            '预测值': 'exp_cn_predict',
+            '前值': 'exp_cn_previous'
+        }
+        need_clip = True
+    elif instrument == 'IMP-CN':
+        df = ak.macro_china_imports_yoy()
+        df['date'] = pd.to_datetime(df['日期']).dt.date
+        extract_columns = {
+            '今值': 'imp_cn_current',
+            '预测值': 'imp_cn_predict',
+            '前值': 'imp_cn_previous'
+
+        }
+        need_clip = True
+    elif instrument == 'industrial-production-yoy-CN':
+        df = ak.macro_china_industrial_production_yoy()
+        df['date'] = pd.to_datetime(df['日期']).dt.date
+        extract_columns = {
+            '今值': 'ipy_cn_current',
+            '预测值': 'ipy_cn_predict',
+            '前值': 'ipy_cn_previous'
+        }
+        need_clip = True
+    elif instrument == 'PMI-CN':
+        df = ak.macro_china_pmi_yearly()
+        df['date'] = pd.to_datetime(df['日期']).dt.date
+        extract_columns = {
+            '今值': 'pmi_cn_current',
+            '预测值': 'pmi_cn_predict',
+            '前值': 'pmi_cn_previous'
+        }
+        need_clip = True
+    elif instrument == 'non-man-PMI-CN':
+        df = ak.macro_china_non_man_pmi()
+        df['date'] = pd.to_datetime(df['日期']).dt.date
+        extract_columns = {
+            '今值': 'nPMI_cn_current',
+            '预测值': 'nPMI_cn_predict',
+            '前值': 'nPMI_cn_previous'
+        }
+        need_clip = True
+    elif instrument == 'fx-CN':
+        df = ak.macro_china_fx_reserves_yearly()
+        df['date'] = pd.to_datetime(df['日期']).dt.date
+        extract_columns = {
+            '今值': 'fx_cn_current',
+            '预测值': 'fx_cn_predict',
+            '前值': 'fx_cn_previous'
+        }
+        need_clip = True
+    elif instrument == 'M2-CN':
+        df = ak.macro_china_m2_yearly()
+        df['date'] = pd.to_datetime(df['日期']).dt.date
+        extract_columns = {
+            '今值': 'm2_cn_current',
+            '预测值': 'm2_cn_predict',
+            '前值': 'm2_cn_previous'
+        }
+        need_clip = True
     else:
         raise NotImplementedError
 
@@ -267,10 +391,9 @@ def get_market_data(instrument, start_date, end_date):
         for k, v in extract_columns.items():
             r[v] = getattr(row, k)
         res.append(r)
-
     return res
 
 
 
 if __name__ == '__main__':
-    print(get_market_data('unemployment-rate-CN', '20210101', '20220110'))
+    print(get_market_data('AFRE-CN', '20210101', '20220110'))

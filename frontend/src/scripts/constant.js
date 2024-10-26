@@ -278,7 +278,67 @@ const FOLLOWED_DATA = [
                 name: '失业率',
                 code: '',
                 instrument: 'unemployment-rate-CN'
-            }
+            },
+            {
+                name: '社融增量',
+                code: '',
+                instrument: 'AFRE-CN'
+            },
+            {
+                name: 'GDP年率',
+                code: '',
+                instrument: 'GDP-CN'
+            },
+            {
+                name: 'CPI年率',
+                code: '',
+                instrument: 'CPI-yearly-CN'
+            },
+            {
+                name: 'CPI月率',
+                code: '',
+                instrument: 'CPI-monthly-CN'
+            },
+            {
+                name: 'PPI年率',
+                code: '',
+                instrument: 'PPI-CN'
+            },
+            {
+                name: '以美元计算出口年率',
+                code: '',
+                instrument: 'EXP-CN'
+            },
+            {
+                name: '以美元计算进口年率',
+                code: '',
+                instrument: 'IMP-CN'
+            },
+            {
+                name: '规模以上工业增加值年率',
+                code: '',
+                instrument: 'industrial-production-yoy-CN'
+            },
+            {
+                name: '官方制造业PMI',
+                code: '',
+                instrument: 'PMI-CN'
+            },
+            {
+                name: '中国官方非制造业PMI',
+                code: '',
+                instrument: 'non-man-PMI-CN'
+            },
+            {
+                name: '外汇储备（亿美元）',
+                code: '',
+                instrument: 'fx-CN'
+            },
+            {
+                name: 'M2货币供应年率',
+                code: '',
+                instrument: 'M2-CN'
+            },
         ]
     },
     {
