@@ -17,7 +17,7 @@ import { CanvasRenderer } from "echarts/renderers";
 import { LabelLayout, UniversalTransition } from "echarts/features";
 
 import { timeFormat } from "@/scripts/formatter";
-import { PERCENTILE_CHART_TRANSLATION } from "./constant";
+import { PERCENTILE_CHART_TRANSLATION, FOLLOWED_DATA_NAME_2_CATEGORY, PERCENTILE_CHART_CATEGORY_COLOR } from "./constant";
 
 echarts.use([
     TitleComponent,
@@ -1312,14 +1312,21 @@ function drawPercentileGraph (chart, data) {
         });
         const seriesData = [];
         for (const [name, value] of Object.entries(d.percentile)) {
-            seriesData.push([value, name]);
+            const category = FOLLOWED_DATA_NAME_2_CATEGORY[name];
+            const color = PERCENTILE_CHART_CATEGORY_COLOR[category];
+            seriesData.push({
+                value: [value, name],
+                itemStyle: {
+                    color: color
+                }
+            });
         }
         series.push({
             singleAxisIndex: idx,
             coordinateSystem: 'singleAxis',
             type: 'scatter',
             data: seriesData,
-            symbolSize: 30,
+            symbolSize: 15,
         });
     })
     const option = {
@@ -1333,7 +1340,6 @@ function drawPercentileGraph (chart, data) {
         singleAxis: singleAxis,
         series: series
     };
-    console.log(option);
     chart.setOption(option);
     return chart;
 }

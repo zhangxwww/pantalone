@@ -287,7 +287,23 @@ const FOLLOWED_DATA = [
         skipPercentile: true,
         content: []
     }
-]
+];
+
+const DEFUALT_COLOR = ['#50c48f', '#26ccd8', '#3685fe', '#9977ef', '#f5616f', '#f7b13f', '#f9e264', '#f47a75', '#009db2', '#024b51', '#0780cf', '#765005'];
+
+const FOLLOWED_DATA_NAME_2_CATEGORY = {};
+const PERCENTILE_CHART_CATEGORY_COLOR = {};
+const _CATEGORIES = [];
+for (const data of FOLLOWED_DATA) {
+    const category = data.category;
+    _CATEGORIES.push(category);
+    for (const content of data.content) {
+        FOLLOWED_DATA_NAME_2_CATEGORY[content.name] = category;
+    }
+    const catIndex = _CATEGORIES.findIndex((cat) => cat === category);
+    PERCENTILE_CHART_CATEGORY_COLOR[category] = DEFUALT_COLOR[catIndex];
+}
+
 
 const PERCENTILE_PERIOD_WINDOW = [
     {
@@ -326,16 +342,18 @@ const PERCENTILE_PERIOD_WINDOW = [
         'period': 'monthly',
         'window': -1
     }
-]
+];
 
 const PERCENTILE_CHART_TRANSLATION = {
     'daily': '当日',
     'weekly': '当周',
     'monthly': '当月',
-}
+};
 
 export {
     FOLLOWED_DATA,
+    FOLLOWED_DATA_NAME_2_CATEGORY,
     PERCENTILE_PERIOD_WINDOW,
-    PERCENTILE_CHART_TRANSLATION
-}
+    PERCENTILE_CHART_TRANSLATION,
+    PERCENTILE_CHART_CATEGORY_COLOR
+};
