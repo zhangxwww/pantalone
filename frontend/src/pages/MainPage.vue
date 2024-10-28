@@ -141,6 +141,8 @@
             <add-fixed-dialog ref="addFixedDialog" @add="onAddData"></add-fixed-dialog>
 
             <add-fund-dialog ref="addFundDialog" @add="onAddData"></add-fund-dialog>
+
+            <side-chat :page="'首页'" />
         </el-main>
         <el-footer>
             <version-footer />
@@ -183,6 +185,7 @@ import AddFixedDialog from '@/components/dialogs/AddFixedDialog.vue'
 import AddFundDialog from '@/components/dialogs/AddFundDialog.vue'
 import TabTable from '@/components/TabTable.vue'
 import VersionFooter from '../components/VersionFooter.vue'
+import SideChat from '../components/SideChat.vue'
 
 
 export default {
@@ -488,7 +491,8 @@ export default {
         AddFixedDialog,
         AddFundDialog,
         TabTable,
-        VersionFooter
+        VersionFooter,
+        SideChat
     },
 
     async mounted () {
