@@ -19,7 +19,7 @@ import libs.spider as spider
 import sql_app.schemas as schemas
 import sql_app.crud as crud
 from libs.indicator import list_dict_to_dataframe, dataframe_to_list_dict, boll
-from libs.utils import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date, run_async_task
+from libs.utils.date_transform import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
 from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START
 
 

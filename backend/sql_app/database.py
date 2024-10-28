@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from libs.utils import get_db_path
+from libs.utils.path import get_db_path
 
 
 SQLALCHEMY_DATABASE_URL = f"sqlite+aiosqlite:///{get_db_path()}"

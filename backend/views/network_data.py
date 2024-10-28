@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from libs.utils import timeit, log_request, log_response
+from libs.utils.decorator import timeit, log_request, log_response
 import api_model
 import libs.operation as operation
 from db import get_db

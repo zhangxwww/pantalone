@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from libs.utils import timeit, log_request
+from libs.utils.decorator import timeit, log_request
 import api_model
 import libs.operation as operation
 from db import get_db

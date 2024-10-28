@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from libs.utils import timeit, log_response
+from libs.utils.decorator import timeit, log_response
 from __version__ import __version__
 
 

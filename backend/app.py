@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 from sql_app import models
 from sql_app.database import engine
-from libs.utils import get_log_file_path
+from libs.utils.path import get_log_file_path
 
 from views.statistic import router as statistic_router
 from views.local_data import router as local_data_router
@@ -66,4 +66,4 @@ app.mount('/', staticfiles.StaticFiles(directory='../frontend/dist/', html=True)
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run('app:app', host='localhost', port=9876, reload=True)
+    uvicorn.run('app:app', host='localhost', port=9876, reload=False)

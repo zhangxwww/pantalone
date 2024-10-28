@@ -3,7 +3,8 @@ from datetime import datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from libs.utils import trans_str_date_to_next_n_trade_date, trans_date_to_str, run_async_task
+from libs.utils.date_transform import trans_str_date_to_next_n_trade_date, trans_date_to_str
+from libs.utils.asyncio import run_async_task
 
 
 async def async_add_data_after_n_days_to_db(func: Callable, db: AsyncSession, dates: List[str], n: int):
