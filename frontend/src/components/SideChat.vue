@@ -24,7 +24,11 @@
                   </el-avatar>
                 </td>
                 <td style="text-align: left;">
-                  <div :style="`background-color: ${chat.role === 'ai' ? '#f3f4f6' : '#d2e3fd'};`" class="dialog">
+                  <div v-if="chat.role === 'ai'" style="background-color: #f3f4f6;" class="dialog">
+                    <!-- <v-md-preview :text="chat.content"></v-md-preview> -->
+                    <v-md-editor v-model="chat.content" mode="preview" />
+                  </div>
+                  <div v-else style="background-color: #d2e3fd;" class="dialog">
                     {{ chat.content }}
                   </div>
                 </td>
@@ -86,8 +90,11 @@ export default {
           await chatStreamRequest({
             'messages': this.chats,
             'page': this.page
-          }, (response) => {
-            this.chats[this.chats.length - 1].content += response;
+          }, (chunk) => {
+            if (chunk.length > 1 && chunk.endsWith('\n')) {
+              chunk = chunk.slice(0, -1);
+            }
+            this.chats[this.chats.length - 1].content += chunk;
             this.scrollToBottom();
           }, () => {
             this.streaming = false;
@@ -118,5 +125,31 @@ export default {
   border-top-left-radius: 0px;
   padding: 8px;
   width: fit-content;
+}
+</style>
+
+<style>
+.vuepress-markdown-body:not(.custom) {
+  padding: 5px 5px;
+  background-color: #f3f4f6;
+}
+
+.vuepress-markdown-body {
+  max-width: 350px;
+}
+
+.el-drawer__header {
+  align-items: center;
+  color: #72767b;
+  display: flex;
+  margin-bottom: 15px;
+  padding: var(--el-drawer-padding-primary);
+  padding-bottom: 0;
+}
+
+.el-drawer__body {
+  flex: 1;
+  overflow: auto;
+  padding: 0px;
 }
 </style>
