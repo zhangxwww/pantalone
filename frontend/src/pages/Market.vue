@@ -3,14 +3,14 @@
     <el-header>
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item>行情看板</el-breadcrumb-item>
+        <el-breadcrumb-item>{{ page }}</el-breadcrumb-item>
       </el-breadcrumb>
     </el-header>
 
     <el-main>
       <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
         <el-col :span="6" :offset="9">
-          <span style="font-size: var(--el-font-size-large); font-weight: bold">行情看板</span>
+          <span style="font-size: var(--el-font-size-large); font-weight: bold">{{ page }}</span>
         </el-col>
       </el-row>
       <el-row justify="center">
@@ -40,6 +40,7 @@
           </el-row>
         </el-tab-pane>
       </el-tabs>
+      <side-chat :page="page" />
     </el-main>
     <el-footer>
       <VersionFooter />
@@ -49,6 +50,7 @@
 
 <script>
 import VersionFooter from '../components/VersionFooter.vue';
+import SideChat from '../components/SideChat.vue';
 import {
   initGraph,
   drawKLineGraph,
@@ -64,6 +66,7 @@ import { FOLLOWED_DATA } from '../scripts/constant';
 export default {
   data () {
     return {
+      page: '行情看板',
       period: 'daily',
       indicator: {
         value: '',
@@ -233,7 +236,8 @@ export default {
     },
   },
   components: {
-    VersionFooter
+    VersionFooter,
+    SideChat
   }
 };
 

@@ -3,7 +3,7 @@
     <el-header>
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item>基金持仓明细</el-breadcrumb-item>
+        <el-breadcrumb-item>{{ page }}</el-breadcrumb-item>
       </el-breadcrumb>
     </el-header>
     <el-main>
@@ -20,7 +20,7 @@
       </el-row>
       <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
         <el-col :span="6" :offset="9">
-          <span style="font-size: var(--el-font-size-large); font-weight: bold">基金持仓明细</span>
+          <span style="font-size: var(--el-font-size-large); font-weight: bold">{{ page }}</span>
         </el-col>
         <el-col :span="3" :offset="4">
           <el-input v-model="searchFundCode" placeholder="请输入基金代码" @keyup.enter="searchFund" />
@@ -72,6 +72,7 @@
       </el-row>
       <el-skeleton v-else :rows="5" animated
         style="width: 70%; margin-left: 15%; margin-bottom: 15px; margin-top: 30px; text-align: left;" />
+      <side-chat :page="page" />
     </el-main>
     <el-footer>
       <version-footer />
@@ -82,6 +83,7 @@
 <script>
 import { Search } from '@element-plus/icons-vue';
 import VersionFooter from '../components/VersionFooter.vue';
+import SideChat from '../components/SideChat.vue';
 import {
   getFundHoldingDataRequest,
   getFundNameRequest,
@@ -97,6 +99,7 @@ export default {
   name: 'FundPosition',
   data () {
     return {
+      page: '基金持仓明细',
       holdingData: [],
       holdingFunds: [],
       notHoldingFunds: [],
@@ -250,7 +253,8 @@ export default {
   },
   components: {
     Search,
-    VersionFooter
+    VersionFooter,
+    SideChat
   }
 }
 </script>
