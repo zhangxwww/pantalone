@@ -38,6 +38,7 @@ Open `http://localhost:9876/` in browser.
 - major
   - embedding for relevant holdings
   - holding relationship [https://echarts.apache.org/examples/zh/editor.html?c=graph-label-overlap]()
+  - chat with context (pandasai)
 - minor
   - cache with expiration
   - market data
@@ -47,3 +48,4 @@ Open `http://localhost:9876/` in browser.
   - push news summary
   - charts panel, select data and draw
     - correlation, linear regression
+  - whoosh for news search, rag
