@@ -117,6 +117,35 @@ async function getBackendVersionRequest () {
     return res.data;
 }
 
+async function chatStreamRequest (body, onMessage, onEnd) {
+    const response = await fetch('/api/ai/chat/stream', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'text/event-stream'
+        },
+        body: JSON.stringify(body)
+    });
+    if (!response.ok) {
+        console.error('Failed to connect to the chat server');
+        console.error(response);
+        return;
+    }
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        onMessage(chunk);
+
+    }
+    onEnd();
+}
+
 
 export {
     getChinaBondYieldDataRequest,
@@ -136,5 +165,6 @@ export {
     getMarketDataRequest,
     getLatestCurrencyRateRequest,
     getBackendVersionRequest,
-    getPricePercentileRequest
+    getPricePercentileRequest,
+    chatStreamRequest
 }

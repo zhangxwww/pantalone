@@ -15,16 +15,15 @@ def print_set_version(version, which) -> None:
     Console().print(f"[cyan]Set {which} version to[/] [b green]{version}[/]")
 
 def get_backend_version() -> str:
-    with open('backend/__version__.py', 'r') as f:
-        lines = f.readline().strip()
-    version = lines.split('=')[1].strip().strip('\'')
+    with open('backend/VERSION', 'r') as f:
+        version = f.read().strip()
     print_current_version(version, 'backend')
     return version
 
 def set_backend_version(version) -> None:
     print_set_version(version, 'backend')
-    line = f"__version__ = '{version}'\n"
-    with open('backend/__version__.py', 'w') as f:
+    line = f"{version}"
+    with open('backend/VERSION', 'w') as f:
         f.write(line)
 
 def get_frontend_version() -> str:

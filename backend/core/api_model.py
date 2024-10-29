@@ -136,3 +136,8 @@ class _PercentilePeriodWindowData(BaseModel):
 class PercentileRequestData(BaseModel):
     period_window: list[_PercentilePeriodWindowData]
     data: list[_PercentileData]
+
+
+class ChatMessageRequestData(BaseModel):
+    messages: list[dict[str, str]]
+    page: str

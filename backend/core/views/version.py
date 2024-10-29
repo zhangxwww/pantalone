@@ -1,7 +1,7 @@
+import os
 from fastapi import APIRouter
 
 from libs.utils.decorator import timeit, log_response
-from __version__ import __version__
 
 
 router = APIRouter(tags=['version'])
@@ -11,4 +11,6 @@ router = APIRouter(tags=['version'])
 @log_response
 @timeit
 async def get_version():
-    return {'version': __version__}
+    with open(os.path.join(os.path.dirname(__file__), '../../VERSION'), 'r') as f:
+        v = f.read().strip()
+    return {'version': v}
