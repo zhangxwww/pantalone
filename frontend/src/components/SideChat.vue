@@ -25,7 +25,6 @@
                 </td>
                 <td style="text-align: left;">
                   <div v-if="chat.role === 'ai'" style="background-color: #f3f4f6;" class="dialog">
-                    <!-- <v-md-preview :text="chat.content"></v-md-preview> -->
                     <v-md-editor v-model="chat.content" mode="preview" />
                   </div>
                   <div v-else style="background-color: #d2e3fd;" class="dialog">
@@ -38,8 +37,9 @@
         </el-scrollbar>
       </template>
       <template #footer>
-        <el-input v-model="query" @keyup.enter="sendMessage" :disabled="streaming"
-          style="max-width: 100%; margin-top: 5px; margin-bottom: 5px;" placeholder="Press enter to send" />
+        <el-input v-model="query" @keyup.enter="sendMessage"
+          style="max-width: 100%; margin-top: 5px; margin-bottom: 5px;" placeholder="Press enter to send">
+        </el-input>
       </template>
     </el-drawer>
   </div>
@@ -63,7 +63,7 @@ export default {
 
       scrollToBottom: () => {
         this.$nextTick(() => {
-          this.$refs.scrollbarRef.setScrollTop(10000);
+          this.$refs.scrollbarRef.setScrollTop(100000);
         });
       },
 
