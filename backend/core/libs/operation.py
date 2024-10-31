@@ -740,3 +740,84 @@ async def get_percentile(db, query: api_model.PercentileRequestData):
         res.append(r)
 
     return res
+
+
+async def get_stock_bond_info(db, stocks, bonds):
+    stock_info = []
+    stock_found = set()
+    for stock in stocks:
+        data = await crud.get_stock_info_data(db, stock)
+        if data:
+            stock_info.append({
+                'code': data.code,
+                'abbreviation': data.abbreviation,
+                'name': data.name,
+                'industry': data.industry,
+                'market': data.market
+            })
+            stock_found.add(stock)
+
+    bond_info = []
+    bond_found = set()
+    for bond in bonds:
+        data = await crud.get_bond_info_data(db, bond)
+        if data:
+            bond_info.append({
+                'code': data.code,
+                'abbreviation': data.abbreviation,
+                'name': data.name,
+                'type': data.type,
+                'level': data.level
+            })
+            bond_found.add(bond)
+
+    def _crawl_stock(stock):
+        try:
+            data = spider.get_stock_info(stock)
+        except TypeError:
+            return stock, None
+        return stock, {
+            'code': stock,
+            'abbreviation': data['股票简称'] or '',
+            'name': data['公司名称'] or '',
+            'industry': data['所属行业'] or '',
+            'market': data['所在市场'] or ''
+        }
+
+    def _crawl_bond(bond):
+        try:
+            data = spider.get_bond_info(bond)
+        except TypeError:
+            return bond, None
+        return bond, {
+            'code': bond,
+            'abbreviation': data['债券简称'] or '',
+            'name': data['债券名称'] or '',
+            'type': data['债券类型'] or '',
+            'level': data['信用等级'] or ''
+        }
+
+    stock_not_found = set(stocks) - stock_found
+    bond_not_found = set(bonds) - bond_found
+
+    spider_stock_info = Parallel(n_jobs=-1)(delayed(_crawl_stock)(stock) for stock in stock_not_found)
+    spider_bond_info = Parallel(n_jobs=-1)(delayed(_crawl_bond)(bond) for bond in bond_not_found)
+
+    for code, s in spider_stock_info:
+        if s:
+            stock_info.append(s)
+        else:
+            logger.warning(f'Not found stock: {code}')
+    for code, b in spider_bond_info:
+        if b:
+            bond_info.append(b)
+        else:
+            logger.warning(f'Not found bond: {code}')
+
+    await crud.create_stock_info_data_from_list(db, stock_info)
+    await crud.create_bond_info_data_from_list(db, bond_info)
+
+    return {
+        'stock': stock_info,
+        'bond': bond_info
+    }

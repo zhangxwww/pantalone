@@ -443,7 +443,6 @@ def _get_a_stock_info(code):
     json = response.json()
     data = json['result']['data'][0]
     return {
-        '股票代码': data['SECURITY_CODE'],
         '股票简称': data['SECURITY_NAME_ABBR'],
         '公司名称': data['ORG_NAME'],
         '所在市场': 'A股',

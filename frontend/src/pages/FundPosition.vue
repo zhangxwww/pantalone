@@ -8,14 +8,8 @@
     </el-header>
     <el-main>
       <el-row justify="center">
-        <el-col :span="7">
-          <div id="relevance-stock" style="width: 100%; height: 300px"></div>
-        </el-col>
-        <el-col :span="7">
-          <div id="relevance-bond" style="width: 100%; height: 300px"></div>
-        </el-col>
-        <el-col :span="7">
-          <div id="relevance-all" style="width: 100%; height: 300px"></div>
+        <el-col :span="20">
+          <div id="relation-graph" style="width: 100%; height: 800px"></div>
         </el-col>
       </el-row>
       <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
@@ -87,13 +81,13 @@ import SideChat from '../components/SideChat.vue';
 import {
   getFundHoldingDataRequest,
   getFundNameRequest,
-  getFundHoldingRelevanceDataRequest
+  getStockBondInfoRequest
 } from '../scripts/requests';
 import {
   initGraph,
-  drawRelevanceScatterGraph,
-  drawEmptyRelevanceScatterGraph
+  drawRelationGraph,
 } from '../scripts/graph';
+import { RelationGraphBuilder } from '../scripts/graphBuilder';
 
 export default {
   name: 'FundPosition',
@@ -129,11 +123,12 @@ export default {
       if (this.searchFundCode === '') {
         return;
       }
-      this.drawEmptyRelevanceChart();
       this.notHoldingFunds.push(this.searchFundCode);
       this.searchFundCode = '';
+      this.relationGraph.showLoading();
+      // eslint-disable-next-line no-unused-vars
       const [holding, state] = await this.updateHoldings([...this.holdingFunds, ...this.notHoldingFunds]);
-      await this.drawRelevanceChart(holding, state);
+      await this.drawRelationGraph(holding);
     },
 
     async updateHoldings (symbols) {
@@ -199,9 +194,7 @@ export default {
     },
 
     initGraph () {
-      this.relStockGraph = initGraph('relevance-stock');
-      this.relBondGraph = initGraph('relevance-bond');
-      this.relAllGraph = initGraph('relevance-all');
+      this.relationGraph = initGraph('relation-graph')
     },
 
     setAllGraphLoading () {
@@ -216,40 +209,57 @@ export default {
       this.relBondGraph.hideLoading();
     },
 
-    async drawRelevanceChart (holding, state) {
-      const data = await getFundHoldingRelevanceDataRequest(holding);
-      console.log(data);
-      const relevance = data.relevance;
-      const promise = relevance.order.map(async code => await this.getFundName(code));
-      relevance.name = await Promise.all(promise);
 
-      drawRelevanceScatterGraph(this.relStockGraph, relevance, state, '股票持仓', 'stockPos');
-      drawRelevanceScatterGraph(this.relBondGraph, relevance, state, '债券持仓', 'bondPos');
-      drawRelevanceScatterGraph(this.relAllGraph, relevance, state, '全部持仓', 'allPos');
-      this.setAllGraphUnloading();
-    },
+    async drawRelationGraph (holding) {
+      let stocks = [];
+      let bonds = [];
 
-    drawEmptyRelevanceChart () {
-      drawEmptyRelevanceScatterGraph(this.relStockGraph, '股票持仓', 'stockPos');
-      drawEmptyRelevanceScatterGraph(this.relBondGraph, '债券持仓', 'bondPos');
-      drawEmptyRelevanceScatterGraph(this.relAllGraph, '全部持仓', 'allPos');
-      this.setAllGraphLoading();
-    },
+      const fundHolding = [];
+      for (const [fund, h] of Object.entries(holding)) {
+        stocks.push(...h.stock.map(hh => hh.code));
+        bonds.push(...h.bond.map(hh => hh.code));
+        fundHolding.push({
+          'fundCode': fund,
+          'stocks': h.stock.map(hh => hh.code),
+          'bonds': h.bond.map(hh => hh.code)
+        });
+      }
+      stocks = [...new Set(stocks)];
+      bonds = [...new Set(bonds)];
 
+      console.log(stocks);
+      console.log(bonds);
+      console.log(fundHolding);
+
+      const resp = await getStockBondInfoRequest(stocks, bonds);
+      const stockBondInfo = resp.data;
+      console.log(stockBondInfo);
+
+      const fundName = {};
+      for (const f of this.holdingData) {
+        fundName[f.fundCode] = f.fundName;
+      }
+      console.log(fundName);
+
+      const graph = new RelationGraphBuilder(fundName, holding, stockBondInfo).build();
+      console.log(graph);
+
+      drawRelationGraph(this.relationGraph, graph);
+      this.relationGraph.hideLoading();
+    }
 
   },
   async mounted () {
     console.log(this.$route.query.symbols);
     this.holdingFunds.push(...this.$route.query.symbols);
     this.initGraph();
-    this.drawEmptyRelevanceChart();
+    this.relationGraph.showLoading();
+    // eslint-disable-next-line no-unused-vars
     const [holding, state] = await this.updateHoldings(this.holdingFunds);
-    await this.drawRelevanceChart(holding, state);
+    await this.drawRelationGraph(holding);
   },
   unmounted () {
-    this.relStockGraph.dispose();
-    this.relBondGraph.dispose();
-    this.relAllGraph.dispose();
+    this.relationGraph.dispose();
   },
   components: {
     Search,

@@ -138,6 +138,11 @@ class PercentileRequestData(BaseModel):
     data: list[_PercentileData]
 
 
+class GetStockBondInfoRequestData(BaseModel):
+    stocks: list[str]
+    bonds: list[str]
+
+
 class ChatMessageRequestData(BaseModel):
     messages: list[dict[str, str]]
     page: str

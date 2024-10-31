@@ -176,3 +176,25 @@ class MarketData(Base):
     code = Column(String)
     date = Column(Date)
     price = Column(Float)
+
+
+class StockInfoData(Base):
+    __tablename__ = 'stock_info_data'
+
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String)
+    abbreviation = Column(String)
+    name = Column(String)
+    industry = Column(String)
+    market = Column(String)
+
+
+class BondInfoData(Base):
+    __tablename__ = 'bond_info_data'
+
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String)
+    abbreviation = Column(String)
+    name = Column(String)
+    type = Column(String)
+    level = Column(String)

@@ -56,6 +56,11 @@ async function getPricePercentileRequest (data) {
     return res.data;
 }
 
+async function getStockBondInfoRequest (stocks, bonds) {
+    const res = await axios.post('/api/stock-bond-info', { 'stocks': stocks, 'bonds': bonds });
+    return res.data;
+}
+
 function uploadRequest (file, callback) {
 
     const reader = new FileReader();
@@ -166,5 +171,6 @@ export {
     getLatestCurrencyRateRequest,
     getBackendVersionRequest,
     getPricePercentileRequest,
-    chatStreamRequest
+    chatStreamRequest,
+    getStockBondInfoRequest
 }

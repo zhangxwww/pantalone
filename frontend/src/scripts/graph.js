@@ -1,5 +1,5 @@
 import * as echarts from "echarts/core";
-import { LineChart, PieChart, ScatterChart, BarChart, CandlestickChart } from "echarts/charts";
+import { LineChart, PieChart, ScatterChart, BarChart, CandlestickChart, GraphChart } from "echarts/charts";
 import {
     TitleComponent,
     TooltipComponent,
@@ -36,6 +36,7 @@ echarts.use([
     ScatterChart,
     BarChart,
     CandlestickChart,
+    GraphChart,
     CanvasRenderer,
     LabelLayout,
     UniversalTransition,
@@ -1396,6 +1397,106 @@ function drawPercentileGraph (chart, data) {
     return chart;
 }
 
+function drawRelationGraph (chart, graph) {
+    console.log(graph);
+    graph.nodes.forEach(node => {
+        const cat = graph.categories[node.category].name;
+        if (cat === '基金') {
+            node.symbolSize = 20;
+        } else if (cat === '股票' || cat === '债券') {
+            node.symbolSize = 12;
+        } else {
+            node.symbolSize = 8;
+        }
+        node.draggable = true;
+    })
+    const option = {
+        title: {
+            text: '基金持仓关联',
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        tooltip: {
+            formatter: param => {
+                const cat = graph.categories[param.data.category].name;
+                let html = '<table><tbody>';
+                if (cat === '股票' || cat === '债券') {
+                    html += `
+                    <tr>
+                        <td align="left">${param.marker}<b>${cat}信息</b></td>
+                    </tr>
+                    <tr>
+                        <td align="left"><b>${cat}名称</b></td>
+                        <td align="right">${param.data.extra.name || '暂无'}</td>
+                    </tr>
+                    <tr>
+                        <td align="left"><b>${cat}简称</b></td>
+                        <td align="right">${param.data.extra.abbr || '暂无'}</td>
+                    </tr>
+                    <tr>
+                        <td align="left"><b>${cat}代码</b></td>
+                        <td align="right">${param.data.extra.code || '暂无'}</td>
+                    </tr>
+                    `;
+                } else {
+                    html += `
+                    <tr>
+                        <td align="left">${param.marker}<b>${cat}</b></td>
+                    </tr>
+                    <tr>
+                        <td align="left">${param.data.name}</td>
+                    </tr>
+                    `;
+                }
+                html += '</tbody></table>';
+
+                return html;
+            }
+        },
+        legend: [
+            {
+                data: graph.categories.map(c => c.name),
+                top: 30
+            }
+        ],
+        series: [
+            {
+                type: 'graph',
+                layout: 'force',
+                data: graph.nodes,
+                links: graph.links,
+                categories: graph.categories,
+                roam: true,
+                label: {
+                    show: true,
+                    position: 'right',
+                    formatter: '{b}'
+                },
+                labelLayout: {
+                    hideOverlap: true
+                },
+                scaleLimit: {
+                    min: 0.4,
+                    max: 2
+                },
+                legendHoverLink: false,
+                focusNodeAdjacency: true,
+                lineStyle: {
+                    color: 'source',
+                    curveness: 0.3
+                },
+                force: {
+                    edgeLength: 120
+                }
+            }
+        ]
+    };
+    chart.setOption(option);
+    return chart;
+}
+
+
 function drawEmptyAssetChangeLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
@@ -1527,6 +1628,7 @@ export {
     drawKLineGraph,
     drawMarketPriceLineGraph,
     drawPercentileGraph,
+    drawRelationGraph,
 
     drawEmptyAssetChangeLineGraph,
     drawEmptyAssetDeltaChangeBarGraph,
