@@ -142,7 +142,18 @@ class Data {
                     const currentRet = (uHis.currentNetValue - latest.currentNetValue + uHis.cumDividendRatio - latest.cumDividendRatio) / (latest.currentNetValue + latest.cumDividendRatio);
                     const currentSpan = (uHis.currentTime - latest.currentTime) / (1000 * 3600 * 24);
 
-                    uHis.annualizedReturnRate = statistic.averageReturn(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan);
+                    // Note: There are two ways to calculate annualized return rate
+                    //       The first one is to calculate the return rate from the first day to the current day by net value
+                    //       The second one is to calculate the mean of the latest return rate and the current return rate
+                    //       The first one represents the return rate of the fund itself, while the second one represents the return rate of the investment
+
+                    // The First Way
+                    // const returnRate = (uHis.currentNetValue + uHis.cumDividendRatio - first.currentNetValue) / first.currentNetValue;
+                    // const totalSpan = (uHis.currentTime - first.currentTime) / (1000 * 3600 * 24);
+                    // uHis.annualizedReturnRate = returnRate / totalSpan * 365;
+
+                    // The Second Way
+                    uHis.annualizedReturnRate = statistic.averageReturn(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan, 'arithmetic');
 
                     uHis.cumInvest = latest.cumInvest + (uHis.currentShares - latest.currentShares) * uHis.currentNetValue;
                     uHis.cumReturn = uHis.currentAmount - uHis.cumInvest + uHis.cumDividend;
