@@ -36,7 +36,6 @@ Open `http://localhost:9876/` in browser.
 ## TODO list
 
 - major
-  - embedding for relevant holdings
   - chat with context (pandasai)
 - minor
   - cache with expiration
