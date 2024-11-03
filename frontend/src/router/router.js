@@ -3,6 +3,7 @@ import MainPage from '../pages/MainPage.vue';
 import FundPosition from '../pages/FundPosition.vue';
 import Market from '../pages/Market.vue';
 import Percentile from '../pages/Percentile.vue';
+import Dashboard from '../pages/Dashboard.vue';
 
 const routes = [
     {
@@ -24,6 +25,11 @@ const routes = [
         path: '/percentile',
         name: 'Percentile',
         component: Percentile
+    },
+    {
+        path: '/dashboard',
+        name: 'Dashboard',
+        component: Dashboard
     }
 ];
 

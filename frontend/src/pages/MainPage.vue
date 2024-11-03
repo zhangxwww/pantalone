@@ -125,6 +125,12 @@
                                         百分位分析
                                     </router-link>
                                 </el-dropdown-item>
+                                <el-dropdown-item>
+                                    <router-link :to="{ path: '/dashboard' }"
+                                        style="text-decoration-line: none; font: inherit">
+                                        指标仪表盘
+                                    </router-link>
+                                </el-dropdown-item>
                             </el-dropdown-menu>
                         </template>
                     </el-dropdown>
