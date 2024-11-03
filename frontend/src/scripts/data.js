@@ -55,6 +55,7 @@ class Data {
                 if (mHis.currency !== 'CNY') {
                     mHis.referenceAmount *= mHis.currencyRate;
                     mHis.beginningReferenceAmount *= mHis.beginningCurrencyRate;
+                    // NOTE:
                     // beginningShares is denominated in foreign currency
                     // currentShares is denominated in local currency
                     mHis.beginningShares *= mHis.beginningCurrencyRate;
@@ -132,9 +133,11 @@ class Data {
                     uHis.cumDividend = 0;
                     uHis.cumReturnRate = 1;
                     uHis.latestReturnRate = 0;
+                    uHis.averageHoldingCost = uHis.currentNetValue;
+                    uHis.cumNetValue = uHis.currentNetValue + uHis.cumDividendRatio;
                 } else {
                     const first = uData.history[0];
-                    const latestSpan = (latest.currentTime - first.currentTime) / (1000 * 3600 * 24);
+                    const firstSpan = (uHis.currentTime - first.currentTime) / (1000 * 3600 * 24);
 
                     uHis.cumDividendRatio = uHis.dividendRatio + latest.cumDividendRatio;
                     uHis.cumDividend = uHis.currentDividend + latest.cumDividend;
@@ -142,18 +145,15 @@ class Data {
                     const currentRet = (uHis.currentNetValue - latest.currentNetValue + uHis.cumDividendRatio - latest.cumDividendRatio) / (latest.currentNetValue + latest.cumDividendRatio);
                     const currentSpan = (uHis.currentTime - latest.currentTime) / (1000 * 3600 * 24);
 
-                    // Note: There are two ways to calculate annualized return rate
-                    //       The first one is to calculate the return rate from the first day to the current day by net value
-                    //       The second one is to calculate the mean of the latest return rate and the current return rate
-                    //       The first one represents the return rate of the fund itself, while the second one represents the return rate of the investment
+                    uHis.cumNetValue = uHis.currentNetValue + uHis.cumDividendRatio;
 
-                    // The First Way
-                    // const returnRate = (uHis.currentNetValue + uHis.cumDividendRatio - first.currentNetValue) / first.currentNetValue;
-                    // const totalSpan = (uHis.currentTime - first.currentTime) / (1000 * 3600 * 24);
-                    // uHis.annualizedReturnRate = returnRate / totalSpan * 365;
+                    if (uHis.currentShares > latest.currentShares) {
+                        uHis.averageHoldingCost = statistic.averageMean(latest.averageHoldingCost, uHis.currentNetValue, latest.currentShares, uHis.currentShares, 'arithmetic');
+                    } else {
+                        uHis.averageHoldingCost = latest.averageHoldingCost;
+                    }
 
-                    // The Second Way
-                    uHis.annualizedReturnRate = statistic.averageMean(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan, 'arithmetic');
+                    uHis.annualizedReturnRate = ((uHis.cumNetValue - uHis.averageHoldingCost) / uHis.averageHoldingCost) / firstSpan * 365;
 
                     uHis.cumInvest = latest.cumInvest + (uHis.currentShares - latest.currentShares) * uHis.currentNetValue;
                     uHis.cumReturn = uHis.currentAmount - uHis.cumInvest + uHis.cumDividend;
