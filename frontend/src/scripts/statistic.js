@@ -48,18 +48,18 @@ function expanding (array, func) {
     return result;
 }
 
-function averageReturn (ret1, ret2, span1, span2, method = 'arithmetic') {
+function averageMean (value1, value2, weight1, weight2, method = 'arithmetic') {
     if (method === 'arithmetic') {
-        return (ret1 * span1 + ret2 * span2) / (span1 + span2);
+        return (value1 * weight1 + value2 * weight2) / (weight1 + weight2);
     } else if (method === 'geometric') {
         return Math.pow(
-            Math.pow(ret1 + 1, span1 / 365) *
-            Math.pow(ret2 + 1, span2 / 365),
-            365 / (span1 + span2))
+            Math.pow(value1 + 1, weight1 / 365) *
+            Math.pow(value2 + 1, weight2 / 365),
+            365 / (weight1 + weight2))
             - 1;
     } else {
         throw new Error(`Invalid method ${method}`);
     }
 }
 
-export default { mean, std, rolling, expanding, nanmean, nanstd, countNotNaN, averageReturn };
+export default { mean, std, rolling, expanding, nanmean, nanstd, countNotNaN, averageMean };

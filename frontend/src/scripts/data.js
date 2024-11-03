@@ -81,7 +81,7 @@ class Data {
                     if (currentSpan < 1) {
                         mHis.annualizedReturnRate = latest.annualizedReturnRate;
                     } else {
-                        mHis.annualizedReturnRate = statistic.averageReturn(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan);
+                        mHis.annualizedReturnRate = statistic.averageMean(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan);
                     }
                     mHis.latestReturnRate = currentRet / currentSpan * 365;
                     mHis.cumReturnRate = latest.cumReturnRate * (currentRet + 1);
@@ -153,7 +153,7 @@ class Data {
                     // uHis.annualizedReturnRate = returnRate / totalSpan * 365;
 
                     // The Second Way
-                    uHis.annualizedReturnRate = statistic.averageReturn(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan, 'arithmetic');
+                    uHis.annualizedReturnRate = statistic.averageMean(latest.annualizedReturnRate, currentRet / currentSpan * 365, latestSpan, currentSpan, 'arithmetic');
 
                     uHis.cumInvest = latest.cumInvest + (uHis.currentShares - latest.currentShares) * uHis.currentNetValue;
                     uHis.cumReturn = uHis.currentAmount - uHis.cumInvest + uHis.cumDividend;
