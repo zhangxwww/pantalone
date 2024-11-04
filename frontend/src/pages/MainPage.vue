@@ -128,7 +128,7 @@
                                 <el-dropdown-item>
                                     <router-link :to="{ path: '/dashboard' }"
                                         style="text-decoration-line: none; font: inherit">
-                                        指标仪表盘
+                                        指标实验室
                                     </router-link>
                                 </el-dropdown-item>
                             </el-dropdown-menu>
