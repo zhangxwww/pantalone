@@ -1,12 +1,16 @@
 import ast
+import builtins
 
 
 class Transformer(ast.NodeTransformer):
     def __init__(self, df_var_name):
         self.used_columns = set()
         self.df_name = df_var_name
+        self.builtins = set(dir(builtins))
 
     def visit_Name(self, node):
+        if node.id in self.builtins:
+            return node
         new_node = ast.Subscript(
             value=ast.Name(id=self.df_name, ctx=ast.Load()),
             slice=ast.Index(value=ast.Constant(node.id)),
