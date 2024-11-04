@@ -42,6 +42,7 @@ Open `http://localhost:9876/` in browser.
   - market data
     - dual y axis for YoY and MoM data
   - select model
+  - re-organize code: controllers, cruds
 - further
   - push news summary
   - charts panel, select data and draw
