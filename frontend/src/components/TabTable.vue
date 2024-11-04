@@ -89,6 +89,12 @@ function sortByFmtPercentile (col) {
     }
 }
 
+function sortByYesOrNo (col) {
+    return (a, b) => {
+        return a[col] === b[col] ? 0 : a[col] === '是' ? -1 : 1;
+    }
+}
+
 export default {
     name: 'TabTable',
     data () {
@@ -186,9 +192,7 @@ export default {
                         label: '快速赎回',
                         width: '105',
                         sortable: true,
-                        sort_method: (a, b) => {
-                            return a === b ? 0 : a ? -1 : 1;
-                        }
+                        sort_method: sortByYesOrNo
                     }
                 ],
                 fixedDeposit: [
