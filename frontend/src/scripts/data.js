@@ -794,7 +794,7 @@ class Data {
 
         const meanReturn = statistic.rolling(excessReturn, period, statistic.nanmean);
         const stdReturn = statistic.rolling(excessReturn, period, statistic.nanstd);
-        const sharpeRatio = meanReturn.map((m, i) => m / stdReturn[i]);
+        const sharpeRatio = meanReturn.map((m, i) => stdReturn[i] !== 0 ? m / stdReturn[i] : NaN);
         const n = statistic.rolling(excessReturn, period, statistic.countNotNaN);
 
         console.log(excessReturn);
