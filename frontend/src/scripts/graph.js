@@ -42,11 +42,11 @@ echarts.use([
     UniversalTransition,
 ]);
 
-function initGraph (domId) {
+export function initGraph (domId) {
     return echarts.init(document.getElementById(domId));
 }
 
-function drawAssetChangeLineGraph (chart, data) {
+export function drawAssetChangeLineGraph (chart, data) {
     console.log(data);
     const option = {
         title: {
@@ -141,7 +141,7 @@ function drawAssetChangeLineGraph (chart, data) {
     return chart;
 }
 
-function drawAssetDeltaChangeBarGraph (chart, data) {
+export function drawAssetDeltaChangeBarGraph (chart, data) {
     console.log(data);
     const option = {
         title: {
@@ -228,7 +228,7 @@ function drawAssetDeltaChangeBarGraph (chart, data) {
     return chart;
 }
 
-function drawPieGraph (chart, data, title) {
+export function drawPieGraph (chart, data, title) {
     console.log(data);
     const option = {
         title: {
@@ -238,7 +238,7 @@ function drawPieGraph (chart, data, title) {
             textAlign: "center"
         },
         tooltip: {
-            formatter: function (params) {
+            formatter: (params) => {
                 return `
                 <table>
                     <tbody>
@@ -275,15 +275,15 @@ function drawPieGraph (chart, data, title) {
     return chart;
 }
 
-function drawResidualMaturityPieGraph (chart, data) {
+export function drawResidualMaturityPieGraph (chart, data) {
     return drawPieGraph(chart, data, "剩余期限");
 }
 
-function drawExpectedReturnPieGraph (chart, data) {
+export function drawExpectedReturnPieGraph (chart, data) {
     return drawPieGraph(chart, data, "预期收益");
 }
 
-function drawLiquidityReturnPositionScatterGraph (chart, data) {
+export function drawLiquidityReturnPositionScatterGraph (chart, data) {
     console.log(data);
     let amount = [];
     if (data.amount.length === 1) {
@@ -320,7 +320,7 @@ function drawLiquidityReturnPositionScatterGraph (chart, data) {
             }
         },
         tooltip: {
-            formatter: function (params) {
+            formatter: (params) => {
                 return `
                 <table>
                     <tbody>
@@ -365,7 +365,7 @@ function drawLiquidityReturnPositionScatterGraph (chart, data) {
     return chart;
 }
 
-function drawAverageReturnLineGraph (chart, data) {
+export function drawAverageReturnLineGraph (chart, data) {
     console.log(data);
     const option = {
         title: {
@@ -448,7 +448,7 @@ function drawAverageReturnLineGraph (chart, data) {
     return chart;
 }
 
-function drawCumulativeReturnLineGraph (chart, data) {
+export function drawCumulativeReturnLineGraph (chart, data) {
     console.log(data);
     const option = {
         title: {
@@ -531,7 +531,7 @@ function drawCumulativeReturnLineGraph (chart, data) {
     return chart;
 }
 
-function drawDrawdownLineGraph (chart, data) {
+export function drawDrawdownLineGraph (chart, data) {
     console.log(data);
     const option = {
         title: {
@@ -602,7 +602,7 @@ function drawDrawdownLineGraph (chart, data) {
     return chart;
 }
 
-function drawRiskIndicatorLineGraph (chart, data) {
+export function drawRiskIndicatorLineGraph (chart, data) {
     console.log(data);
 
     const help = {
@@ -708,7 +708,7 @@ function drawRiskIndicatorLineGraph (chart, data) {
     return chart;
 }
 
-function drawRelevanceScatterGraph (chart, data, states, title, key) {
+export function drawRelevanceScatterGraph (chart, data, states, title, key) {
     console.log(data);
 
     const mergeDistance = 0.001;
@@ -782,7 +782,7 @@ function drawRelevanceScatterGraph (chart, data, states, title, key) {
             axisLabel: { show: false }
         },
         tooltip: {
-            formatter: function (params) {
+            formatter: (params) => {
                 return `
                 <table>
                     <tbody>
@@ -821,7 +821,7 @@ function drawRelevanceScatterGraph (chart, data, states, title, key) {
     return chart;
 }
 
-function drawKLineGraph (chart, data, title, period, indicator) {
+export function drawKLineGraph (chart, data, title, period, indicator) {
     console.log(title, period, indicator);
     const dates = data.map(d => d.date);
     const oclhv = data.map(d => [d.open, d.close, d.low, d.high, d.volume]);
@@ -859,7 +859,7 @@ function drawKLineGraph (chart, data, title, period, indicator) {
                 fontSize: 12,
                 color: '#333'
             },
-            position: function (pos, params, el, elRect, size) {
+            position: (pos, params, el, elRect, size) => {
                 const obj = {
                     top: 60
                 };
@@ -937,7 +937,7 @@ function drawKLineGraph (chart, data, title, period, indicator) {
                 data: dates,
                 boundaryGap: false,
                 axisLabel: {
-                    formatter: function (value) {
+                    formatter: (value) => {
                         return echarts.time.format(value, '{MM}-{dd}');
                     }
                 },
@@ -1085,7 +1085,7 @@ function drawKLineGraph (chart, data, title, period, indicator) {
     return chart;
 }
 
-function drawMarketPriceLineGraph (chart, data, title) {
+export function drawMarketPriceLineGraph (chart, data, title) {
     console.log(data);
 
     const translation = {
@@ -1239,7 +1239,7 @@ function drawMarketPriceLineGraph (chart, data, title) {
                 fontSize: 12,
                 color: '#333'
             },
-            position: function (pos, params, el, elRect, size) {
+            position: (pos, params, el, elRect, size) => {
                 const obj = {
                     top: 60
                 };
@@ -1300,7 +1300,7 @@ function drawMarketPriceLineGraph (chart, data, title) {
             data: dates,
             boundaryGap: false,
             axisLabel: {
-                formatter: function (value) {
+                formatter: (value) => {
                     return echarts.time.format(value, '{MM}-{dd}');
                 }
             },
@@ -1338,7 +1338,7 @@ function drawMarketPriceLineGraph (chart, data, title) {
     return chart;
 }
 
-function drawPercentileGraph (chart, data) {
+export function drawPercentileGraph (chart, data) {
     const title = [];
     const singleAxis = [];
     const series = [];
@@ -1379,13 +1379,14 @@ function drawPercentileGraph (chart, data) {
             coordinateSystem: 'singleAxis',
             type: 'scatter',
             data: seriesData,
-            symbolSize: 15,
+            symbol: 'rect',
+            symbolSize: [3, 15],
         });
     })
     const option = {
         tooltip: {
             position: 'top',
-            formatter: function (params) {
+            formatter: (params) => {
                 return `<b>${params.value[1]}</b>: ${params.value[0].toFixed(2)}`;
             }
         },
@@ -1394,10 +1395,35 @@ function drawPercentileGraph (chart, data) {
         series: series
     };
     chart.setOption(option);
+
+    chart.on('mouseover', function (params) {
+        if (params.seriesIndex !== undefined && params.dataIndex !== undefined) {
+            option.series.forEach((_, seriesIndex) => {
+                chart.dispatchAction({
+                    type: 'highlight',
+                    seriesIndex: seriesIndex,
+                    dataIndex: params.dataIndex
+                });
+            });
+        }
+    });
+
+    chart.on('mouseout', function (params) {
+        if (params.seriesIndex !== undefined && params.dataIndex !== undefined) {
+            option.series.forEach((_, seriesIndex) => {
+                chart.dispatchAction({
+                    type: 'downplay',
+                    seriesIndex: seriesIndex,
+                    dataIndex: params.dataIndex
+                });
+            });
+        }
+    });
+
     return chart;
 }
 
-function drawRelationGraph (chart, graph) {
+export function drawRelationGraph (chart, graph) {
     console.log(graph);
     graph.nodes.forEach(node => {
         const cat = graph.categories[node.category].name;
@@ -1419,39 +1445,43 @@ function drawRelationGraph (chart, graph) {
         },
         tooltip: {
             formatter: param => {
-                const cat = graph.categories[param.data.category].name;
-                let html = '<table><tbody>';
-                if (cat === '股票' || cat === '债券') {
-                    html += `
-                    <tr>
-                        <td align="left">${param.marker}<b>${cat}信息</b></td>
-                    </tr>
-                    <tr>
-                        <td align="left"><b>${cat}名称</b></td>
-                        <td align="right">${param.data.extra.name || '暂无'}</td>
-                    </tr>
-                    <tr>
-                        <td align="left"><b>${cat}简称</b></td>
-                        <td align="right">${param.data.extra.abbr || '暂无'}</td>
-                    </tr>
-                    <tr>
-                        <td align="left"><b>${cat}代码</b></td>
-                        <td align="right">${param.data.extra.code || '暂无'}</td>
-                    </tr>
-                    `;
-                } else {
-                    html += `
-                    <tr>
-                        <td align="left">${param.marker}<b>${cat}</b></td>
-                    </tr>
-                    <tr>
-                        <td align="left">${param.data.name}</td>
-                    </tr>
-                    `;
-                }
-                html += '</tbody></table>';
+                if (param.dataType === 'node') {
+                    const cat = graph.categories[param.data.category].name;
+                    let html = '<table><tbody>';
+                    if (cat === '股票' || cat === '债券') {
+                        html += `
+                        <tr>
+                            <td align="left">${param.marker}<b>${cat}信息</b></td>
+                        </tr>
+                        <tr>
+                            <td align="left"><b>${cat}名称</b></td>
+                            <td align="right">${param.data.extra.name || '暂无'}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><b>${cat}简称</b></td>
+                            <td align="right">${param.data.extra.abbr || '暂无'}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><b>${cat}代码</b></td>
+                            <td align="right">${param.data.extra.code || '暂无'}</td>
+                        </tr>
+                        `;
+                    } else {
+                        html += `
+                        <tr>
+                            <td align="left">${param.marker}<b>${cat}</b></td>
+                        </tr>
+                        <tr>
+                            <td align="left">${param.data.name}</td>
+                        </tr>
+                        `;
+                    }
+                    html += '</tbody></table>';
 
-                return html;
+                    return html;
+                } else {  // edge
+                    return '';
+                }
             }
         },
         legend: [
@@ -1497,7 +1527,7 @@ function drawRelationGraph (chart, graph) {
 }
 
 
-function drawEmptyAssetChangeLineGraph (chart, dates) {
+export function drawEmptyAssetChangeLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         cashData: Array(dates.length).fill(Number.NaN),
@@ -1508,7 +1538,7 @@ function drawEmptyAssetChangeLineGraph (chart, dates) {
     return drawAssetChangeLineGraph(chart, data);
 }
 
-function drawEmptyAssetDeltaChangeBarGraph (chart, dates) {
+export function drawEmptyAssetDeltaChangeBarGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         cashDeltaData: Array(dates.length).fill(Number.NaN),
@@ -1520,7 +1550,7 @@ function drawEmptyAssetDeltaChangeBarGraph (chart, dates) {
     return drawAssetDeltaChangeBarGraph(chart, data);
 }
 
-function drawEmptyResidualMaturityPieGraph (chart) {
+export function drawEmptyResidualMaturityPieGraph (chart) {
     const data = [
         { value: 0, name: "T+0" },
         { value: 0, name: "T+1" },
@@ -1534,7 +1564,7 @@ function drawEmptyResidualMaturityPieGraph (chart) {
     return drawResidualMaturityPieGraph(chart, data);
 }
 
-function drawEmptyExpectedReturnPieGraph (chart) {
+export function drawEmptyExpectedReturnPieGraph (chart) {
     const data = [
         { value: 0, name: "<1%" },
         { value: 0, name: "1%-2%" },
@@ -1545,7 +1575,7 @@ function drawEmptyExpectedReturnPieGraph (chart) {
     return drawExpectedReturnPieGraph(chart, data);
 }
 
-function drawEmptyLiquidityReturnPositionScatterGraph (chart) {
+export function drawEmptyLiquidityReturnPositionScatterGraph (chart) {
     const data = {
         data: [],
         amount: [],
@@ -1554,7 +1584,7 @@ function drawEmptyLiquidityReturnPositionScatterGraph (chart) {
     return drawLiquidityReturnPositionScatterGraph(chart, data);
 }
 
-function drawEmptyAverageReturnLineGraph (chart, dates) {
+export function drawEmptyAverageReturnLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         data: {
@@ -1567,7 +1597,7 @@ function drawEmptyAverageReturnLineGraph (chart, dates) {
     return drawAverageReturnLineGraph(chart, data);
 }
 
-function drawEmptyCumulativeReturnLineGraph (chart, dates) {
+export function drawEmptyCumulativeReturnLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         cumReturn: {
@@ -1580,7 +1610,7 @@ function drawEmptyCumulativeReturnLineGraph (chart, dates) {
     return drawCumulativeReturnLineGraph(chart, data);
 }
 
-function drawEmptyDrawdownLineGraph (chart, dates) {
+export function drawEmptyDrawdownLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         drawdownGeometric: Array(dates.length).fill(Number.NaN),
@@ -1589,7 +1619,7 @@ function drawEmptyDrawdownLineGraph (chart, dates) {
     return drawDrawdownLineGraph(chart, data);
 }
 
-function drawEmptyRiskIndicatorLineGraph (chart, dates) {
+export function drawEmptyRiskIndicatorLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
         sharpeRatio: Array(dates.length).fill(Number.NaN),
@@ -1598,7 +1628,7 @@ function drawEmptyRiskIndicatorLineGraph (chart, dates) {
     return drawRiskIndicatorLineGraph(chart, data);
 }
 
-function drawEmptyRelevanceScatterGraph (chart, title, key) {
+export function drawEmptyRelevanceScatterGraph (chart, title, key) {
     const data = {
         name: []
     };
@@ -1607,38 +1637,7 @@ function drawEmptyRelevanceScatterGraph (chart, title, key) {
     return drawRelevanceScatterGraph(chart, data, state, title, key);
 }
 
-function drawEmptyMarketPriceLineGraph (chart, title) {
+export function drawEmptyMarketPriceLineGraph (chart, title) {
     const data = {};
     return drawMarketPriceLineGraph(chart, data, title);
-}
-
-export {
-    initGraph,
-
-    drawAssetChangeLineGraph,
-    drawAssetDeltaChangeBarGraph,
-    drawResidualMaturityPieGraph,
-    drawExpectedReturnPieGraph,
-    drawLiquidityReturnPositionScatterGraph,
-    drawAverageReturnLineGraph,
-    drawCumulativeReturnLineGraph,
-    drawDrawdownLineGraph,
-    drawRiskIndicatorLineGraph,
-    drawRelevanceScatterGraph,
-    drawKLineGraph,
-    drawMarketPriceLineGraph,
-    drawPercentileGraph,
-    drawRelationGraph,
-
-    drawEmptyAssetChangeLineGraph,
-    drawEmptyAssetDeltaChangeBarGraph,
-    drawEmptyResidualMaturityPieGraph,
-    drawEmptyExpectedReturnPieGraph,
-    drawEmptyLiquidityReturnPositionScatterGraph,
-    drawEmptyAverageReturnLineGraph,
-    drawEmptyCumulativeReturnLineGraph,
-    drawEmptyDrawdownLineGraph,
-    drawEmptyRiskIndicatorLineGraph,
-    drawEmptyRelevanceScatterGraph,
-    drawEmptyMarketPriceLineGraph
 }

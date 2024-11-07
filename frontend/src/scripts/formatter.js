@@ -1,4 +1,4 @@
-function timeFormat (t, short = false) {
+export function timeFormat (t, short = false) {
     let year = t.getFullYear();
     let month = t.getMonth() + 1;
     let day = t.getDate();
@@ -10,5 +10,3 @@ function timeFormat (t, short = false) {
     }
     return formatted;
 }
-
-export { timeFormat };

@@ -1,67 +1,67 @@
 import axios from 'axios';
 
-async function getChinaBondYieldDataRequest (dates) {
+export async function getChinaBondYieldDataRequest (dates) {
     const res = await axios.post('/api/CN1YR', { 'dates': dates });
     return res.data;
 }
 
-async function getLPRDataRequest (dates) {
+export async function getLPRDataRequest (dates) {
     const res = await axios.post('/api/lpr', { 'dates': dates })
     return res.data;
 }
 
-async function getIndexCloseRequest (dates) {
+export async function getIndexCloseRequest (dates) {
     const res = await axios.post('/api/index-close', { 'dates': dates });
     return res.data;
 }
 
-async function getFundNameRequest (symbol) {
+export async function getFundNameRequest (symbol) {
     const res = await axios.post('/api/fund-name', { 'symbol': symbol });
     return res.data;
 }
 
-async function getRefreshedFundNetValueRequest (symbols) {
+export async function getRefreshedFundNetValueRequest (symbols) {
     const res = await axios.post('/api/refresh', { 'symbols': symbols });
     return res.data;
 }
 
-async function getFundHoldingDataRequest (symbols) {
+export async function getFundHoldingDataRequest (symbols) {
     const res = await axios.post('/api/holding', { 'symbols': symbols });
     return res.data;
 }
 
-async function getFundHoldingRelevanceDataRequest (holding) {
+export async function getFundHoldingRelevanceDataRequest (holding) {
     const res = await axios.post('/api/relevance', { 'holding': holding });
     return res.data;
 }
 
-async function getKLineDataRequest (symbol, period, market) {
+export async function getKLineDataRequest (symbol, period, market) {
     const res = await axios.post('/api/kline',
         { 'code': symbol, 'period': period, 'market': market });
     return res.data;
 }
 
-async function getMarketDataRequest (instrument) {
+export async function getMarketDataRequest (instrument) {
     const res = await axios.post('/api/market', { 'instrument': instrument });
     return res.data;
 }
 
-async function getLatestCurrencyRateRequest (symbol) {
+export async function getLatestCurrencyRateRequest (symbol) {
     const res = await axios.post('/api/latest-currency-rate', { 'symbol': symbol });
     return res.data;
 }
 
-async function getPricePercentileRequest (data) {
+export async function getPricePercentileRequest (data) {
     const res = await axios.post('/api/price-percentile', data);
     return res.data;
 }
 
-async function getStockBondInfoRequest (stocks, bonds) {
+export async function getStockBondInfoRequest (stocks, bonds) {
     const res = await axios.post('/api/stock-bond-info', { 'stocks': stocks, 'bonds': bonds });
     return res.data;
 }
 
-function uploadRequest (file, callback) {
+export function uploadRequest (file, callback) {
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -77,13 +77,13 @@ function uploadRequest (file, callback) {
     reader.readAsDataURL(file.raw);
 }
 
-async function loadDataRequest () {
+export async function loadDataRequest () {
     const res = await axios.get('/api/data');
     return res.data;
 }
 
 
-async function addDataRequest (type, data, id) {
+export async function addDataRequest (type, data, id) {
     await axios.post(`/api/data/${type}`, {
         id: id,
         content: data
@@ -91,7 +91,7 @@ async function addDataRequest (type, data, id) {
 }
 
 
-async function getTIntervalRequest (p, df) {
+export async function getTIntervalRequest (p, df) {
     const res = await axios.get('/api/statistics/t/interval', {
         params: {
             p: p,
@@ -102,7 +102,7 @@ async function getTIntervalRequest (p, df) {
 }
 
 
-async function getNormalIntervalRequest (p) {
+export async function getNormalIntervalRequest (p) {
     const res = await axios.get('/api/statistics/normal/interval', {
         params: {
             p: p
@@ -112,17 +112,17 @@ async function getNormalIntervalRequest (p) {
 }
 
 
-async function getGitUpdatedRequest () {
+export async function getGitUpdatedRequest () {
     const res = await axios.get('/api/git/updated');
     return res.data;
 }
 
-async function getBackendVersionRequest () {
+export async function getBackendVersionRequest () {
     const res = await axios.get('/api/version');
     return res.data;
 }
 
-async function chatStreamRequest (body, onMessage, onEnd) {
+export async function chatStreamRequest (body, onMessage, onEnd) {
     const response = await fetch('/api/ai/chat/stream', {
         method: 'POST',
         headers: {
@@ -149,28 +149,4 @@ async function chatStreamRequest (body, onMessage, onEnd) {
 
     }
     onEnd();
-}
-
-
-export {
-    getChinaBondYieldDataRequest,
-    getLPRDataRequest,
-    getFundNameRequest,
-    uploadRequest,
-    loadDataRequest,
-    addDataRequest,
-    getTIntervalRequest,
-    getNormalIntervalRequest,
-    getIndexCloseRequest,
-    getRefreshedFundNetValueRequest,
-    getFundHoldingDataRequest,
-    getFundHoldingRelevanceDataRequest,
-    getKLineDataRequest,
-    getGitUpdatedRequest,
-    getMarketDataRequest,
-    getLatestCurrencyRateRequest,
-    getBackendVersionRequest,
-    getPricePercentileRequest,
-    chatStreamRequest,
-    getStockBondInfoRequest
 }

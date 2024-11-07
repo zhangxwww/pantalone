@@ -1,4 +1,4 @@
-const FOLLOWED_DATA = [
+export const FOLLOWED_DATA = [
     {
         category: 'A股指数',
         isKLine: true,
@@ -349,10 +349,10 @@ const FOLLOWED_DATA = [
     }
 ];
 
-const DEFUALT_COLOR = ['#50c48f', '#26ccd8', '#3685fe', '#9977ef', '#f5616f', '#f7b13f', '#f9e264', '#f47a75', '#009db2', '#024b51', '#0780cf', '#765005'];
+export const DEFUALT_COLOR = ['#50c48f', '#26ccd8', '#3685fe', '#9977ef', '#f5616f', '#f7b13f', '#f9e264', '#f47a75', '#009db2', '#024b51', '#0780cf', '#765005'];
 
-const FOLLOWED_DATA_NAME_2_CATEGORY = {};
-const PERCENTILE_CHART_CATEGORY_COLOR = {};
+export const FOLLOWED_DATA_NAME_2_CATEGORY = {};
+export const PERCENTILE_CHART_CATEGORY_COLOR = {};
 const _CATEGORIES = [];
 for (const data of FOLLOWED_DATA) {
     const category = data.category;
@@ -365,7 +365,7 @@ for (const data of FOLLOWED_DATA) {
 }
 
 
-const PERCENTILE_PERIOD_WINDOW = [
+export const PERCENTILE_PERIOD_WINDOW = [
     {
         'period': 'daily',
         'window': 1
@@ -404,16 +404,8 @@ const PERCENTILE_PERIOD_WINDOW = [
     }
 ];
 
-const PERCENTILE_CHART_TRANSLATION = {
+export const PERCENTILE_CHART_TRANSLATION = {
     'daily': '当日',
     'weekly': '当周',
     'monthly': '当月',
-};
-
-export {
-    FOLLOWED_DATA,
-    FOLLOWED_DATA_NAME_2_CATEGORY,
-    PERCENTILE_PERIOD_WINDOW,
-    PERCENTILE_CHART_TRANSLATION,
-    PERCENTILE_CHART_CATEGORY_COLOR
 };

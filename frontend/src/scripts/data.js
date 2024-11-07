@@ -17,7 +17,7 @@ function clone (x) {
 }
 
 
-class Data {
+export default class Data {
     async load () {
         this.json = await loadDataRequest();
         this.data = this.prepareData();
@@ -923,5 +923,3 @@ class Data {
         }
     }
 }
-
-export default Data;

@@ -1,4 +1,4 @@
-function isNumberValidator (rule, value, callback) {
+export function isNumberValidator (rule, value, callback) {
     if (!value) {
         callback();
     } else {
@@ -13,7 +13,7 @@ function isNumberValidator (rule, value, callback) {
     }
 }
 
-function isIntegerValidator (rule, value, callback) {
+export function isIntegerValidator (rule, value, callback) {
     if (!value) {
         callback();
     } else {
@@ -25,5 +25,3 @@ function isIntegerValidator (rule, value, callback) {
         }
     }
 }
-
-export { isNumberValidator, isIntegerValidator };

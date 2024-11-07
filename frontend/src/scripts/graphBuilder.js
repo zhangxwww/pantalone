@@ -1,4 +1,4 @@
-class RelationGraphBuilder {
+export class RelationGraphBuilder {
     constructor(fundName, fundHolding, info) {
         this.fundName = fundName;
         this.fundHolding = fundHolding;
@@ -120,5 +120,3 @@ class RelationGraphBuilder {
         };
     }
 }
-
-export { RelationGraphBuilder };
