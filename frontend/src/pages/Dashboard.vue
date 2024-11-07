@@ -159,6 +159,7 @@
 <script>
 import SideChat from '../components/SideChat.vue';
 import VersionFooter from '../components/VersionFooter.vue';
+import { getUCPListRequest } from '../scripts/requests';
 
 const INDICATOR_MENU = [
   {
@@ -394,6 +395,11 @@ export default {
       }
     }
   },
+  mounted: async () => {
+    const data = await getUCPListRequest();
+    console.log(data);
+  },
+
   components: {
     SideChat,
     VersionFooter,

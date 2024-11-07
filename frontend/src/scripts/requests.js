@@ -46,6 +46,11 @@ async function getMarketDataRequest (instrument) {
     return res.data;
 }
 
+async function getUCPListRequest () {
+    const res = await axios.get('/api/ucp-list');
+    return res.data;
+}
+
 async function getLatestCurrencyRateRequest (symbol) {
     const res = await axios.post('/api/latest-currency-rate', { 'symbol': symbol });
     return res.data;
@@ -172,5 +177,6 @@ export {
     getBackendVersionRequest,
     getPricePercentileRequest,
     chatStreamRequest,
-    getStockBondInfoRequest
+    getStockBondInfoRequest,
+    getUCPListRequest
 }

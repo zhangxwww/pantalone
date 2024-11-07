@@ -85,6 +85,13 @@ async def get_market_data(data: api_model.GetMarketData, db: AsyncSession = Depe
     return {'market': await operation.get_market_data(db, data.instrument)}
 
 
+@router.get('/ucp-list')
+@log_response
+@timeit
+async def get_ucp_list(db: AsyncSession = Depends(get_db)):
+    return {'ucp_list': await operation.get_ucp_list(db)}
+
+
 @router.post('/latest-currency-rate')
 @log_request
 @log_response

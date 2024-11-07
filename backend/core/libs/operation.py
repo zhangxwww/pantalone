@@ -19,6 +19,7 @@ import libs.spider as spider
 import sql_app.schemas as schemas
 import sql_app.crud as crud
 from libs.indicator import list_dict_to_dataframe, dataframe_to_list_dict, boll
+from libs.protocol.ucp import UCP
 from libs.utils.date_transform import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
 from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START
 
@@ -672,6 +673,18 @@ async def get_market_data(db, instrument):
                 r['price'] = None
 
     return res
+
+
+async def get_ucp_list(db):
+    unique_market_codes = await crud.get_unique_market_code(db)
+    logger.debug(f'Unique market codes: {unique_market_codes}')
+    unique_market_codes = [UCP('market', code, 'price').ucp for code in unique_market_codes]
+
+    unique_kline_codes = await crud.get_unique_kline_code(db)
+    logger.debug(f'Unique kline codes: {unique_kline_codes}')
+    unique_kline_codes = [UCP('kline', code, 'close').ucp for code in unique_kline_codes]
+
+    return unique_market_codes + unique_kline_codes
 
 
 async def get_percentile(db, query: api_model.PercentileRequestData):
