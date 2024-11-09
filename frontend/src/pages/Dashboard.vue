@@ -22,6 +22,25 @@
                 unlink-panels :shortcuts="dateRangeShortCuts" />
             </el-col>
           </el-row>
+
+          <el-row style="margin-bottom: 10px;">
+            <el-col :span="22">
+              <span>
+                <el-text size="large">时间聚合</el-text>
+              </span>
+            </el-col>
+          </el-row>
+          <el-row style="margin-bottom: 20px;">
+            <el-col :span="22">
+              <el-select v-model="aggregate" placeholder="Select" style="width: 90px">
+                <el-option label="日" value="daily" />
+                <el-option label="周" value="weekly" />
+                <el-option label="月" value="monthly" />
+                <el-option label="年" value="yearly" />
+              </el-select>
+            </el-col>
+          </el-row>
+
           <el-row style="margin-bottom: 10px;">
             <el-col :span="22">
               <span>
@@ -171,6 +190,7 @@ export default {
       page: '指标实验室',
 
       dateRange: '',
+      aggregate: 'daily',
 
       indicators: [],
 
