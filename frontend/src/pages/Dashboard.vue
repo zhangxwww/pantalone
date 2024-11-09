@@ -160,67 +160,9 @@
 import SideChat from '../components/SideChat.vue';
 import VersionFooter from '../components/VersionFooter.vue';
 import { getUCPListRequest } from '../scripts/requests';
+import { parseUCPString } from '../scripts/protocol/ucp';
+import { FOLLOWED_DATA, INSTRUMENT_INDICATOR_TRANSLATION_LONG } from '../scripts/constant';
 
-const INDICATOR_MENU = [
-  {
-    label: '经济指标',
-    value: 'economic',
-    children: [{
-      value: 'chengzhenrenkoushiyelv',
-      label: '城镇人口失业率',
-    }, {
-      value: 'guominshengchanzongzhi',
-      label: '国民生产总值',
-    }]
-  }, {
-    label: '股票指数',
-    value: 'stock',
-    children: [{
-      value: 'hushen300',
-      label: '沪深300（月）',
-    }]
-  }, {
-    label: '黄金价格',
-    value: 'gold',
-    children: [{
-      value: 'huangjin9999',
-      label: '黄金现货Au9999（月）',
-    }]
-  }
-];
-
-const OPERATOR_MENU = [
-  {
-    label: '普通运算符',
-    value: 'operatoins',
-    children: [
-      {
-        label: '+',
-        value: '+',
-      }, {
-        label: '-',
-        value: '-',
-      }, {
-        label: '*',
-        value: '*',
-      }, {
-        label: '/',
-        value: '/',
-      }
-    ]
-  }
-];
-
-const VALUE_2_LABEL = {};
-function v2l (node) {
-  if (node.children) {
-    node.children.forEach(v2l);
-  } else {
-    VALUE_2_LABEL[node.value] = node.label;
-  }
-}
-INDICATOR_MENU.forEach(v2l);
-OPERATOR_MENU.forEach(v2l);
 
 export default {
   name: 'Dashboard',
@@ -229,72 +171,6 @@ export default {
       page: '指标实验室',
 
       dateRange: '',
-      dateRangeShortCuts: [
-        {
-          text: '过去一周',
-          value: () => {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-            return [start, end]
-          },
-        },
-        {
-          text: '过去一个月',
-          value: () => {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-            return [start, end]
-          },
-        },
-        {
-          text: '过去一年',
-          value: () => {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 365)
-            return [start, end]
-          },
-        },
-        {
-          text: '过去三年',
-          value: () => {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 365 * 3)
-            return [start, end]
-          },
-        },
-        {
-          text: '过去十年',
-          value: () => {
-            const end = new Date()
-            const start = new Date()
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 365 * 10)
-            return [start, end]
-          },
-        },
-        {
-          text: '当月至今',
-          value: () => {
-            const end = new Date()
-            const start = new Date()
-            start.setDate(1)
-            return [start, end]
-          },
-        },
-        {
-          text: '今年至今',
-          value: () => {
-            const end = new Date()
-            const start = new Date()
-            start.setMonth(0)
-            start.setDate(1)
-            return [start, end]
-          },
-        },
-      ],
 
       indicators: [],
 
@@ -304,22 +180,42 @@ export default {
       selectedOperatorValue: null,
       addedNumber: null,
 
-      indicatorMenu: INDICATOR_MENU,
-      operatorMenu: OPERATOR_MENU,
+      indicatorMenu: [],
+      operatorMenu: [
+        {
+          label: '普通运算符',
+          value: 'operation',
+          children: [
+            {
+              label: '+',
+              value: 'ucp:operation/plus/plus',
+            }, {
+              label: '-',
+              value: 'ucp:operation/plus/plus',
+            }, {
+              label: '*',
+              value: 'ucp:operation/mul/mul',
+            }, {
+              label: '/',
+              value: 'ucp:operation/div/div',
+            }
+          ]
+        }
+      ],
       filterNodeMethod: (value, data) => data.label.includes(value),
 
-      value2label: VALUE_2_LABEL,
+      value2label: {},
 
       formular: [],
 
       onQuery: () => {
         const queries = [];
         for (const indicator of this.indicators) {
-          let query = ''
+          let query = [];
           for (const item of indicator) {
-            query += item.value;
+            query.push(item.value);
           }
-          queries.push(query);
+          queries.push(query.join(' '));
         }
         console.log(queries);
       },
@@ -392,12 +288,133 @@ export default {
           type: 'number'
         });
         this.addedNumber = null;
-      }
+      },
+
+      dateRangeShortCuts: [
+        {
+          text: '过去一周',
+          value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            return [start, end]
+          },
+        },
+        {
+          text: '过去一个月',
+          value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            return [start, end]
+          },
+        },
+        {
+          text: '过去一年',
+          value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 365)
+            return [start, end]
+          },
+        },
+        {
+          text: '过去三年',
+          value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 365 * 3)
+            return [start, end]
+          },
+        },
+        {
+          text: '过去十年',
+          value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 365 * 10)
+            return [start, end]
+          },
+        },
+        {
+          text: '当月至今',
+          value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setDate(1)
+            return [start, end]
+          },
+        },
+        {
+          text: '今年至今',
+          value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setMonth(0)
+            start.setDate(1)
+            return [start, end]
+          },
+        },
+      ],
     }
   },
-  mounted: async () => {
+  async mounted () {
     const data = await getUCPListRequest();
-    console.log(data);
+    const ucpList = data.ucp_list;
+    console.log(ucpList);
+    const code2ucp = {};
+    for (const ucp of ucpList) {
+      if (!code2ucp[ucp.code]) {
+        code2ucp[ucp.code] = [];
+      }
+      code2ucp[ucp.code].push(ucp.ucp);
+    }
+    for (const cat of FOLLOWED_DATA) {
+      const children = [];
+      for (const content of cat.content) {
+        const key = cat.isKLine ? content.code : content.instrument;
+        const items = code2ucp[key];
+        if (items.length === 1) {
+          children.push({
+            value: items[0],
+            label: content.name,
+          });
+        } else {
+          const childrenchildren = [];
+          for (const i of items) {
+            childrenchildren.push({
+              value: i,
+              label: INSTRUMENT_INDICATOR_TRANSLATION_LONG[parseUCPString(i).code],
+            });
+          }
+          children.push({
+            value: content.name,
+            label: content.name,
+            children: childrenchildren
+          });
+        }
+      }
+      this.indicatorMenu.push({
+        label: cat.category,
+        value: cat.category,
+        children: children,
+      });
+    }
+
+    const v2l = (node) => {
+      if (node.children) {
+        node.children.forEach(v2l);
+      } else {
+        this.value2label[node.value] = node.label;
+      }
+    }
+
+    this.indicatorMenu.forEach(v2l);
+    this.operatorMenu.forEach(v2l);
+
+    console.log(this.indicatorMenu);
+    console.log(this.operatorMenu);
+    console.log(this.value2label);
   },
 
   components: {
