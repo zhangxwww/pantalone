@@ -21,7 +21,7 @@ import sql_app.crud as crud
 from libs.indicator import list_dict_to_dataframe, dataframe_to_list_dict, boll
 from libs.protocol.ucp import UCP
 from libs.utils.date_transform import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
-from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START
+from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START, INDICATOR_NAME_TO_CODE
 
 
 async def get_china_bond_yield_data(db, dates):
@@ -678,13 +678,25 @@ async def get_market_data(db, instrument):
 async def get_ucp_list(db):
     unique_market_codes = await crud.get_unique_market_code(db)
     logger.debug(f'Unique market codes: {unique_market_codes}')
-    unique_market_codes = [UCP('market', code, 'price').ucp for code in unique_market_codes]
+    unique_market_codes = [
+        UCP.from_kwargs(type_='market', code=code, column='price')
+        for code in unique_market_codes
+    ]
 
     unique_kline_codes = await crud.get_unique_kline_code(db)
     logger.debug(f'Unique kline codes: {unique_kline_codes}')
-    unique_kline_codes = [UCP('kline', code, 'close').ucp for code in unique_kline_codes]
+    unique_kline_codes = [
+        UCP.from_kwargs(type_='kline', code=code, column='close')
+        for code in unique_kline_codes
+    ]
 
-    return unique_market_codes + unique_kline_codes
+    ucps = unique_market_codes + unique_kline_codes
+    res = [
+        {
+            'ucp': u.ucp, 'code': INDICATOR_NAME_TO_CODE[u.code] if u.type == 'market' else u.code,
+        } for u in ucps]
+
+    return res
 
 
 async def get_percentile(db, query: api_model.PercentileRequestData):

@@ -107,3 +107,9 @@ INSTRUMENT_CODES = {
         'm2_cn_previous'
     ]
 }
+
+INDICATOR_NAME_TO_CODE = {
+    i: code
+    for code, indicator_list in INSTRUMENT_CODES.items()
+    for i in indicator_list
+}
