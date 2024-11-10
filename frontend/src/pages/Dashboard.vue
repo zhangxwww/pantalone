@@ -26,17 +26,25 @@
           <el-row style="margin-bottom: 10px;">
             <el-col :span="22">
               <span>
-                <el-text size="large">时间聚合</el-text>
+                <el-text size="large">采样设置</el-text>
               </span>
             </el-col>
           </el-row>
           <el-row style="margin-bottom: 20px;">
-            <el-col :span="22">
-              <el-select v-model="aggregate" placeholder="Select" style="width: 90px">
+            <el-col :span="4" :push="6">
+              <el-select v-model="sampleInternal" placeholder="Select" style="width: 90px">
                 <el-option label="日" value="daily" />
                 <el-option label="周" value="weekly" />
                 <el-option label="月" value="monthly" />
                 <el-option label="年" value="yearly" />
+              </el-select>
+            </el-col>
+            <el-col :span="4" :push="8">
+              <el-select v-model="sampleValue" placeholder="Select" style="width: 90px">
+                <el-option label="期初值" value="open" />
+                <el-option label="最大值" value="high" />
+                <el-option label="最小值" value="low" />
+                <el-option label="期末值" value="close" />
               </el-select>
             </el-col>
           </el-row>
@@ -190,7 +198,8 @@ export default {
       page: '指标实验室',
 
       dateRange: '',
-      aggregate: 'daily',
+      sampleInternal: 'daily',
+      sampleValue: 'close',
 
       indicators: [],
 

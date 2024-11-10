@@ -846,3 +846,55 @@ async def get_stock_bond_info(db, stocks, bonds):
         'stock': stock_info,
         'bond': bond_info
     }
+
+
+async def get_ucp_query_results(db, ucp_string, sample_interval, sample_value):
+
+    ucp_list = [UCP.from_string(u) for u in ucp_string.split(' ')]
+    unique_ucp_data = list(set(u for u in ucp_list if u.type in ['market', 'kline']))
+
+    async def _get_data(ucp):
+        if ucp.type == 'market':
+            data = await crud.get_market_data(db, ucp.code)
+        elif ucp.type == 'kline':
+            data = await crud.get_daily_kline_data_by_code(db, ucp.code)
+        return [{'date': d.date, ucp.code: getattr(d, ucp.column)} for d in data]
+
+    def _to_df(data):
+        df = pd.DataFrame(data)
+        return df
+
+    dfs = []
+    for ucp in unique_ucp_data:
+        data = await _get_data(ucp)
+        df = _to_df(data)
+        dfs.append(df)
+
+    if dfs:
+        result_df = dfs[0]
+        for df in dfs[1:]:
+            result_df = pd.merge(result_df, df, on='date', how='outer')
+    else:
+        result_df = pd.DataFrame()
+
+    resample_dict = {
+        'daily': 'D',
+        'weekly': 'W',
+        'monthly': 'M',
+        'yearly': 'Y'
+    }
+    resampled_df = result_df.resample(resample_dict[sample_interval], on='date')
+
+    if sample_value == 'close':
+        result_df = resampled_df.last()
+    elif sample_value == 'open':
+        result_df = resampled_df.first()
+    elif sample_value == 'high':
+        result_df = resampled_df.max()
+    elif sample_value == 'low':
+        result_df = resampled_df.min()
+
+    result_df = result_df.interpolate(method='linear', axis=0)
+
+
+    expr = ''.join([u.code for u in ucp_list])

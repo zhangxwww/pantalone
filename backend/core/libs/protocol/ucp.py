@@ -9,14 +9,14 @@ class UCP:
         self.code_ = code
         self.column_ = column
 
-    @staticmethod
-    def from_string(ucp_string):
+    @classmethod
+    def from_string(cls, ucp_string):
         type_, code, column = ucp_string.split(':')[1].split('/')
-        return UCP(type_, code, column)
+        return cls(type_, code, column)
 
-    @staticmethod
-    def from_kwargs(**kwargs):
-        return UCP(kwargs['type_'], kwargs['code'], kwargs['column'])
+    @classmethod
+    def from_kwargs(cls, **kwargs):
+        return cls(kwargs['type_'], kwargs['code'], kwargs['column'])
 
     @property
     def ucp(self):
@@ -33,3 +33,11 @@ class UCP:
     @property
     def column(self):
         return self.column_
+
+    def __hash__(self):
+        return hash((self.type_, self.code_, self.column_))
+
+    def __eq__(self, other):
+        if isinstance(other, UCP):
+            return (self.type_, self.code_, self.column_) == (other.type_, other.code_, other.column_)
+        return False

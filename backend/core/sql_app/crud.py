@@ -684,6 +684,18 @@ async def get_kline_data(
     return results.scalars().all()
 
 
+async def get_daily_kline_data_by_code(
+    db: AsyncSession,
+    code: str
+):
+    query = select(models.KLineData).where(
+        models.KLineData.code == code,
+        models.KLineData.period == 'daily'
+    ).order_by(models.KLineData.date)
+    results = await db.execute(query)
+    return results.scalars().all()
+
+
 async def get_unique_kline_code(
     db: AsyncSession
 ):
