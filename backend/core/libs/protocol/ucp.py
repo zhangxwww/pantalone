@@ -28,7 +28,21 @@ class UCP:
 
     @property
     def code(self):
-        return self.code_
+        if self.type != 'operation':
+            return self.code_
+        else:
+            return {
+                'plus': '+',
+                'minus': '-',
+                'mul': '*',
+                'div': '/',
+            }[self.code_]
+
+    @property
+    def safe_code(self):
+        if self.code[0].isdigit() and not self.type == 'constant':
+            return f'_{self.code}'
+        return self.code
 
     @property
     def column(self):

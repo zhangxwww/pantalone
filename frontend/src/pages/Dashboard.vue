@@ -40,7 +40,7 @@
               </el-select>
             </el-col>
             <el-col :span="4" :push="8">
-              <el-select v-model="sampleValue" placeholder="Select" style="width: 90px">
+              <el-select v-model="sampleFunc" placeholder="Select" style="width: 90px">
                 <el-option label="期初值" value="open" />
                 <el-option label="最大值" value="high" />
                 <el-option label="最小值" value="low" />
@@ -186,7 +186,7 @@
 <script>
 import SideChat from '../components/SideChat.vue';
 import VersionFooter from '../components/VersionFooter.vue';
-import { getUCPListRequest } from '../scripts/requests';
+import { getUCPListRequest, getUCPQueryRequest } from '../scripts/requests';
 import { parseUCPString } from '../scripts/protocol/ucp';
 import { FOLLOWED_DATA, INSTRUMENT_INDICATOR_TRANSLATION_LONG } from '../scripts/constant';
 
@@ -197,9 +197,9 @@ export default {
     return {
       page: '指标实验室',
 
-      dateRange: '',
+      dateRange: [],
       sampleInternal: 'daily',
-      sampleValue: 'close',
+      sampleFunc: 'close',
 
       indicators: [],
 
@@ -220,7 +220,7 @@ export default {
               value: 'ucp:operation/plus/plus',
             }, {
               label: '-',
-              value: 'ucp:operation/plus/plus',
+              value: 'ucp:operation/minus/minus',
             }, {
               label: '*',
               value: 'ucp:operation/mul/mul',
@@ -237,16 +237,27 @@ export default {
 
       formular: [],
 
-      onQuery: () => {
-        const queries = [];
+      onQuery: async () => {
         for (const indicator of this.indicators) {
           let query = [];
           for (const item of indicator) {
             query.push(item.value);
           }
-          queries.push(query.join(' '));
+          query = query.join(' ');
+          console.log(query);
+          let start_date, end_date;
+          if (this.dateRange.length === 2) {
+            start_date = this.dateRange[0].toISOString().split('T')[0];
+            end_date = this.dateRange[1].toISOString().split('T')[0];
+          } else {
+            start_date = null;
+            end_date = null;
+          }
+
+          console.log(start_date, end_date);
+          const res = await getUCPQueryRequest(query, this.sampleInternal, this.sampleFunc, start_date, end_date);
+          console.log(res);
         }
-        console.log(queries);
       },
 
       onReset: () => {
@@ -313,7 +324,7 @@ export default {
         }
         this.formular.push({
           label: this.addedNumber,
-          value: this.addedNumber,
+          value: `ucp:constant/${this.addedNumber}/${this.addedNumber}`,
           type: 'number'
         });
         this.addedNumber = null;

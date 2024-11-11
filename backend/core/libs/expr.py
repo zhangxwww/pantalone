@@ -4,7 +4,6 @@ import builtins
 
 class Transformer(ast.NodeTransformer):
     def __init__(self, df_var_name):
-        self.used_columns = set()
         self.df_name = df_var_name
         self.builtins = set(dir(builtins))
 
@@ -18,7 +17,6 @@ class Transformer(ast.NodeTransformer):
         )
         ast.copy_location(new_node, node)
         ast.fix_missing_locations(new_node)
-        self.used_columns.add(node.id)
         return new_node
 
 
@@ -30,7 +28,7 @@ class Preprocessor:
         tree = ast.parse(code, mode='eval')
         transformer = Transformer(self.df_var_name)
         tree = transformer.visit(tree)
-        return tree, transformer.used_columns
+        return tree
 
 
 class Executor:

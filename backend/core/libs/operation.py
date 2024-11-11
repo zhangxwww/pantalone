@@ -4,7 +4,6 @@ import base64
 from datetime import datetime, timedelta
 from joblib import Parallel, delayed
 import itertools
-from collections import defaultdict
 
 from loguru import logger
 
@@ -20,6 +19,7 @@ import sql_app.schemas as schemas
 import sql_app.crud as crud
 from libs.indicator import list_dict_to_dataframe, dataframe_to_list_dict, boll
 from libs.protocol.ucp import UCP
+from libs.expr import Executor, Preprocessor
 from libs.utils.date_transform import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
 from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START, INDICATOR_NAME_TO_CODE
 
@@ -848,7 +848,7 @@ async def get_stock_bond_info(db, stocks, bonds):
     }
 
 
-async def get_ucp_query_results(db, ucp_string, sample_interval, sample_value):
+async def get_ucp_query_result(db, ucp_string, sample_interval, sample_func, start, end):
 
     ucp_list = [UCP.from_string(u) for u in ucp_string.split(' ')]
     unique_ucp_data = list(set(u for u in ucp_list if u.type in ['market', 'kline']))
@@ -858,7 +858,7 @@ async def get_ucp_query_results(db, ucp_string, sample_interval, sample_value):
             data = await crud.get_market_data(db, ucp.code)
         elif ucp.type == 'kline':
             data = await crud.get_daily_kline_data_by_code(db, ucp.code)
-        return [{'date': d.date, ucp.code: getattr(d, ucp.column)} for d in data]
+        return [{'date': d.date, ucp.safe_code: getattr(d, ucp.column)} for d in data]
 
     def _to_df(data):
         df = pd.DataFrame(data)
@@ -877,6 +877,12 @@ async def get_ucp_query_results(db, ucp_string, sample_interval, sample_value):
     else:
         result_df = pd.DataFrame()
 
+    result_df['date'] = pd.to_datetime(result_df['date'])
+    if start:
+        result_df = result_df[result_df['date'] >= datetime.strptime(start, '%Y-%m-%d')]
+    if end:
+        result_df = result_df[result_df['date'] <= datetime.strptime(end, '%Y-%m-%d')]
+
     resample_dict = {
         'daily': 'D',
         'weekly': 'W',
@@ -885,16 +891,36 @@ async def get_ucp_query_results(db, ucp_string, sample_interval, sample_value):
     }
     resampled_df = result_df.resample(resample_dict[sample_interval], on='date')
 
-    if sample_value == 'close':
+    if sample_func == 'close':
         result_df = resampled_df.last()
-    elif sample_value == 'open':
+    elif sample_func == 'open':
         result_df = resampled_df.first()
-    elif sample_value == 'high':
+    elif sample_func == 'high':
         result_df = resampled_df.max()
-    elif sample_value == 'low':
+    elif sample_func == 'low':
         result_df = resampled_df.min()
 
     result_df = result_df.interpolate(method='linear', axis=0)
+    result_df = result_df.dropna()
+    result_df = result_df.reset_index()
 
+    logger.debug(f'\n{result_df.tail(5)}')
 
-    expr = ''.join([u.code for u in ucp_list])
+    expr = ''.join([u.safe_code for u in ucp_list])
+    logger.debug(f'expr: {expr}')
+
+    preprocessor = Preprocessor('df')
+    executor = Executor('df')
+
+    try:
+        tree = preprocessor.preprocess(expr)
+        res = executor.execute(tree, result_df)
+    except SyntaxError:
+        return {'status': 'fail', 'value': []}
+
+    def _to_dict(df, series):
+        return [{'date': d, 'value': v} for d, v in zip(df['date'], series)]
+
+    res = _to_dict(result_df, res)
+
+    return {'status': 'success', 'value': res}

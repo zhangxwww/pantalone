@@ -47,7 +47,12 @@ async function getMarketDataRequest (instrument) {
 }
 
 async function getUCPListRequest () {
-    const res = await axios.get('/api/ucp-list');
+    const res = await axios.get('/api/playground/ucp-list');
+    return res.data;
+}
+
+export async function getUCPQueryRequest (ucp, interval, func, start, end) {
+    const res = await axios.post('/api/playground/ucp-query', { 'ucp': ucp, 'interval': interval, 'func': func, 'start_date': start, 'end_date': end });
     return res.data;
 }
 
