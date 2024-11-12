@@ -7,6 +7,11 @@
       </el-breadcrumb>
     </el-header>
     <el-main>
+      <el-row style="width: 70%; margin-left: 15%; margin-bottom: 15px">
+        <el-col :span="6" :offset="9">
+          <span style="font-size: var(--el-font-size-large); font-weight: bold">{{ page }}</span>
+        </el-col>
+      </el-row>
       <el-row>
         <el-col :span="8">
           <el-row style="margin-bottom: 10px;">
@@ -99,7 +104,7 @@
           </el-row>
         </el-col>
         <el-col :span="16">
-
+          <div id="playground-chart" style="width: 100%; height: 600px;"></div>
         </el-col>
       </el-row>
 
@@ -187,8 +192,9 @@
 import SideChat from '../components/SideChat.vue';
 import VersionFooter from '../components/VersionFooter.vue';
 import { getUCPListRequest, getUCPQueryRequest } from '../scripts/requests';
-import { parseUCPString } from '../scripts/protocol/ucp';
+import { parseUCPString, UCPStringToFormula } from '../scripts/protocol/ucp';
 import { FOLLOWED_DATA, INSTRUMENT_INDICATOR_TRANSLATION_LONG } from '../scripts/constant';
+import { initGraph, drawGeneralLineGraph } from '../scripts/graph';
 
 
 export default {
@@ -259,6 +265,16 @@ export default {
         }
         const res = await getUCPQueryRequest(queries, this.sampleInternal, this.sampleFunc, start_date, end_date);
         console.log(res);
+        if (res.ucp_query_result.status === 'success') {
+          const legend = queries.map(q => UCPStringToFormula(q));
+          this.playgroundChart = drawGeneralLineGraph(this.playgroundChart, res.ucp_query_result.value, legend);
+        } else {
+          this.$message({
+            message: '表达式语法错误',
+            type: 'error',
+            plain: true,
+          });
+        }
       },
 
       onReset: () => {
@@ -400,6 +416,9 @@ export default {
     }
   },
   async mounted () {
+    this.playgroundChart = initGraph('playground-chart');
+    this.playgroundChart = drawGeneralLineGraph(this.playgroundChart, [], []);
+
     const data = await getUCPListRequest();
     const ucpList = data.ucp_list;
     console.log(ucpList);
@@ -456,6 +475,10 @@ export default {
     console.log(this.indicatorMenu);
     console.log(this.operatorMenu);
     console.log(this.value2label);
+  },
+
+  unmounted () {
+    this.playgroundChart.dispose();
   },
 
   components: {

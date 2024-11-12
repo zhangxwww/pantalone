@@ -7,3 +7,16 @@ export function parseUCPString (ucpString) {
     };
     return ucp;
 }
+
+export function UCPStringToFormula (string) {
+    const operationCodeToSymbol = {
+        'plus': '+',
+        'minus': '-',
+        'mul': '*',
+        'div': '/'
+    };
+    return string.split(' ')
+        .map(s => parseUCPString(s).code)
+        .map(c => operationCodeToSymbol[c] || c)
+        .join(' ');
+}

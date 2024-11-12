@@ -43,6 +43,7 @@ echarts.use([
 ]);
 
 function initGraph (domId) {
+    console.log(`init chart ${domId}`);
     return echarts.init(document.getElementById(domId));
 }
 
@@ -938,7 +939,7 @@ function drawKLineGraph (chart, data, title, period, indicator) {
                 boundaryGap: false,
                 axisLabel: {
                     formatter: function (value) {
-                        return echarts.time.format(value, '{MM}-{dd}');
+                        return echarts.time.format(value, '{yy}-{MM}-{dd}');
                     }
                 },
                 min: 'dataMin',
@@ -1232,7 +1233,7 @@ function drawMarketPriceLineGraph (chart, data, title) {
             boundaryGap: false,
             axisLabel: {
                 formatter: function (value) {
-                    return echarts.time.format(value, '{MM}-{dd}');
+                    return echarts.time.format(value, '{yy}-{MM}-{dd}');
                 }
             },
             min: 'dataMin',
@@ -1427,6 +1428,98 @@ function drawRelationGraph (chart, graph) {
     return chart;
 }
 
+export function drawGeneralLineGraph (chart, data, legend) {
+    console.log(data);
+    console.log(legend);
+    const dates = data.map(d => d.date.split('T')[0]);
+    const option = {
+        xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: dates,
+            axisLabel: {
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yy}-{MM}-{dd}');
+                }
+            },
+            min: 'dataMin',
+            max: 'dataMax',
+            axisPointer: {
+                show: true
+            },
+        },
+        yAxis: {
+            type: "value",
+            scale: true,
+            axisLine: { lineStyle: { color: '#777' } },
+        },
+        legend: {
+            x: "center",
+            y: "bottom",
+        },
+        series: legend.map((name, index) => {
+            return {
+                name: name,
+                type: 'line',
+                data: data.map(d => d[`value_${index}`]),
+                smooth: false,
+                showSymbol: false
+            };
+        }),
+        tooltip: {
+            transitionDuration: 0,
+            confine: true,
+            borderRadius: 4,
+            borderWidth: 1,
+            borderColor: '#333',
+            backgroundColor: 'rgba(255,255,255,0.9)',
+            textStyle: {
+                fontSize: 12,
+                color: '#333'
+            },
+            position: function (pos, params, el, elRect, size) {
+                const obj = {
+                    top: 60
+                };
+                obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
+                return obj;
+            },
+            axisPointer: {
+                type: 'cross',
+                animation: false,
+                label: {
+                    backgroundColor: '#ccc',
+                    borderColor: '#aaa',
+                    borderWidth: 1,
+                    shadowBlur: 0,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 0,
+                    color: '#222'
+                }
+            },
+            formatter: (param) => {
+                console.log(param);
+                let html = '<table><tbody>';
+                const index = param.dataIndex;
+                const d = data[index];
+                html += `<tr><td align="left"><b>${dates[index]}</b></td></tr>`;
+                legend.forEach((le, idx) => {
+                    const key = `value_${idx}`
+                    html += `
+                    <tr>
+                        <td align="left"><b>${le}</b></td>
+                        <td align="right">${d[key].toFixed(2)}</td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+                return html;
+            }
+        },
+    };
+    console.log(option);
+    chart.setOption(option);
+    return chart;
+}
 
 function drawEmptyAssetChangeLineGraph (chart, dates) {
     const data = {
