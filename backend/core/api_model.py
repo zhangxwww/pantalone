@@ -143,6 +143,14 @@ class GetStockBondInfoRequestData(BaseModel):
     bonds: list[str]
 
 
+class GetUCPQueryResultRequestData(BaseModel):
+    ucp: list[str]
+    interval: Literal['daily', 'weekly', 'monthly', 'yearly']
+    func: Literal['close', 'open', 'high', 'low']
+    start_date: str | None = None
+    end_date: str | None = None
+
+
 class ChatMessageRequestData(BaseModel):
     messages: list[dict[str, str]]
     page: str

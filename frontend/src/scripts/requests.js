@@ -82,14 +82,12 @@ export async function loadDataRequest () {
     return res.data;
 }
 
-
 export async function addDataRequest (type, data, id) {
     await axios.post(`/api/data/${type}`, {
         id: id,
         content: data
     });
 }
-
 
 export async function getTIntervalRequest (p, df) {
     const res = await axios.get('/api/statistics/t/interval', {
@@ -101,7 +99,6 @@ export async function getTIntervalRequest (p, df) {
     return res.data;
 }
 
-
 export async function getNormalIntervalRequest (p) {
     const res = await axios.get('/api/statistics/normal/interval', {
         params: {
@@ -110,7 +107,6 @@ export async function getNormalIntervalRequest (p) {
     });
     return res.data;
 }
-
 
 export async function getGitUpdatedRequest () {
     const res = await axios.get('/api/git/updated');

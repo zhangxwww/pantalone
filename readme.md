@@ -37,13 +37,15 @@ Open `http://localhost:9876/` in browser.
 
 - major
   - chat with context (pandasai)
+  - correlation, linear regression
 - minor
+  - support ()
+  - log request only pydantic model
   - cache with expiration
   - market data
     - dual y axis for YoY and MoM data
   - select model
+  - re-organize code: controllers, cruds
 - further
   - push news summary
-  - charts panel, select data and draw
-    - correlation, linear regression
   - whoosh for news search, rag

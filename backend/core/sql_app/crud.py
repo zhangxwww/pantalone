@@ -684,6 +684,26 @@ async def get_kline_data(
     return results.scalars().all()
 
 
+async def get_daily_kline_data_by_code(
+    db: AsyncSession,
+    code: str
+):
+    query = select(models.KLineData).where(
+        models.KLineData.code == code,
+        models.KLineData.period == 'daily'
+    ).order_by(models.KLineData.date)
+    results = await db.execute(query)
+    return results.scalars().all()
+
+
+async def get_unique_kline_code(
+    db: AsyncSession
+):
+    query = select(models.KLineData.code).distinct()
+    results = await db.execute(query)
+    return results.scalars().all()
+
+
 # ********** market data **********
 
 @_retry_when_db_locked(retry_times=3)
@@ -716,6 +736,14 @@ async def get_market_data(
     code: str
 ):
     query = select(models.MarketData).filter(models.MarketData.code == code).order_by(models.MarketData.date)
+    results = await db.execute(query)
+    return results.scalars().all()
+
+
+async def get_unique_market_code(
+    db: AsyncSession
+):
+    query = select(models.MarketData.code).distinct()
     results = await db.execute(query)
     return results.scalars().all()
 

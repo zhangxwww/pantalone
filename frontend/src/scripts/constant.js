@@ -409,3 +409,107 @@ export const PERCENTILE_CHART_TRANSLATION = {
     'weekly': '当周',
     'monthly': '当月',
 };
+
+export const INSTRUMENT_INDICATOR_TRANSLATION_SHORT = {
+    'lpr_1y': '1年期LPR',
+    'lpr_5y': '5年期LPR',
+    'short_term_rate': '短期贷款利率',
+    'mid_term_rate': '中长期贷款利率',
+    '美元': 'USD/CNY',
+    '欧元': 'EUR/CNY',
+    '日元': 'JPY/CNY',
+    '英镑': 'GBP/CNY',
+    '港币': 'HKD/CNY',
+    '泰国铢': 'THB/CNY',
+    'leverage_resident': '居民部门',
+    'leverage_non_financial': '非金融企业部门',
+    'leverage_government': '政府部门',
+    'leverage_central_government': '中央政府',
+    'leverage_local_government': '地方政府',
+    'leverage_real_economy': '实体经济部门',
+    'leverage_financial_assets': '金融部门资产方',
+    'leverage_financial_liabilities': '金融部门负债方',
+    'national_urban_unemployment_rate': '全国城镇',
+    '31_major_cities_urban_unemployment_rate': '31个大城市',
+    'national_urban_local_unemployment_rate': '本地户籍',
+    'national_urban_migrant_unemployment_rate': '外来户籍',
+    '16_24_urban_unemployment_rate': '16-24岁',
+    '25_59_urban_unemployment_rate': '25-59岁',
+    '16_24_urban_unemployment_rate_excluding_students': '16-24岁不含在校生',
+    '25_29_urban_unemployment_rate_excludng_students': '25-29岁不含在校生',
+    '30_59_urban_unemployment_rate_excludng_students': '30-59岁不含在校生',
+    'aggregate_financing_to_the_real_economy': '社会融资规模增量',
+    'renminbi_loan': '人民币贷款',
+    'entrusted_foreign_currency_loan': '委托贷款外币贷款',
+    'entrusted_loan': '委托贷款',
+    'trust_loan': '信托贷款',
+    'undiscounted_bank_acceptance_bill': '未贴现银行承兑汇票',
+    'corporate_bonds': '企业债券',
+    'domestic_stock_financing_for_non_financial_enterprises': '非金融企业境内股票融资',
+    'gdp_cn_current': '今值',
+    'gdp_cn_predict': '预测值',
+    'gdp_cn_previous': '前值',
+    'cpi_yearly_cn_current': '今值',
+    'cpi_yearly_cn_predict': '预测值',
+    'cpi_yearly_cn_previous': '前值',
+    'cpi_monthly_cn_current': '今值',
+    'cpi_monthly_cn_predict': '预测值',
+    'cpi_monthly_cn_previous': '前值',
+    'ppi_cn_current': '今值',
+    'ppi_cn_predict': '预测值',
+    'ppi_cn_previous': '前值',
+    'exp_cn_current': '今值',
+    'exp_cn_predict': '预测值',
+    'exp_cn_previous': '前值',
+    'imp_cn_current': '今值',
+    'imp_cn_predict': '预测值',
+    'imp_cn_previous': '前值',
+    'ipy_cn_current': '今值',
+    'ipy_cn_predict': '预测值',
+    'ipy_cn_previous': '前值',
+    'pmi_cn_current': '今值',
+    'pmi_cn_predict': '预测值',
+    'pmi_cn_previous': '前值',
+    'nPMI_cn_current': '今值',
+    'nPMI_cn_predict': '预测值',
+    'nPMI_cn_previous': '前值',
+    'fx_cn_current': '今值',
+    'fx_cn_predict': '预测值',
+    'fx_cn_previous': '前值',
+    'm2_cn_current': '今值',
+    'm2_cn_predict': '预测值',
+    'm2_cn_previous': '前值',
+};
+
+export const INSTRUMENT_INDICATOR_TRANSLATION_LONG = {};
+for (const [raw, t] of Object.entries(INSTRUMENT_INDICATOR_TRANSLATION_SHORT)) {
+    if (raw.includes('leverage')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `${t}杠杆率`;
+    } else if (raw.includes('unemployment')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `${t}失业率`;
+    } else if (raw.includes('gdp')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `GDP${t}`;
+    } else if (raw.includes('cpi_yearly')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `CPI年率${t}`;
+    } else if (raw.includes('cpi_monthly')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `CPI月率${t}`;
+    } else if (raw.includes('ppi')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `PPI年率${t}`;
+    } else if (raw.includes('exp')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `以美元计算出口年率${t}`;
+    } else if (raw.includes('imp')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `以美元计算进口年率${t}`;
+    } else if (raw.includes('ipy')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `规模以上工业增加值年率${t}`;
+    } else if (raw.includes('pmi')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `官方制造业PMI${t}`;
+    } else if (raw.includes('nPMI')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `官方非制造业PMI${t}`;
+    } else if (raw.includes('fx')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `外汇储备${t}`;
+    } else if (raw.includes('m2')) {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = `M2货币供应年率${t}`;
+    } else {
+        INSTRUMENT_INDICATOR_TRANSLATION_LONG[raw] = t;
+    }
+}

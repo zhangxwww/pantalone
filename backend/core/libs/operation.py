@@ -4,7 +4,6 @@ import base64
 from datetime import datetime, timedelta
 from joblib import Parallel, delayed
 import itertools
-from collections import defaultdict
 
 from loguru import logger
 
@@ -19,8 +18,10 @@ import libs.spider as spider
 import sql_app.schemas as schemas
 import sql_app.crud as crud
 from libs.indicator import list_dict_to_dataframe, dataframe_to_list_dict, boll
+from libs.protocol.ucp import UCP
+from libs.expr import Executor, Preprocessor
 from libs.utils.date_transform import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
-from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START
+from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START, INDICATOR_NAME_TO_CODE
 
 
 async def get_china_bond_yield_data(db, dates):
@@ -674,6 +675,30 @@ async def get_market_data(db, instrument):
     return res
 
 
+async def get_ucp_list(db):
+    unique_market_codes = await crud.get_unique_market_code(db)
+    logger.debug(f'Unique market codes: {unique_market_codes}')
+    unique_market_codes = [
+        UCP.from_kwargs(type_='market', code=code, column='price')
+        for code in unique_market_codes
+    ]
+
+    unique_kline_codes = await crud.get_unique_kline_code(db)
+    logger.debug(f'Unique kline codes: {unique_kline_codes}')
+    unique_kline_codes = [
+        UCP.from_kwargs(type_='kline', code=code, column='close')
+        for code in unique_kline_codes
+    ]
+
+    ucps = unique_market_codes + unique_kline_codes
+    res = [
+        {
+            'ucp': u.ucp, 'code': INDICATOR_NAME_TO_CODE[u.code] if u.type == 'market' else u.code,
+        } for u in ucps]
+
+    return res
+
+
 async def get_percentile(db, query: api_model.PercentileRequestData):
 
     def _resample(daily_df, period):
@@ -821,3 +846,88 @@ async def get_stock_bond_info(db, stocks, bonds):
         'stock': stock_info,
         'bond': bond_info
     }
+
+
+async def get_ucp_query_result(db, ucp_string_list, sample_interval, sample_func, start, end):
+
+    ucp_list = [UCP.from_string(u)
+                for ucp_string in ucp_string_list
+                for u in ucp_string.split(' ')]
+    unique_ucp_data = list(set(u for u in ucp_list if u.type in ['market', 'kline']))
+
+    async def _get_data(ucp):
+        if ucp.type == 'market':
+            data = await crud.get_market_data(db, ucp.code)
+        elif ucp.type == 'kline':
+            data = await crud.get_daily_kline_data_by_code(db, ucp.code)
+        return [{'date': d.date, ucp.safe_code: getattr(d, ucp.column)} for d in data]
+
+    def _to_df(data):
+        df = pd.DataFrame(data)
+        return df
+
+    dfs = []
+    for ucp in unique_ucp_data:
+        data = await _get_data(ucp)
+        df = _to_df(data)
+        dfs.append(df)
+
+    if dfs:
+        result_df = dfs[0]
+        for df in dfs[1:]:
+            result_df = pd.merge(result_df, df, on='date', how='outer')
+    else:
+        result_df = pd.DataFrame()
+
+    result_df['date'] = pd.to_datetime(result_df['date'])
+    if start:
+        result_df = result_df[result_df['date'] >= datetime.strptime(start, '%Y-%m-%d')]
+    if end:
+        result_df = result_df[result_df['date'] <= datetime.strptime(end, '%Y-%m-%d')]
+
+    resample_dict = {
+        'daily': 'D',
+        'weekly': 'W',
+        'monthly': 'M',
+        'yearly': 'Y'
+    }
+    resampled_df = result_df.resample(resample_dict[sample_interval], on='date')
+
+    if sample_func == 'close':
+        result_df = resampled_df.last()
+    elif sample_func == 'open':
+        result_df = resampled_df.first()
+    elif sample_func == 'high':
+        result_df = resampled_df.max()
+    elif sample_func == 'low':
+        result_df = resampled_df.min()
+
+    result_df = result_df.interpolate(method='linear', axis=0)
+    result_df = result_df.dropna()
+    result_df = result_df.reset_index()
+
+    logger.debug(f'\n{result_df.tail(5)}')
+
+    res = [{'date': d} for d in result_df['date']]
+    for i, ucp_string in enumerate(ucp_string_list):
+        expr = ''.join([UCP.from_string(u).safe_code
+                        for u in ucp_string.split(' ')])
+        logger.debug(f'expr {i}: {expr}')
+
+        preprocessor = Preprocessor('df')
+        executor = Executor('df')
+
+        try:
+            tree = preprocessor.preprocess(expr)
+            exec_res = executor.execute(tree, result_df)
+        except SyntaxError:
+            return {'status': 'fail', 'value': []}
+
+        for j, r in enumerate(exec_res):
+            value = r
+            if math.isnan(r) or np.isinf(r):
+                logger.warning(f'Invalid: {res[j]["date"]} {expr}: {r}')
+                value = None
+            res[j][f'value_{i}'] = value
+
+    return {'status': 'success', 'value': res}

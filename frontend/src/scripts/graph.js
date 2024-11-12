@@ -17,7 +17,7 @@ import { CanvasRenderer } from "echarts/renderers";
 import { LabelLayout, UniversalTransition } from "echarts/features";
 
 import { timeFormat } from "@/scripts/formatter";
-import { PERCENTILE_CHART_TRANSLATION, FOLLOWED_DATA_NAME_2_CATEGORY, PERCENTILE_CHART_CATEGORY_COLOR } from "./constant";
+import { PERCENTILE_CHART_TRANSLATION, FOLLOWED_DATA_NAME_2_CATEGORY, PERCENTILE_CHART_CATEGORY_COLOR, INSTRUMENT_INDICATOR_TRANSLATION_SHORT } from "./constant";
 
 echarts.use([
     TitleComponent,
@@ -937,8 +937,8 @@ export function drawKLineGraph (chart, data, title, period, indicator) {
                 data: dates,
                 boundaryGap: false,
                 axisLabel: {
-                    formatter: (value) => {
-                        return echarts.time.format(value, '{MM}-{dd}');
+                    formatter: function (value) {
+                        return echarts.time.format(value, '{yy}-{MM}-{dd}');
                     }
                 },
                 min: 'dataMin',
@@ -1088,76 +1088,7 @@ export function drawKLineGraph (chart, data, title, period, indicator) {
 export function drawMarketPriceLineGraph (chart, data, title) {
     console.log(data);
 
-    const translation = {
-        'lpr_1y': '1年期LPR',
-        'lpr_5y': '5年期LPR',
-        'short_term_rate': '短期贷款利率',
-        'mid_term_rate': '中长期贷款利率',
-        '美元': 'USD/CNY',
-        '欧元': 'EUR/CNY',
-        '日元': 'JPY/CNY',
-        '英镑': 'GBP/CNY',
-        '港币': 'HKD/CNY',
-        '泰国铢': 'THB/CNY',
-        'leverage_resident': '居民部门',
-        'leverage_non_financial': '非金融企业部门',
-        'leverage_government': '政府部门',
-        'leverage_central_government': '中央政府',
-        'leverage_local_government': '地方政府',
-        'leverage_real_economy': '实体经济部门',
-        'leverage_financial_assets': '金融部门资产方',
-        'leverage_financial_liabilities': '金融部门负债方',
-        'national_urban_unemployment_rate': '全国城镇',
-        '31_major_cities_urban_unemployment_rate': '31个大城市',
-        'national_urban_local_unemployment_rate': '本地户籍',
-        'national_urban_migrant_unemployment_rate': '外来户籍',
-        '16_24_urban_unemployment_rate': '16-24岁',
-        '25_59_urban_unemployment_rate': '25-59岁',
-        '16_24_urban_unemployment_rate_excluding_students': '16-24岁不含在校生',
-        '25_29_urban_unemployment_rate_excludng_students': '25-29岁不含在校生',
-        '30_59_urban_unemployment_rate_excludng_students': '30-59岁不含在校生',
-        'aggregate_financing_to_the_real_economy': '社会融资规模增量',
-        'renminbi_loan': '人民币贷款',
-        'entrusted_foreign_currency_loan': '委托贷款外币贷款',
-        'entrusted_loan': '委托贷款',
-        'trust_loan': '信托贷款',
-        'undiscounted_bank_acceptance_bill': '未贴现银行承兑汇票',
-        'corporate_bonds': '企业债券',
-        'domestic_stock_financing_for_non_financial_enterprises': '非金融企业境内股票融资',
-        'gdp_cn_current': '今值',
-        'gdp_cn_predict': '预测值',
-        'gdp_cn_previous': '前值',
-        'cpi_yearly_cn_current': '今值',
-        'cpi_yearly_cn_predict': '预测值',
-        'cpi_yearly_cn_previous': '前值',
-        'cpi_monthly_cn_current': '今值',
-        'cpi_monthly_cn_predict': '预测值',
-        'cpi_monthly_cn_previous': '前值',
-        'ppi_cn_current': '今值',
-        'ppi_cn_predict': '预测值',
-        'ppi_cn_previous': '前值',
-        'exp_cn_current': '今值',
-        'exp_cn_predict': '预测值',
-        'exp_cn_previous': '前值',
-        'imp_cn_current': '今值',
-        'imp_cn_predict': '预测值',
-        'imp_cn_previous': '前值',
-        'ipy_cn_current': '今值',
-        'ipy_cn_predict': '预测值',
-        'ipy_cn_previous': '前值',
-        'pmi_cn_current': '今值',
-        'pmi_cn_predict': '预测值',
-        'pmi_cn_previous': '前值',
-        'nPMI_cn_current': '今值',
-        'nPMI_cn_predict': '预测值',
-        'nPMI_cn_previous': '前值',
-        'fx_cn_current': '今值',
-        'fx_cn_predict': '预测值',
-        'fx_cn_previous': '前值',
-        'm2_cn_current': '今值',
-        'm2_cn_predict': '预测值',
-        'm2_cn_previous': '前值',
-    };
+    const translation = INSTRUMENT_INDICATOR_TRANSLATION_SHORT;
 
     const showPercent = {
         '1年期LPR': true,
@@ -1300,8 +1231,8 @@ export function drawMarketPriceLineGraph (chart, data, title) {
             data: dates,
             boundaryGap: false,
             axisLabel: {
-                formatter: (value) => {
-                    return echarts.time.format(value, '{MM}-{dd}');
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yy}-{MM}-{dd}');
                 }
             },
             min: 'dataMin',
@@ -1526,6 +1457,98 @@ export function drawRelationGraph (chart, graph) {
     return chart;
 }
 
+export function drawGeneralLineGraph (chart, data, legend) {
+    console.log(data);
+    console.log(legend);
+    const dates = data.map(d => d.date.split('T')[0]);
+    const option = {
+        xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: dates,
+            axisLabel: {
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yy}-{MM}-{dd}');
+                }
+            },
+            min: 'dataMin',
+            max: 'dataMax',
+            axisPointer: {
+                show: true
+            },
+        },
+        yAxis: {
+            type: "value",
+            scale: true,
+            axisLine: { lineStyle: { color: '#777' } },
+        },
+        legend: {
+            x: "center",
+            y: "bottom",
+        },
+        series: legend.map((name, index) => {
+            return {
+                name: name,
+                type: 'line',
+                data: data.map(d => d[`value_${index}`]),
+                smooth: false,
+                showSymbol: false
+            };
+        }),
+        tooltip: {
+            transitionDuration: 0,
+            confine: true,
+            borderRadius: 4,
+            borderWidth: 1,
+            borderColor: '#333',
+            backgroundColor: 'rgba(255,255,255,0.9)',
+            textStyle: {
+                fontSize: 12,
+                color: '#333'
+            },
+            position: function (pos, params, el, elRect, size) {
+                const obj = {
+                    top: 60
+                };
+                obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
+                return obj;
+            },
+            axisPointer: {
+                type: 'cross',
+                animation: false,
+                label: {
+                    backgroundColor: '#ccc',
+                    borderColor: '#aaa',
+                    borderWidth: 1,
+                    shadowBlur: 0,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 0,
+                    color: '#222'
+                }
+            },
+            formatter: (param) => {
+                console.log(param);
+                let html = '<table><tbody>';
+                const index = param.dataIndex;
+                const d = data[index];
+                html += `<tr><td align="left"><b>${dates[index]}</b></td></tr>`;
+                legend.forEach((le, idx) => {
+                    const key = `value_${idx}`
+                    html += `
+                    <tr>
+                        <td align="left"><b>${le}</b></td>
+                        <td align="right">${d[key].toFixed(2)}</td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+                return html;
+            }
+        },
+    };
+    console.log(option);
+    chart.setOption(option);
+    return chart;
+}
 
 export function drawEmptyAssetChangeLineGraph (chart, dates) {
     const data = {
