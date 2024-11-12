@@ -848,9 +848,11 @@ async def get_stock_bond_info(db, stocks, bonds):
     }
 
 
-async def get_ucp_query_result(db, ucp_string, sample_interval, sample_func, start, end):
+async def get_ucp_query_result(db, ucp_string_list, sample_interval, sample_func, start, end):
 
-    ucp_list = [UCP.from_string(u) for u in ucp_string.split(' ')]
+    ucp_list = [UCP.from_string(u)
+                for ucp_string in ucp_string_list
+                for u in ucp_string.split(' ')]
     unique_ucp_data = list(set(u for u in ucp_list if u.type in ['market', 'kline']))
 
     async def _get_data(ucp):
@@ -906,21 +908,26 @@ async def get_ucp_query_result(db, ucp_string, sample_interval, sample_func, sta
 
     logger.debug(f'\n{result_df.tail(5)}')
 
-    expr = ''.join([u.safe_code for u in ucp_list])
-    logger.debug(f'expr: {expr}')
+    res = [{'date': d} for d in result_df['date']]
+    for i, ucp_string in enumerate(ucp_string_list):
+        expr = ''.join([UCP.from_string(u).safe_code
+                        for u in ucp_string.split(' ')])
+        logger.debug(f'expr {i}: {expr}')
 
-    preprocessor = Preprocessor('df')
-    executor = Executor('df')
+        preprocessor = Preprocessor('df')
+        executor = Executor('df')
 
-    try:
-        tree = preprocessor.preprocess(expr)
-        res = executor.execute(tree, result_df)
-    except SyntaxError:
-        return {'status': 'fail', 'value': []}
+        try:
+            tree = preprocessor.preprocess(expr)
+            exec_res = executor.execute(tree, result_df)
+        except SyntaxError:
+            return {'status': 'fail', 'value': []}
 
-    def _to_dict(df, series):
-        return [{'date': d, 'value': v} for d, v in zip(df['date'], series)]
-
-    res = _to_dict(result_df, res)
+        for j, r in enumerate(exec_res):
+            value = r
+            if math.isnan(r) or np.isinf(r):
+                logger.warning(f'Invalid: {res[j]["date"]} {expr}: {r}')
+                value = None
+            res[j][f'value_{i}'] = value
 
     return {'status': 'success', 'value': res}

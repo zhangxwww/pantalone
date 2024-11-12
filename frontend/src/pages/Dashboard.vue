@@ -238,6 +238,7 @@ export default {
       formular: [],
 
       onQuery: async () => {
+        const queries = [];
         for (const indicator of this.indicators) {
           let query = [];
           for (const item of indicator) {
@@ -245,19 +246,19 @@ export default {
           }
           query = query.join(' ');
           console.log(query);
-          let start_date, end_date;
-          if (this.dateRange.length === 2) {
-            start_date = this.dateRange[0].toISOString().split('T')[0];
-            end_date = this.dateRange[1].toISOString().split('T')[0];
-          } else {
-            start_date = null;
-            end_date = null;
-          }
 
-          console.log(start_date, end_date);
-          const res = await getUCPQueryRequest(query, this.sampleInternal, this.sampleFunc, start_date, end_date);
-          console.log(res);
+          queries.push(query);
         }
+        let start_date, end_date;
+        if (this.dateRange.length === 2) {
+          start_date = this.dateRange[0].toISOString().split('T')[0];
+          end_date = this.dateRange[1].toISOString().split('T')[0];
+        } else {
+          start_date = null;
+          end_date = null;
+        }
+        const res = await getUCPQueryRequest(queries, this.sampleInternal, this.sampleFunc, start_date, end_date);
+        console.log(res);
       },
 
       onReset: () => {

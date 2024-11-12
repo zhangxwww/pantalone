@@ -144,7 +144,7 @@ class GetStockBondInfoRequestData(BaseModel):
 
 
 class GetUCPQueryResultRequestData(BaseModel):
-    ucp: str
+    ucp: list[str]
     interval: Literal['daily', 'weekly', 'monthly', 'yearly']
     func: Literal['close', 'open', 'high', 'low']
     start_date: str | None = None
