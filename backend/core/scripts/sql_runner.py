@@ -2,7 +2,7 @@ import sys
 import sqlite3
 import shutil
 
-from libs.utils import get_db_path
+from libs.utils.path import get_db_path
 
 
 if __name__ == '__main__':

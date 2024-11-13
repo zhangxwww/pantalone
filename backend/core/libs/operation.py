@@ -202,7 +202,11 @@ async def get_fund_name(db, symbol):
         logger.debug(f'Get fund name from db: {db_data.name}')
         return db_data.name
     else:
-        name = spider.get_fund_name_from_symbol(symbol)
+        try:
+            name = spider.get_fund_name_from_symbol(symbol)
+        except KeyError:
+            logger.warning(f'Cannot find fund name for symbol: {symbol}')
+            return None
         item = schemas.FundNameDataCreate(symbol=symbol, name=name)
         await crud.create_fund_name(db, item)
         logger.debug(f'Get fund name from spider: {name}')

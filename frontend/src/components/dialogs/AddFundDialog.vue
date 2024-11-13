@@ -116,6 +116,13 @@ export default {
                 const data = await getFundNameRequest(this.form.symbol);
                 const fund_name = data.fund_name;
                 console.log(fund_name);
+                if (!fund_name) {
+                    this.$message({
+                        message: '未找到该基金代码对应的基金',
+                        type: 'error',
+                        plain: true,
+                    });
+                }
 
                 const netValueData = await getRefreshedFundNetValueRequest([this.form.symbol]);
                 console.log(netValueData);
