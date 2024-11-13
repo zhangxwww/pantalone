@@ -37,15 +37,23 @@ Open `http://localhost:9876/` in browser.
 
 - major
   - chat with context (pandasai)
-  - correlation, linear regression
+  - playground
+    - correlation, linear regression
+    - ()
+    - rmax, rmin, rmean, rstd, rsum, csum, yoy, mom
+    - chart type
+  - percentile => oppertunity
+    - probability of return > threshold
+    - normalty test
+    - connection among subcharts
 - minor
-  - support ()
-  - log request only pydantic model
+  - more data
+    - global
+    - bond
   - cache with expiration
   - market data
     - dual y axis for YoY and MoM data
   - select model
-  - re-organize code: controllers, cruds
 - further
   - push news summary
   - whoosh for news search, rag
