@@ -653,16 +653,19 @@ export default class Data {
         let data = []
         for (let cData of this.data.cashData) {
             const last = cData.history[cData.history.length - 1];
-            data.push({
-                liquidity: 1,
-                return: 0,
-                amount: last.amount,
-                name: last.name
-            })
+            if (last.amount > 0) {
+                data.push({
+                    liquidity: 1,
+                    return: 0,
+                    amount: last.amount,
+                    name: last.name
+                });
+            }
+
         }
         for (let mData of this.data.monetaryFundData) {
             const last = mData.history[mData.history.length - 1];
-            if (!last.holding) {
+            if (!last.holding || last.currentAmount <= 0) {
                 continue;
             }
             if (last.fastRedemption) {
@@ -671,14 +674,14 @@ export default class Data {
                     return: last.annualizedReturnRate,
                     amount: last.currentAmount,
                     name: last.name
-                })
+                });
             } else {
                 data.push({
                     liquidity: 1,
                     return: last.annualizedReturnRate,
                     amount: last.currentAmount,
                     name: last.name
-                })
+                });
             }
         }
         for (let fData of this.data.fixedDepositData) {
@@ -691,11 +694,11 @@ export default class Data {
                 return: last.rate,
                 amount: last.beginningAmount,
                 name: last.name
-            })
+            });
         }
         for (let uData of this.data.fundData) {
             const last = uData.history[uData.history.length - 1];
-            if (!last.holding) {
+            if (!last.holding || last.currentAmount <= 0) {
                 continue;
             }
             data.push({
@@ -703,7 +706,7 @@ export default class Data {
                 return: last.annualizedReturnRate,
                 amount: last.currentAmount,
                 name: last.name
-            })
+            });
         }
         data = data.sort((a, b) => {
             if (a.liquidity === b.liquidity) {
