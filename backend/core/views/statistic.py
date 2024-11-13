@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from loguru import logger
 from scipy.stats import chi2, t, norm
 
 from libs.utils.decorator import timeit, log_request, log_response
