@@ -15,28 +15,28 @@
       <el-row>
         <el-col :span="8">
           <el-row style="margin-bottom: 10px;">
-            <el-col :span="22">
+            <el-col :span="24">
               <span>
                 <el-text size="large">时间范围</el-text>
               </span>
             </el-col>
           </el-row>
           <el-row style="margin-bottom: 20px;">
-            <el-col :span="22">
+            <el-col :span="24">
               <el-date-picker v-model="dateRange" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
                 unlink-panels :shortcuts="dateRangeShortCuts" />
             </el-col>
           </el-row>
 
           <el-row style="margin-bottom: 10px;">
-            <el-col :span="22">
+            <el-col :span="24">
               <span>
                 <el-text size="large">采样设置</el-text>
               </span>
             </el-col>
           </el-row>
           <el-row style="margin-bottom: 20px;">
-            <el-col :span="4" :push="6">
+            <el-col :span="4" :push="7">
               <el-select v-model="sampleInternal" placeholder="Select" style="width: 90px">
                 <el-option label="日" value="daily" />
                 <el-option label="周" value="weekly" />
@@ -44,7 +44,7 @@
                 <el-option label="年" value="yearly" />
               </el-select>
             </el-col>
-            <el-col :span="4" :push="8">
+            <el-col :span="4" :push="9">
               <el-select v-model="sampleFunc" placeholder="Select" style="width: 90px">
                 <el-option label="期初值" value="open" />
                 <el-option label="最大值" value="high" />
@@ -55,7 +55,7 @@
           </el-row>
 
           <el-row style="margin-bottom: 10px;">
-            <el-col :span="22">
+            <el-col :span="24">
               <span>
                 <el-text size="large">指标选择</el-text>
               </span>
@@ -65,7 +65,7 @@
             <el-col :span="24">
               <el-row v-for="(indicator, index) in indicators" :key="indicator" align="middle"
                 style="margin-bottom: 10px;">
-                <el-col :span="22"
+                <el-col :span="20"
                   style="text-align: left; padding: 5px; border-radius: 5px; border: 1px #e0e0e0 solid;">
                   <el-space wrap :size="[6, 6]">
                     <el-tag v-for="item in indicator" :key="item.value"
@@ -75,14 +75,29 @@
                   </el-space>
                 </el-col>
                 <el-col :span="2">
-                  <el-button type="danger" @click="onDeleteIndicator(index)"
+                  <el-button v-if="!unvisableIndicatorIndices.has(index)" type="primary" plain
+                    @click="unvisableIndicatorIndices.add(index)"
+                    style="width: 90%; margin-left: 15%; border-radius: 5px; font-size: 16px; font-weight: lighter; ">
+                    <el-icon>
+                      <View />
+                    </el-icon>
+                  </el-button>
+                  <el-button v-else type="info" plain @click="unvisableIndicatorIndices.delete(index)"
+                    style="width: 90%; margin-left: 15%; border-radius: 5px; font-size: 16px; font-weight: lighter; ">
+                    <el-icon>
+                      <Hide />
+                    </el-icon>
+                  </el-button>
+                </el-col>
+                <el-col :span="2">
+                  <el-button type="danger" plain @click="onDeleteIndicator(index)"
                     style="width: 100%; margin-left: 20%; border-radius: 5px; font-size: 12px; font-weight: lighter; ">
                     删除
                   </el-button>
                 </el-col>
               </el-row>
               <el-row align="middle" style="margin-bottom: 10px;">
-                <el-col :span="22" style="padding: 5px; border-radius: 5px; border: 1px #e0e0e0 dashed;">
+                <el-col :span="24" style="padding: 5px; border-radius: 5px; border: 1px #e0e0e0 dashed;">
                   <el-button @click="onShowDialog" style="width: 100%; border-width: 0px;">
                     添加指标
                   </el-button>
@@ -91,12 +106,12 @@
             </el-col>
           </el-row>
           <el-row style="margin-bottom: 20px;">
-            <el-col :span="4" :push="6">
+            <el-col :span="4" :push="7">
               <el-button @click="onQuery" type="primary">
                 查询
               </el-button>
             </el-col>
-            <el-col :span="4" :push="8">
+            <el-col :span="4" :push="9">
               <el-button @click="onReset">
                 重置
               </el-button>
@@ -189,6 +204,7 @@
 </template>
 
 <script>
+import { View, Hide } from '@element-plus/icons-vue';
 import SideChat from '../components/SideChat.vue';
 import VersionFooter from '../components/VersionFooter.vue';
 import { getUCPListRequest, getUCPQueryRequest } from '../scripts/requests';
@@ -208,6 +224,7 @@ export default {
       sampleFunc: 'close',
 
       indicators: [],
+      unvisableIndicatorIndices: null,
 
       dialogVisible: false,
 
@@ -223,9 +240,95 @@ export default {
 
       formular: [],
 
+      initChart: () => {
+        this.playgroundChart = initGraph('playground-chart');
+        this.playgroundChart = drawGeneralLineGraph(this.playgroundChart, [], []);
+      },
+
+      initMenus: async () => {
+        const data = await getUCPListRequest();
+        const ucpIndicatorList = data.ucp_list.indicator;
+        console.log(ucpIndicatorList);
+        const code2ucp = {};
+        for (const ucp of ucpIndicatorList) {
+          if (!code2ucp[ucp.code]) {
+            code2ucp[ucp.code] = [];
+          }
+          code2ucp[ucp.code].push(ucp.ucp);
+        }
+        for (const cat of FOLLOWED_DATA) {
+          const children = [];
+          for (const content of cat.content) {
+            const key = cat.isKLine ? content.code : content.instrument;
+            const items = code2ucp[key];
+            if (items.length === 1) {
+              children.push({
+                value: items[0],
+                label: content.name,
+              });
+            } else {
+              const childrenchildren = [];
+              for (const i of items) {
+                childrenchildren.push({
+                  value: i,
+                  label: INSTRUMENT_INDICATOR_TRANSLATION_LONG[parseUCPString(i).code],
+                });
+              }
+              children.push({
+                value: content.name,
+                label: content.name,
+                children: childrenchildren
+              });
+            }
+          }
+          this.indicatorMenu.push({
+            label: cat.category,
+            value: cat.category,
+            children: children,
+          });
+        }
+
+        const ucpOperationList = data.ucp_list.operation;
+        console.log(ucpOperationList);
+        const commonOperatorMenuChildren = [];
+        for (const ucp of ucpOperationList) {
+          commonOperatorMenuChildren.push({
+            value: ucp.ucp,
+            label: OPERATION_CODE_2_SYMBOL[parseUCPString(ucp.ucp).code],
+          });
+        }
+        this.operatorMenu.push({
+          label: '普通运算符',
+          value: 'operation',
+          children: commonOperatorMenuChildren,
+        });
+
+        const v2l = (node) => {
+          if (node.children) {
+            node.children.forEach(v2l);
+          } else {
+            this.value2label[node.value] = node.label;
+          }
+        }
+
+        this.indicatorMenu.forEach(v2l);
+        this.operatorMenu.forEach(v2l);
+
+        console.log(this.indicatorMenu);
+        console.log(this.operatorMenu);
+        console.log(this.value2label);
+      },
+
+      initIndicators: () => {
+        this.indicators = localStorage.getItem('dashboard-indicators') ? JSON.parse(localStorage.getItem('dashboard-indicators')) : [];
+      },
+
       onQuery: async () => {
         const queries = [];
-        for (const indicator of this.indicators) {
+        for (const [index, indicator] of this.indicators.entries()) {
+          if (this.unvisableIndicatorIndices.has(index)) {
+            continue;
+          }
           let query = [];
           for (const item of indicator) {
             query.push(item.value);
@@ -246,8 +349,12 @@ export default {
         const res = await getUCPQueryRequest(queries, this.sampleInternal, this.sampleFunc, start_date, end_date);
         console.log(res);
         if (res.ucp_query_result.status === 'success') {
-          const legend = queries.map(q => UCPStringToFormula(q));
+          const legend = queries
+            .map(q => UCPStringToFormula(q));
+          console.log(legend);
+          this.playgroundChart.clear();
           this.playgroundChart = drawGeneralLineGraph(this.playgroundChart, res.ucp_query_result.value, legend);
+          localStorage.setItem('dashboard-indicators', JSON.stringify(this.indicators));
         } else {
           this.$message({
             message: '表达式语法错误',
@@ -261,7 +368,6 @@ export default {
         this.dateRange = '';
         this.indicators.splice(0, this.indicators.length);
       },
-
 
       onTagClose: (index) => {
         this.formular.splice(index, 1);
@@ -396,80 +502,10 @@ export default {
     }
   },
   async mounted () {
-    this.playgroundChart = initGraph('playground-chart');
-    this.playgroundChart = drawGeneralLineGraph(this.playgroundChart, [], []);
-
-    const data = await getUCPListRequest();
-    const ucpIndicatorList = data.ucp_list.indicator;
-    console.log(ucpIndicatorList);
-    const code2ucp = {};
-    for (const ucp of ucpIndicatorList) {
-      if (!code2ucp[ucp.code]) {
-        code2ucp[ucp.code] = [];
-      }
-      code2ucp[ucp.code].push(ucp.ucp);
-    }
-    for (const cat of FOLLOWED_DATA) {
-      const children = [];
-      for (const content of cat.content) {
-        const key = cat.isKLine ? content.code : content.instrument;
-        const items = code2ucp[key];
-        if (items.length === 1) {
-          children.push({
-            value: items[0],
-            label: content.name,
-          });
-        } else {
-          const childrenchildren = [];
-          for (const i of items) {
-            childrenchildren.push({
-              value: i,
-              label: INSTRUMENT_INDICATOR_TRANSLATION_LONG[parseUCPString(i).code],
-            });
-          }
-          children.push({
-            value: content.name,
-            label: content.name,
-            children: childrenchildren
-          });
-        }
-      }
-      this.indicatorMenu.push({
-        label: cat.category,
-        value: cat.category,
-        children: children,
-      });
-    }
-
-    const ucpOperationList = data.ucp_list.operation;
-    console.log(ucpOperationList);
-    const commonOperatorMenuChildren = [];
-    for (const ucp of ucpOperationList) {
-      commonOperatorMenuChildren.push({
-        value: ucp.ucp,
-        label: OPERATION_CODE_2_SYMBOL[parseUCPString(ucp.ucp).code],
-      });
-    }
-    this.operatorMenu.push({
-      label: '普通运算符',
-      value: 'operation',
-      children: commonOperatorMenuChildren,
-    });
-
-    const v2l = (node) => {
-      if (node.children) {
-        node.children.forEach(v2l);
-      } else {
-        this.value2label[node.value] = node.label;
-      }
-    }
-
-    this.indicatorMenu.forEach(v2l);
-    this.operatorMenu.forEach(v2l);
-
-    console.log(this.indicatorMenu);
-    console.log(this.operatorMenu);
-    console.log(this.value2label);
+    this.unvisableIndicatorIndices = new Set();
+    this.initChart();
+    this.initMenus();
+    this.initIndicators();
   },
 
   unmounted () {
@@ -479,6 +515,8 @@ export default {
   components: {
     SideChat,
     VersionFooter,
+    View,
+    Hide
   }
 }
 </script>
