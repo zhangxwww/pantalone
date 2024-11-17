@@ -75,14 +75,14 @@
                   </el-space>
                 </el-col>
                 <el-col :span="2">
-                  <el-button v-if="!unvisableIndicatorIndices.has(index)" type="primary" plain
-                    @click="unvisableIndicatorIndices.add(index)"
+                  <el-button v-if="!unvisibleIndicatorIndices.has(index)" type="primary" plain
+                    @click="unvisibleIndicatorIndices.add(index)"
                     style="width: 90%; margin-left: 15%; border-radius: 5px; font-size: 16px; font-weight: lighter; ">
                     <el-icon>
                       <View />
                     </el-icon>
                   </el-button>
-                  <el-button v-else type="info" plain @click="unvisableIndicatorIndices.delete(index)"
+                  <el-button v-else type="info" plain @click="unvisibleIndicatorIndices.delete(index)"
                     style="width: 90%; margin-left: 15%; border-radius: 5px; font-size: 16px; font-weight: lighter; ">
                     <el-icon>
                       <Hide />
@@ -224,7 +224,7 @@ export default {
       sampleFunc: 'close',
 
       indicators: [],
-      unvisableIndicatorIndices: null,
+      unvisibleIndicatorIndices: null,
 
       dialogVisible: false,
 
@@ -321,12 +321,13 @@ export default {
 
       initIndicators: () => {
         this.indicators = localStorage.getItem('dashboard-indicators') ? JSON.parse(localStorage.getItem('dashboard-indicators')) : [];
+        this.unvisibleIndicatorIndices = localStorage.getItem('dashboard-unvisible') ? new Set(JSON.parse(localStorage.getItem('dashboard-unvisible'))) : new Set();
       },
 
       onQuery: async () => {
         const queries = [];
         for (const [index, indicator] of this.indicators.entries()) {
-          if (this.unvisableIndicatorIndices.has(index)) {
+          if (this.unvisibleIndicatorIndices.has(index)) {
             continue;
           }
           let query = [];
@@ -337,6 +338,9 @@ export default {
           console.log(query);
 
           queries.push(query);
+        }
+        if (queries.length === 0) {
+          return;
         }
         let start_date, end_date;
         if (this.dateRange.length === 2) {
@@ -355,6 +359,7 @@ export default {
           this.playgroundChart.clear();
           this.playgroundChart = drawGeneralLineGraph(this.playgroundChart, res.ucp_query_result.value, legend);
           localStorage.setItem('dashboard-indicators', JSON.stringify(this.indicators));
+          localStorage.setItem('dashboard-unvisible', JSON.stringify([...this.unvisibleIndicatorIndices]));
         } else {
           this.$message({
             message: '表达式语法错误',
@@ -502,10 +507,9 @@ export default {
     }
   },
   async mounted () {
-    this.unvisableIndicatorIndices = new Set();
+    this.initIndicators();
     this.initChart();
     this.initMenus();
-    this.initIndicators();
   },
 
   unmounted () {
