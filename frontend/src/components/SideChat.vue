@@ -1,6 +1,7 @@
 <template>
   <div>
-    <el-button v-if="!showDrawer" @click="onButtonClick" plain circle class="fix-bottom-right">
+    <el-button v-if="!showDrawer" @click="onButtonClick" plain circle class="fix-bottom-right"
+      style="box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);">
       <el-icon size="25">
         <chat-dot-square />
       </el-icon>
