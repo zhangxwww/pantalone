@@ -4,6 +4,7 @@ import base64
 from datetime import datetime, timedelta
 from joblib import Parallel, delayed
 import itertools
+import traceback
 
 from loguru import logger
 
@@ -19,7 +20,8 @@ import sql_app.schemas as schemas
 import sql_app.crud as crud
 from libs.indicator import list_dict_to_dataframe, dataframe_to_list_dict, boll
 from libs.protocol.ucp import UCP
-from libs.expr import Executor, Preprocessor
+from libs.expr.expr import Executor, Preprocessor
+from libs.expr.supported_operations import SUPPORTED_OPERATIONS
 from libs.utils.date_transform import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
 from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START, INDICATOR_NAME_TO_CODE
 
@@ -695,12 +697,25 @@ async def get_ucp_list(db):
     ]
 
     ucps = unique_market_codes + unique_kline_codes
-    res = [
+    indicator_res = [
         {
             'ucp': u.ucp, 'code': INDICATOR_NAME_TO_CODE[u.code] if u.type == 'market' else u.code,
         } for u in ucps]
 
-    return res
+    operation_ucp = [
+        UCP.from_kwargs(type_='operation', code=op['code'], column=op['code'])
+        for op in SUPPORTED_OPERATIONS
+    ]
+    operation_res = [
+        {
+            'ucp': u.ucp, 'code': u.code
+        } for u in operation_ucp
+    ]
+
+    return {
+        'indicator': indicator_res,
+        'operation': operation_res
+    }
 
 
 async def get_percentile(db, query: api_model.PercentileRequestData):
@@ -924,7 +939,9 @@ async def get_ucp_query_result(db, ucp_string_list, sample_interval, sample_func
         try:
             tree = preprocessor.preprocess(expr)
             exec_res = executor.execute(tree, result_df)
-        except SyntaxError:
+        except SyntaxError as e:
+            logger.error(f'Syntax error')
+            logger.error(traceback.format_exc())
             return {'status': 'fail', 'value': []}
 
         for j, r in enumerate(exec_res):

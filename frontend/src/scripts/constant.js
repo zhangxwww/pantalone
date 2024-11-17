@@ -480,6 +480,13 @@ export const INSTRUMENT_INDICATOR_TRANSLATION_SHORT = {
     'm2_cn_predict': '预测值',
     'm2_cn_previous': '前值',
 };
+for (const cat of FOLLOWED_DATA) {
+    for (const content of cat.content) {
+        if (!INSTRUMENT_INDICATOR_TRANSLATION_SHORT[content.code]) {
+            INSTRUMENT_INDICATOR_TRANSLATION_SHORT[content.code] = content.name;
+        }
+    }
+}
 
 export const INSTRUMENT_INDICATOR_TRANSLATION_LONG = {};
 for (const [raw, t] of Object.entries(INSTRUMENT_INDICATOR_TRANSLATION_SHORT)) {

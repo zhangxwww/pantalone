@@ -192,7 +192,7 @@
 import SideChat from '../components/SideChat.vue';
 import VersionFooter from '../components/VersionFooter.vue';
 import { getUCPListRequest, getUCPQueryRequest } from '../scripts/requests';
-import { parseUCPString, UCPStringToFormula } from '../scripts/protocol/ucp';
+import { parseUCPString, UCPStringToFormula, OPERATION_CODE_2_SYMBOL } from '../scripts/protocol/ucp';
 import { FOLLOWED_DATA, INSTRUMENT_INDICATOR_TRANSLATION_LONG } from '../scripts/constant';
 import { initGraph, drawGeneralLineGraph } from '../scripts/graph';
 
@@ -216,27 +216,7 @@ export default {
       addedNumber: null,
 
       indicatorMenu: [],
-      operatorMenu: [
-        {
-          label: '普通运算符',
-          value: 'operation',
-          children: [
-            {
-              label: '+',
-              value: 'ucp:operation/plus/plus',
-            }, {
-              label: '-',
-              value: 'ucp:operation/minus/minus',
-            }, {
-              label: '*',
-              value: 'ucp:operation/mul/mul',
-            }, {
-              label: '/',
-              value: 'ucp:operation/div/div',
-            }
-          ]
-        }
-      ],
+      operatorMenu: [],
       filterNodeMethod: (value, data) => data.label.includes(value),
 
       value2label: {},
@@ -420,10 +400,10 @@ export default {
     this.playgroundChart = drawGeneralLineGraph(this.playgroundChart, [], []);
 
     const data = await getUCPListRequest();
-    const ucpList = data.ucp_list;
-    console.log(ucpList);
+    const ucpIndicatorList = data.ucp_list.indicator;
+    console.log(ucpIndicatorList);
     const code2ucp = {};
-    for (const ucp of ucpList) {
+    for (const ucp of ucpIndicatorList) {
       if (!code2ucp[ucp.code]) {
         code2ucp[ucp.code] = [];
       }
@@ -460,6 +440,21 @@ export default {
         children: children,
       });
     }
+
+    const ucpOperationList = data.ucp_list.operation;
+    console.log(ucpOperationList);
+    const commonOperatorMenuChildren = [];
+    for (const ucp of ucpOperationList) {
+      commonOperatorMenuChildren.push({
+        value: ucp.ucp,
+        label: OPERATION_CODE_2_SYMBOL[parseUCPString(ucp.ucp).code],
+      });
+    }
+    this.operatorMenu.push({
+      label: '普通运算符',
+      value: 'operation',
+      children: commonOperatorMenuChildren,
+    });
 
     const v2l = (node) => {
       if (node.children) {

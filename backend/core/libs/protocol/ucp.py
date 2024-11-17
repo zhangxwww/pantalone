@@ -1,8 +1,14 @@
+from libs.expr.supported_operations import SUPPORTED_OPERATIONS
+
+
 class UCP:
     '''
     Unified Code Protocol
     ucp:[type]/[code]/[column]
     '''
+
+    OPERATION_CODE_2_SYMBOL = {op['code']: op['symbol'] for op in SUPPORTED_OPERATIONS}
+
     def __init__(self, type_, code, column):
         self.ucp_string = f'ucp:{type_}/{code}/{column}'
         self.type_ = type_
@@ -15,8 +21,8 @@ class UCP:
         return cls(type_, code, column)
 
     @classmethod
-    def from_kwargs(cls, **kwargs):
-        return cls(kwargs['type_'], kwargs['code'], kwargs['column'])
+    def from_kwargs(cls, type_, code, column):
+        return cls(type_, code, column)
 
     @property
     def ucp(self):
@@ -31,17 +37,15 @@ class UCP:
         if self.type != 'operation':
             return self.code_
         else:
-            return {
-                'plus': '+',
-                'minus': '-',
-                'mul': '*',
-                'div': '/',
-            }[self.code_]
+            return UCP.OPERATION_CODE_2_SYMBOL[self.code_]
 
     @property
     def safe_code(self):
-        if self.code[0].isdigit() and not self.type == 'constant':
-            return f'_{self.code}'
+        if self.type != 'constant':
+            if self.code[0].isdigit():
+                return f'_{self.code}'
+            if self.code[0] == '.':
+                return f'_DOT_{self.code[1:]}'
         return self.code
 
     @property

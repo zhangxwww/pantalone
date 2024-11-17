@@ -10,17 +10,24 @@ export function parseUCPString (ucpString) {
     return ucp;
 }
 
+export const OPERATION_CODE_2_SYMBOL = {
+    'plus': '+',
+    'minus': '-',
+    'mul': '*',
+    'div': '/',
+    'comma': ',',
+    'l_paren': '(',
+    'r_paren': ')',
+};
+
 export function UCPStringToFormula (string) {
-    const operationCodeToSymbol = {
-        'plus': '+',
-        'minus': '-',
-        'mul': '*',
-        'div': '/'
-    };
     return string.split(' ')
         .map(s => parseUCPString(s).code)
-        .map(c => operationCodeToSymbol[c]
+        .map(c => OPERATION_CODE_2_SYMBOL[c]
             || INSTRUMENT_INDICATOR_TRANSLATION_LONG[c]
             || c)
-        .join(' ');
+        .join(' ')
+        .replace(/\(\s+/g, '(')
+        .replace(/\s+\)/g, ')')
+        .replace(/,\s+/g, ',');
 }
