@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from scipy.stats import chi2, t, norm
 
-from libs.decorator.timeit import timeit
-from libs.decorator.log import log_request, log_response
+from libs.decorators.timeit import timeit
+from libs.decorators.log import log_request, log_response
 
 
 router = APIRouter(prefix='/statistics', tags=['statistic'])

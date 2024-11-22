@@ -1,30 +1,23 @@
 import math
-import json
-import base64
+
 from datetime import datetime, timedelta
 from joblib import Parallel, delayed
 import itertools
-import traceback
 
 from loguru import logger
 
 import numpy as np
-import pandas as pd
 from sklearn.preprocessing import MultiLabelBinarizer, MinMaxScaler
 from sklearn.manifold import TSNE
 from sklearn.metrics.pairwise import pairwise_distances
 
-import api_model
 import libs.spider as spider
 import sql_app.schemas as schemas
 import sql_app.crud as crud
 from libs.indicator import list_dict_to_dataframe, dataframe_to_list_dict, boll
-from libs.protocol.ucp import UCP
-from libs.expr.expr import Executor, Preprocessor
-from libs.expr.supported_operations import SUPPORTED_OPERATIONS
-from libs.decorator.cache import CacheWithExpiration
+from libs.decorators.cache import CacheWithExpiration
 from libs.utils.date_transform import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
-from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START, INDICATOR_NAME_TO_CODE
+from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START
 
 
 cache = CacheWithExpiration(expiration_time=3600)
@@ -211,148 +204,6 @@ async def get_fund_name(db, symbol):
         await crud.create_fund_name(db, item)
         logger.debug(f'Get fund name from spider: {name}')
         return name
-
-async def save_base64_data(db, data):
-    content = base64.b64decode(data)
-    json_data = json.loads(content.decode('utf-8'))
-    await crud.create_table_from_json(db, json_data)
-
-async def _get_cash_data_from_db(db):
-    cash_data = []
-    all_data = await crud.get_all_cash_data_history(db)
-    for history in all_data:
-        history_id = history.id
-        history_data = await crud.get_cash_data_history_item_by_history_id(db, history_id)
-
-        history_list = []
-        for his in history_data:
-            h = {
-                'name': his.name,
-                'amount': his.amount,
-                'beginningTime': his.beginningTime
-            }
-            history_list.append(h)
-        cash_data.append({
-            'id': history_id,
-            'history': history_list
-        })
-    return cash_data
-
-async def _get_monetary_fund_data_from_db(db):
-    monetary_data = []
-    all_data = await crud.get_all_monetary_fund_data_history(db)
-    for history in all_data:
-        history_id = history.id
-        history_data = await crud.get_monetary_fund_data_history_item_by_history_id(db, history_id)
-
-        history_list = []
-        for his in history_data:
-            h = {
-                'name': his.name,
-                'beginningAmount': his.beginningAmount,
-                'beginningTime': his.beginningTime,
-                'beginningShares': his.beginningShares,
-                'currentAmount': his.currentAmount,
-                'currentTime': his.currentTime,
-                'currentShares': his.currentShares,
-                'currency': his.currency,
-                'currencyRate': his.currencyRate,
-                'beginningCurrencyRate': his.beginningCurrencyRate,
-                'fastRedemption': his.fastRedemption,
-                'holding': his.holding
-            }
-            history_list.append(h)
-        monetary_data.append({
-            'id': history_id,
-            'history': history_list
-        })
-    return monetary_data
-
-async def _get_fixed_deposit_data_from_db(db):
-    fixed_deposit_data = []
-    all_data = await crud.get_all_fixed_deposit_data_history(db)
-    for history in all_data:
-        history_id = history.id
-        history_data = await crud.get_fixed_deposit_data_history_item_by_history_id(db, history_id)
-
-        history_list = []
-        for his in history_data:
-            h = {
-                'name': his.name,
-                'beginningAmount': his.beginningAmount,
-                'beginningTime': his.beginningTime,
-                'rate': his.rate,
-                'maturity': his.maturity
-            }
-            history_list.append(h)
-        fixed_deposit_data.append({
-            'id': history_id,
-            'history': history_list
-        })
-    return fixed_deposit_data
-
-async def _get_fund_data_from_db(db):
-    fund_data = []
-    all_data = await crud.get_all_fund_data_history(db)
-    for history in all_data:
-        history_id = history.id
-        history_data = await crud.get_fund_data_history_item_by_history_id(db, history_id)
-
-        history_list = []
-        for his in history_data:
-            h = {
-                'name': his.name,
-                'symbol': his.symbol,
-                'currentNetValue': his.currentNetValue,
-                'currentShares': his.currentShares,
-                'currentTime': his.currentTime,
-                'holding': his.holding,
-                'lockupPeriod': his.lockupPeriod,
-                'dividendRatio': his.dividendRatio
-            }
-            history_list.append(h)
-        fund_data.append({
-            'id': history_id,
-            'history': history_list
-        })
-    return fund_data
-
-async def get_data_from_db(db):
-    return {
-        'cashData': await _get_cash_data_from_db(db),
-        'monetaryFundData': await _get_monetary_fund_data_from_db(db),
-        'fixedDepositData': await _get_fixed_deposit_data_from_db(db),
-        'fundData': await _get_fund_data_from_db(db)
-    }
-
-async def add_cash_history(db, data):
-    item = schemas.CashDataHistoryItemCreate(**data.content.model_dump(), beginningTime=datetime.now().date())
-    await crud.create_cash_data_history_item_if_not_exist(db, item, data.id)
-
-async def add_monetary_fund_history(db, data):
-    content = data.content.model_dump()
-
-    logger.debug(content)
-
-    bg_time = content['beginningTime']
-    content['beginningTime'] = datetime.strptime(bg_time, '%Y-%m-%d').date()
-    content['currentTime'] = datetime.now().date()
-    content['beginningShares'] = content['beginningAmount']
-    item = schemas.MonetaryFundDataHistoryItemCreate(**content)
-    await crud.create_monetary_fund_data_history_item_if_not_exist(db, item, data.id)
-
-async def add_fixed_deposit_history(db, data):
-    content = data.content.model_dump()
-    bg_time = content['beginningTime']
-    content['beginningTime'] = datetime.strptime(bg_time, '%Y-%m-%d').date()
-    item = schemas.FixedDepositDataHistoryItemCreate(**content)
-    await crud.create_fixed_deposit_data_history_item_if_not_exist(db, item, data.id)
-
-async def add_fund_history(db, data):
-    content = data.content.model_dump()
-    content['currentTime'] = datetime.now().date()
-    item = schemas.FundDataHistoryItemCreate(**content)
-    await crud.create_fund_data_history_item_if_not_exist(db, item, data.id)
 
 async def get_refreshed_fund_net_value(symbols):
     def _f(symbol):
@@ -665,109 +516,6 @@ async def get_market_data(db, instrument):
 
     return res
 
-async def get_ucp_list(db):
-    unique_market_codes = await crud.get_unique_market_code(db)
-    logger.debug(f'Unique market codes: {unique_market_codes}')
-    unique_market_codes = [
-        UCP.from_kwargs(type_='market', code=code, column='price')
-        for code in unique_market_codes
-    ]
-
-    unique_kline_codes = await crud.get_unique_kline_code(db)
-    logger.debug(f'Unique kline codes: {unique_kline_codes}')
-    unique_kline_codes = [
-        UCP.from_kwargs(type_='kline', code=code, column='close')
-        for code in unique_kline_codes
-    ]
-
-    ucps = unique_market_codes + unique_kline_codes
-    indicator_res = [
-        {
-            'ucp': u.ucp, 'code': INDICATOR_NAME_TO_CODE[u.code] if u.type == 'market' else u.code,
-        } for u in ucps]
-
-    operation_ucp = [
-        UCP.from_kwargs(type_='operation', code=op['code'], column=op['code'])
-        for op in SUPPORTED_OPERATIONS
-    ]
-    operation_res = [
-        {
-            'ucp': u.ucp, 'code': u.code
-        } for u in operation_ucp
-    ]
-
-    return {
-        'indicator': indicator_res,
-        'operation': operation_res
-    }
-
-async def get_percentile(db, query: api_model.PercentileRequestData):
-
-    def _resample(daily_df, period):
-        df = daily_df.copy()
-        if period == 'daily':
-            return df
-        df['date'] = pd.to_datetime(df['date'])
-        df = df.set_index('date')
-        sample = 'W' if period == 'weekly' else 'ME'
-        agg_df = df.resample(sample).agg({
-            'value': 'last'
-        }).dropna()
-        agg_df = agg_df.reset_index()
-        agg_df['date'] = agg_df['date'].dt.date
-        return agg_df
-
-    def _cut_by_window(df, window):
-        if window == -1:
-            return df.copy()
-        current_data = pd.Timestamp.now()
-        start_date = current_data - pd.DateOffset(year=window)
-        filtered = df[df['date'] >= start_date.date()]
-        return filtered
-
-    def _percentile(df):
-        last_value = df['value'].iloc[-1]
-        percentile = (df['value'] < last_value).sum() / df.shape[0] * 100
-        return percentile
-
-    async def _load_data(db, item, is_kline, p):
-        if is_kline:
-            logger.debug(f'Get kline data: {item.code} {item.market} {p}')
-            d = await crud.get_kline_data(db, item.code, p, item.market)
-            d = [{'date': dd.date, 'value': dd.close} for dd in d]
-        else:
-            logger.debug(f'Get market data: {item.code} {item.instrument} {p}')
-            d = await crud.get_market_data(db, INSTRUMENT_CODES[item.instrument][0])
-            d = [{'date': dd.date, 'value': dd.price} for dd in d]
-        return d
-
-    def _calculate_pct(name, is_kline, p, w, d):
-        logger.debug(f'Calculate pct of {name} {p} {w}')
-        df = pd.DataFrame(d)
-        if not is_kline:
-            df = _resample(df, p)
-        df = _cut_by_window(df, w)
-        pct = _percentile(df)
-        return pct
-
-    data = query.data
-    period_window = query.period_window
-
-    res = []
-    for pw in period_window:
-        p, w = pw.period, pw.window
-
-        r = {'period': p, 'window': w, 'percentile': {}}
-        for cat in data:
-            is_kline = cat.isKLine
-            for item in cat.content:
-                d = await _load_data(db, item, is_kline, p)
-                pct = _calculate_pct(item.name, is_kline, p, w, d)
-                r['percentile'][item.name] = pct
-        res.append(r)
-
-    return res
-
 async def get_stock_bond_info(db, stocks, bonds):
     stock_info = []
     stock_found = set()
@@ -847,89 +595,3 @@ async def get_stock_bond_info(db, stocks, bonds):
         'stock': stock_info,
         'bond': bond_info
     }
-
-async def get_ucp_query_result(db, ucp_string_list, sample_interval, sample_func, start, end):
-
-    ucp_list = [UCP.from_string(u)
-                for ucp_string in ucp_string_list
-                for u in ucp_string.split(' ')]
-    unique_ucp_data = list(set(u for u in ucp_list if u.type in ['market', 'kline']))
-
-    async def _get_data(ucp):
-        if ucp.type == 'market':
-            data = await crud.get_market_data(db, ucp.code)
-        elif ucp.type == 'kline':
-            data = await crud.get_daily_kline_data_by_code(db, ucp.code)
-        return [{'date': d.date, ucp.safe_code: getattr(d, ucp.column)} for d in data]
-
-    def _to_df(data):
-        df = pd.DataFrame(data)
-        return df
-
-    dfs = []
-    for ucp in unique_ucp_data:
-        data = await _get_data(ucp)
-        df = _to_df(data)
-        dfs.append(df)
-
-    if dfs:
-        result_df = dfs[0]
-        for df in dfs[1:]:
-            result_df = pd.merge(result_df, df, on='date', how='outer')
-    else:
-        result_df = pd.DataFrame()
-
-    result_df['date'] = pd.to_datetime(result_df['date'])
-    if start:
-        result_df = result_df[result_df['date'] >= datetime.strptime(start, '%Y-%m-%d')]
-    if end:
-        result_df = result_df[result_df['date'] <= datetime.strptime(end, '%Y-%m-%d')]
-
-    resample_dict = {
-        'daily': 'D',
-        'weekly': 'W',
-        'monthly': 'M',
-        'yearly': 'Y'
-    }
-    resampled_df = result_df.resample(resample_dict[sample_interval], on='date')
-
-    if sample_func == 'close':
-        result_df = resampled_df.last()
-    elif sample_func == 'open':
-        result_df = resampled_df.first()
-    elif sample_func == 'high':
-        result_df = resampled_df.max()
-    elif sample_func == 'low':
-        result_df = resampled_df.min()
-
-    result_df = result_df.interpolate(method='linear', axis=0)
-    result_df = result_df.dropna()
-    result_df = result_df.reset_index()
-
-    logger.debug(f'\n{result_df.tail(5)}')
-
-    res = [{'date': d} for d in result_df['date']]
-    for i, ucp_string in enumerate(ucp_string_list):
-        expr = ''.join([UCP.from_string(u).safe_code
-                        for u in ucp_string.split(' ')])
-        logger.debug(f'expr {i}: {expr}')
-
-        preprocessor = Preprocessor('df')
-        executor = Executor('df')
-
-        try:
-            tree = preprocessor.preprocess(expr)
-            exec_res = executor.execute(tree, result_df)
-        except SyntaxError as e:
-            logger.error(f'Syntax error')
-            logger.error(traceback.format_exc())
-            return {'status': 'fail', 'value': []}
-
-        for j, r in enumerate(exec_res):
-            value = r
-            if math.isnan(r) or np.isinf(r):
-                logger.warning(f'Invalid: {res[j]["date"]} {expr}: {r}')
-                value = None
-            res[j][f'value_{i}'] = value
-
-    return {'status': 'success', 'value': res}

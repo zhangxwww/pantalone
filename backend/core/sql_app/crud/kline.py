@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from sql_app import models, schemas
-from libs.decorator.cache import CacheWithExpiration
+from libs.decorators.cache import CacheWithExpiration
 from ._decorators import _retry_when_db_locked
 
 

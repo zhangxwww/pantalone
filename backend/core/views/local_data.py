@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from libs.decorator.timeit import timeit
-from libs.decorator.log import log_request
 import api_model
-import libs.controller as controller
+import controller.local as local_controller
+from libs.decorators.timeit import timeit
+from libs.decorators.log import log_request
 from db import get_db
 
 
@@ -16,7 +16,7 @@ router = APIRouter(prefix='/data', tags=['data'])
 @timeit
 async def add_cash(data: api_model.AddCashHistoryData, db: AsyncSession = Depends(get_db)):
     logger.debug(data)
-    await controller.add_cash_history(db, data)
+    await local_controller.add_cash_history(db, data)
     return {'success': True}
 
 
@@ -25,7 +25,7 @@ async def add_cash(data: api_model.AddCashHistoryData, db: AsyncSession = Depend
 @timeit
 async def add_monetary(data: api_model.AddMonetaryFundHistoryData, db: AsyncSession = Depends(get_db)):
     logger.debug(data)
-    await controller.add_monetary_fund_history(db, data)
+    await local_controller.add_monetary_fund_history(db, data)
     return {'success': True}
 
 
@@ -34,7 +34,7 @@ async def add_monetary(data: api_model.AddMonetaryFundHistoryData, db: AsyncSess
 @timeit
 async def add_fixed(data: api_model.AddFixedDepositHistoryData, db: AsyncSession = Depends(get_db)):
     logger.debug(data)
-    await controller.add_fixed_deposit_history(db, data)
+    await local_controller.add_fixed_deposit_history(db, data)
     return {'success': True}
 
 
@@ -43,7 +43,7 @@ async def add_fixed(data: api_model.AddFixedDepositHistoryData, db: AsyncSession
 @timeit
 async def add_fund(data: api_model.AddFundHistoryData, db: AsyncSession = Depends(get_db)):
     logger.debug(data)
-    await controller.add_fund_history(db, data)
+    await local_controller.add_fund_history(db, data)
     return {'success': True}
 
 
@@ -51,4 +51,4 @@ async def add_fund(data: api_model.AddFundHistoryData, db: AsyncSession = Depend
 @log_request
 @timeit
 async def get_data(db: AsyncSession = Depends(get_db)):
-    return await controller.get_data_from_db(db)
+    return await local_controller.get_data_from_db(db)
