@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from scipy.stats import chi2, t, norm
 
+from libs.math.interval import chi2_interval, t_interval, normal_interval
 from libs.decorators.timeit import timeit
 from libs.decorators.log import log_request, log_response
 
@@ -13,8 +13,7 @@ router = APIRouter(prefix='/statistics', tags=['statistic'])
 @log_response
 @timeit
 async def get_chi2_interval(p: float, df: int):
-    # https://blog.csdn.net/u012958850/article/details/116565996
-    lower, upper = chi2.interval(p, df)
+    lower, upper = chi2_interval(p, df)
     return {
         'lower': lower,
         'upper': upper
@@ -26,7 +25,7 @@ async def get_chi2_interval(p: float, df: int):
 @log_response
 @timeit
 async def get_t_interval(p: float, df: int):
-    lower, upper = t.interval(p, df)
+    lower, upper = t_interval(p, df)
     return {
         'lower': lower,
         'upper': upper
@@ -38,7 +37,7 @@ async def get_t_interval(p: float, df: int):
 @log_response
 @timeit
 async def get_normal_interval(p: float):
-    lower, upper = norm.interval(p)
+    lower, upper = normal_interval(p)
     return {
         'lower': lower,
         'upper': upper
