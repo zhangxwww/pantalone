@@ -36,7 +36,7 @@ Open `http://localhost:9876/` in browser.
 
 ```bash
 cd backend/core
-./scripts/test.ps1
+./scripts/unittest.ps1
 ```
 
 ## TODO list
