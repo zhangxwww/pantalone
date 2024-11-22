@@ -22,7 +22,7 @@ from libs.indicator import list_dict_to_dataframe, dataframe_to_list_dict, boll
 from libs.protocol.ucp import UCP
 from libs.expr.expr import Executor, Preprocessor
 from libs.expr.supported_operations import SUPPORTED_OPERATIONS
-from libs.utils.decorator import CacheWithExpiration
+from libs.decorator.cache import CacheWithExpiration
 from libs.utils.date_transform import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
 from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START, INDICATOR_NAME_TO_CODE
 

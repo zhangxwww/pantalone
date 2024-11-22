@@ -1,7 +1,8 @@
 import os
 from fastapi import APIRouter
 
-from libs.utils.decorator import timeit, log_response
+from libs.decorator.timeit import timeit
+from libs.decorator.log import log_response
 
 
 router = APIRouter(tags=['version'])

@@ -50,7 +50,6 @@ Open `http://localhost:9876/` in browser.
   - more data
     - global
     - bond
-  - cache with expiration
   - market data
     - dual y axis for YoY and MoM data
   - select model

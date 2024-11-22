@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from libs.utils.decorator import timeit
+from libs.decorator.timeit import timeit
 import api_model
 import libs.controller as controller
 from db import get_db

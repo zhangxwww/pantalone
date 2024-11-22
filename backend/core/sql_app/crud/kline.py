@@ -2,8 +2,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from sql_app import models, schemas
+from libs.decorator.cache import CacheWithExpiration
 from ._decorators import _retry_when_db_locked
 
+
+cache = CacheWithExpiration(expiration_time=3600)
 
 # ********** kline data **********
 
@@ -32,6 +35,7 @@ async def create_kline_data_from_list(
         db.add(item)
     await db.commit()
 
+@cache
 async def get_kline_data(
     db: AsyncSession,
     code: str,
@@ -46,6 +50,7 @@ async def get_kline_data(
     results = await db.execute(query)
     return results.scalars().all()
 
+@cache
 async def get_daily_kline_data_by_code(
     db: AsyncSession,
     code: str

@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
 from ai.chat import chat
-from libs.utils.decorator import log_request
+from libs.decorator.log import log_request
 import api_model
 
 

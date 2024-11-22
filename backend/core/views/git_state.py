@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 import subprocess
 
-from libs.utils.decorator import timeit, log_request
+from libs.decorator.timeit import timeit
+from libs.decorator.log import log_request
 
 
 router = APIRouter(tags=['git'])
