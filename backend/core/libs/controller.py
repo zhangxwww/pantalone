@@ -22,9 +22,12 @@ from libs.indicator import list_dict_to_dataframe, dataframe_to_list_dict, boll
 from libs.protocol.ucp import UCP
 from libs.expr.expr import Executor, Preprocessor
 from libs.expr.supported_operations import SUPPORTED_OPERATIONS
+from libs.utils.decorator import CacheWithExpiration
 from libs.utils.date_transform import trans_str_date_to_trade_date, get_one_quarter_before, trans_date_to_trade_date
 from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START, INDICATOR_NAME_TO_CODE
 
+
+cache = CacheWithExpiration(expiration_time=3600)
 
 async def get_china_bond_yield_data(db, dates):
     query_dates = [trans_str_date_to_trade_date(d) for d in dates]
@@ -64,7 +67,6 @@ async def get_china_bond_yield_data(db, dates):
 
     return data
 
-
 def _align_lpr_date(lpr_list, query_dates):
     lpr_list = sorted(lpr_list, key=lambda x: x['date'])
     query_dates = sorted(query_dates)
@@ -93,7 +95,6 @@ def _align_lpr_date(lpr_list, query_dates):
                 break
         res.append({'date': qd, 'rate': l})
     return res
-
 
 async def get_lpr_data(db, dates):
     query_dates = [trans_str_date_to_trade_date(d) for d in dates]
@@ -137,7 +138,6 @@ async def get_lpr_data(db, dates):
         data = db_data_list
 
     return data
-
 
 async def get_index_close_data(db, dates):
     query_dates = [trans_str_date_to_trade_date(d) for d in dates]
@@ -183,7 +183,6 @@ async def get_index_close_data(db, dates):
 
     return final_data
 
-
 async def get_latest_currency_rate(db, symbol):
     if symbol == 'CNY':
         return 1.0
@@ -196,7 +195,6 @@ async def get_latest_currency_rate(db, symbol):
     logger.debug(res)
 
     return res[-1]['rate']
-
 
 async def get_fund_name(db, symbol):
     db_data = await crud.get_fund_name(db, symbol)
@@ -214,12 +212,10 @@ async def get_fund_name(db, symbol):
         logger.debug(f'Get fund name from spider: {name}')
         return name
 
-
 async def save_base64_data(db, data):
     content = base64.b64decode(data)
     json_data = json.loads(content.decode('utf-8'))
     await crud.create_table_from_json(db, json_data)
-
 
 async def _get_cash_data_from_db(db):
     cash_data = []
@@ -241,7 +237,6 @@ async def _get_cash_data_from_db(db):
             'history': history_list
         })
     return cash_data
-
 
 async def _get_monetary_fund_data_from_db(db):
     monetary_data = []
@@ -273,7 +268,6 @@ async def _get_monetary_fund_data_from_db(db):
         })
     return monetary_data
 
-
 async def _get_fixed_deposit_data_from_db(db):
     fixed_deposit_data = []
     all_data = await crud.get_all_fixed_deposit_data_history(db)
@@ -296,7 +290,6 @@ async def _get_fixed_deposit_data_from_db(db):
             'history': history_list
         })
     return fixed_deposit_data
-
 
 async def _get_fund_data_from_db(db):
     fund_data = []
@@ -324,7 +317,6 @@ async def _get_fund_data_from_db(db):
         })
     return fund_data
 
-
 async def get_data_from_db(db):
     return {
         'cashData': await _get_cash_data_from_db(db),
@@ -333,11 +325,9 @@ async def get_data_from_db(db):
         'fundData': await _get_fund_data_from_db(db)
     }
 
-
 async def add_cash_history(db, data):
     item = schemas.CashDataHistoryItemCreate(**data.content.model_dump(), beginningTime=datetime.now().date())
     await crud.create_cash_data_history_item_if_not_exist(db, item, data.id)
-
 
 async def add_monetary_fund_history(db, data):
     content = data.content.model_dump()
@@ -351,7 +341,6 @@ async def add_monetary_fund_history(db, data):
     item = schemas.MonetaryFundDataHistoryItemCreate(**content)
     await crud.create_monetary_fund_data_history_item_if_not_exist(db, item, data.id)
 
-
 async def add_fixed_deposit_history(db, data):
     content = data.content.model_dump()
     bg_time = content['beginningTime']
@@ -359,13 +348,11 @@ async def add_fixed_deposit_history(db, data):
     item = schemas.FixedDepositDataHistoryItemCreate(**content)
     await crud.create_fixed_deposit_data_history_item_if_not_exist(db, item, data.id)
 
-
 async def add_fund_history(db, data):
     content = data.content.model_dump()
     content['currentTime'] = datetime.now().date()
     item = schemas.FundDataHistoryItemCreate(**content)
     await crud.create_fund_data_history_item_if_not_exist(db, item, data.id)
-
 
 async def get_refreshed_fund_net_value(symbols):
     def _f(symbol):
@@ -374,7 +361,6 @@ async def get_refreshed_fund_net_value(symbols):
 
     ret = Parallel(n_jobs=-1)(delayed(_f)(symbol) for symbol in symbols)
     return ret
-
 
 async def get_fund_holding_data(db, symbols):
 
@@ -506,7 +492,6 @@ async def get_fund_holding_data(db, symbols):
 
     return holdings
 
-
 async def get_fund_holding_relevance_data(fund_holding_data):
     def _to_one_hot(data):
 
@@ -580,7 +565,7 @@ async def get_fund_holding_relevance_data(fund_holding_data):
         'order': list(fund_holding_data.keys())
     }
 
-
+@cache
 async def get_kline_data(db, query):
     code = query.code
     period = query.period
@@ -629,7 +614,7 @@ async def get_kline_data(db, query):
 
     return res
 
-
+@cache
 async def get_market_data(db, instrument):
     codes = INSTRUMENT_CODES[instrument]
 
@@ -680,7 +665,6 @@ async def get_market_data(db, instrument):
 
     return res
 
-
 async def get_ucp_list(db):
     unique_market_codes = await crud.get_unique_market_code(db)
     logger.debug(f'Unique market codes: {unique_market_codes}')
@@ -716,7 +700,6 @@ async def get_ucp_list(db):
         'indicator': indicator_res,
         'operation': operation_res
     }
-
 
 async def get_percentile(db, query: api_model.PercentileRequestData):
 
@@ -784,7 +767,6 @@ async def get_percentile(db, query: api_model.PercentileRequestData):
         res.append(r)
 
     return res
-
 
 async def get_stock_bond_info(db, stocks, bonds):
     stock_info = []
@@ -865,7 +847,6 @@ async def get_stock_bond_info(db, stocks, bonds):
         'stock': stock_info,
         'bond': bond_info
     }
-
 
 async def get_ucp_query_result(db, ucp_string_list, sample_interval, sample_func, start, end):
 

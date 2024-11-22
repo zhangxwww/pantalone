@@ -1,8 +1,9 @@
-import functools
 import time
+import functools
 
 from pydantic import BaseModel
 from loguru import logger
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 def timeit(func):
@@ -33,3 +34,39 @@ def log_response(func):
         logger.info(f"Result: {result}")
         return result
     return wrapper
+
+
+class CacheWithExpiration:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(CacheWithExpiration, cls).__new__(cls)
+        return cls._instance
+
+    def __init__(self, expiration_time: int = 3600):
+        if not hasattr(self, 'initialized'):  # 防止多次初始化
+            self.expiration_time = expiration_time
+            self.cache = {}
+            self.initialized = True
+
+    def __call__(self, func):
+        @functools.wraps(func)
+        async def wrapper(*args, **kwargs):
+            key = self._key(func, *args, **kwargs)
+            if key in self.cache:
+                if time.time() - self.cache[key]['time'] < self.expiration_time:
+                    logger.info(f"Cache hit: {key}")
+                    return self.cache[key]['value']
+
+            logger.info(f"Cache miss: {key}")
+            result = await func(*args, **kwargs)
+            self.cache[key] = {'value': result, 'time': time.time()}
+            return result
+        return wrapper
+
+    @staticmethod
+    def _key(func, *args, **kwargs):
+        args = [str(arg) for arg in args if not isinstance(arg, AsyncSession)]
+        kwargs = [f"{k}={v}" for k, v in kwargs.items() if not isinstance(v, AsyncSession)]
+        return f"{func.__name__}--{'-'.join(args)}--{'-'.join(kwargs)}"

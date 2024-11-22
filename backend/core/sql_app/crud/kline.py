@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from ._decorators import _retry_when_db_locked
 from sql_app import models, schemas
+from ._decorators import _retry_when_db_locked
 
 
 # ********** kline data **********
@@ -18,7 +18,6 @@ async def create_kline_data(
     await db.refresh(db_kline_data)
     return db_kline_data
 
-
 @_retry_when_db_locked(retry_times=3)
 async def create_kline_data_from_list(
     db: AsyncSession,
@@ -32,7 +31,6 @@ async def create_kline_data_from_list(
         item = models.KLineData(**item.model_dump())
         db.add(item)
     await db.commit()
-
 
 async def get_kline_data(
     db: AsyncSession,
@@ -48,7 +46,6 @@ async def get_kline_data(
     results = await db.execute(query)
     return results.scalars().all()
 
-
 async def get_daily_kline_data_by_code(
     db: AsyncSession,
     code: str
@@ -59,7 +56,6 @@ async def get_daily_kline_data_by_code(
     ).order_by(models.KLineData.date)
     results = await db.execute(query)
     return results.scalars().all()
-
 
 async def get_unique_kline_code(
     db: AsyncSession

@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from ._decorators import _retry_when_db_locked
 from sql_app import models, schemas
+from ._decorators import _retry_when_db_locked
 
 
 # ********** market data **********
@@ -18,7 +18,6 @@ async def create_market_data(
     await db.refresh(db_market_data)
     return db_market_data
 
-
 @_retry_when_db_locked(retry_times=3)
 async def create_market_data_from_list(
     db: AsyncSession,
@@ -31,7 +30,6 @@ async def create_market_data_from_list(
         db.add(item)
     await db.commit()
 
-
 async def get_market_data(
     db: AsyncSession,
     code: str
@@ -39,7 +37,6 @@ async def get_market_data(
     query = select(models.MarketData).filter(models.MarketData.code == code).order_by(models.MarketData.date)
     results = await db.execute(query)
     return results.scalars().all()
-
 
 async def get_unique_market_code(
     db: AsyncSession
