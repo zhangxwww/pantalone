@@ -1,3 +1,6 @@
+const IGNORE_NODES = new Set(['--', '']);
+const DUMMY_ID = '__DUMMY__';
+
 export class RelationGraphBuilder {
     constructor(fundName, fundHolding, info) {
         this.fundName = fundName;
@@ -25,6 +28,9 @@ export class RelationGraphBuilder {
 
     addNodeIfNotExists (id, name, category, extra) {
         const key = `${category}-${id}`;
+        if (IGNORE_NODES.has(name)) {
+            return DUMMY_ID;
+        }
         if (!this.addedNodes.has(key)) {
             this.nodes.push({
                 id: id,
@@ -38,6 +44,9 @@ export class RelationGraphBuilder {
     }
 
     addLink (source, target) {
+        if (source === DUMMY_ID || target === DUMMY_ID) {
+            return;
+        }
         this.links.push({
             source: source,
             target: target

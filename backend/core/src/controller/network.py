@@ -561,7 +561,7 @@ async def get_stock_bond_info(db, stocks, bonds):
     def _crawl_bond(bond):
         try:
             data = spider.get_bond_info(bond)
-        except TypeError:
+        except (TypeError, NotImplementedError):
             return bond, None
         return bond, {
             'code': bond,

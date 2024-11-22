@@ -44,7 +44,7 @@ def get_lpr():
         lpr.append({'date': date, 'rate': rate})
     return lpr
 
-def get_bond_info(code):
+def _get_cn_bond_info(code):
     prefixes = ['sh', 'sz', 'yhj']
     for pre in prefixes:
         url = f'http://money.finance.sina.com.cn/bond/info/{pre}{code}.html'
@@ -71,6 +71,12 @@ def get_bond_info(code):
             if key in ['债券名称', '债券简称', '债券类型', '信用等级']:
                 res[key] = value
         return res
+
+def get_bond_info(code):
+    if code.startswith('US'):
+        raise NotImplementedError
+    else:
+        return _get_cn_bond_info(code)
 
 def _get_a_stock_info(code):
     url = f'https://datacenter.eastmoney.com/securities/api/data/v1/get?reportName=RPT_F10_BASIC_ORGINFO&columns=ALL&quoteColumns=&filter=(SECURITY_CODE="{code}")&pageNumber=1&pageSize=1&sortTypes=&sortColumns=&source=HSF10&client=PC&v=06067307092909199'
