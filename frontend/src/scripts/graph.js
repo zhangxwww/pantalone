@@ -1270,7 +1270,13 @@ export function drawMarketPriceLineGraph (chart, data, title) {
 }
 
 export function drawPercentileGraph (chart, data) {
-    const title = [];
+    const title = [
+        {
+            text: '标的价格百分位',
+            left: 'center',
+            top: 'top'
+        }
+    ];
     const singleAxis = [];
     const series = [];
     const nLines = data.length;
@@ -1278,7 +1284,7 @@ export function drawPercentileGraph (chart, data) {
     data.forEach((d, idx) => {
         title.push({
             textBaseline: 'middle',
-            top: ((idx + 0.5) * 100) / nLines + '%',
+            top: ((idx + 0.5) * 95) / nLines + 5 + '%',
             text: `${PERCENTILE_CHART_TRANSLATION[d.period]}价格（${d.window > 0 ? d.window + '年' : '至今'}）`
         });
         singleAxis.push({
@@ -1288,8 +1294,8 @@ export function drawPercentileGraph (chart, data) {
             data: axis,
             min: 0,
             max: 100,
-            top: (idx * 100) / nLines + 5 + '%',
-            height: 100 / nLines - 10 + '%',
+            top: (idx * 95) / nLines + 5 + 5 + '%',
+            height: 95 / nLines - 10 + '%',
             axisLabel: {
                 interval: 10
             }

@@ -110,7 +110,7 @@
                                 <el-dropdown-item>
                                     <router-link :to="{ path: '/position', query: { symbols: getFundSymbols() } }"
                                         style="text-decoration-line: none; font: inherit">
-                                        基金仓位明细
+                                        基金持仓明细
                                     </router-link>
                                 </el-dropdown-item>
                                 <el-dropdown-item>
@@ -122,7 +122,7 @@
                                 <el-dropdown-item>
                                     <router-link :to="{ path: '/percentile' }"
                                         style="text-decoration-line: none; font: inherit">
-                                        百分位分析
+                                        潜在机会
                                     </router-link>
                                 </el-dropdown-item>
                                 <el-dropdown-item>

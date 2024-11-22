@@ -12,7 +12,7 @@
           <span style="font-size: var(--el-font-size-large); font-weight: bold">{{ page }}</span>
         </el-col>
       </el-row>
-      <div id="percentile-chart" style="width: 100%; height: 500px"></div>
+      <div id="percentile-chart" style="width: 100%; height: 500px; margin-top: 40px;"></div>
       <side-chat :page="page" />
     </el-main>
     <el-footer>
@@ -32,7 +32,7 @@ export default {
   name: 'Percentile',
   data () {
     return {
-      page: '百分位分析',
+      page: '潜在机会',
       graph: null,
       percentileData: PERCENTILE_PERIOD_WINDOW.map(item => ({
         period: item.period,
