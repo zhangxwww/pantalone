@@ -51,25 +51,25 @@ app.include_router(ai_router, prefix='/api')
 @app.get('/position')
 async def position():
     logger.debug('frontend')
-    return FileResponse('../../frontend/dist/index.html')
+    return FileResponse('../../../frontend/dist/index.html')
 
 @app.get('/market')
 async def market():
     logger.debug('frontend')
-    return FileResponse('../../frontend/dist/index.html')
+    return FileResponse('../../../frontend/dist/index.html')
 
 @app.get('/percentile')
 async def percentile():
     logger.debug('frontend')
-    return FileResponse('../../frontend/dist/index.html')
+    return FileResponse('../../../frontend/dist/index.html')
 
 @app.get('/dashboard')
 async def percentile():
     logger.debug('frontend')
-    return FileResponse('../../frontend/dist/index.html')
+    return FileResponse('../../../frontend/dist/index.html')
 
 
-app.mount('/', staticfiles.StaticFiles(directory='../../frontend/dist/', html=True), name='static')
+app.mount('/', staticfiles.StaticFiles(directory='../../../frontend/dist/', html=True), name='static')
 
 
 if __name__ == '__main__':
