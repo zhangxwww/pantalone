@@ -26,12 +26,18 @@ Refer to [here](backend/service/readme.md) for details.
 
 ```bash
 conda activate pantalone
-cd backend/core
+cd backend/core/src
 python app.py
 ```
 
 Open `http://localhost:9876/` in browser.
 
+### Test:
+
+```bash
+cd backend/core
+./scripts/test.ps1
+```
 
 ## TODO list
 
