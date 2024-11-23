@@ -242,14 +242,11 @@ async def get_expected_return(db, query: api_model.ExpectedReturnRequestData):
 
         return {
             'code': code,
-            'exp': exp,
+            'expected': exp,
             'lower': lower,
             'upper': upper
         }
 
     res = Parallel(n_jobs=-1)(delayed(_f)(item['code'], item['df'], p, dt) for item in data)
-    logger.debug(f'Prob growth rate:')
-    for r in res:
-        logger.debug(f'{r["code"]} {r["exp"]:.4f} ({r["lower"]:.4f}--{r["upper"]:.4f})')
 
     return res

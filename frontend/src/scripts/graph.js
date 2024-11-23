@@ -46,6 +46,10 @@ export function initGraph (domId) {
     return echarts.init(document.getElementById(domId));
 }
 
+export function connectGraph (charts) {
+    echarts.connect(charts);
+}
+
 export function drawAssetChangeLineGraph (chart, data) {
     console.log(data);
     const option = {
@@ -1552,6 +1556,158 @@ export function drawGeneralLineGraph (chart, data, legend) {
         },
     };
     console.log(option);
+    chart.setOption(option);
+    return chart;
+}
+
+export function drawExpectedReturnGraph (chart, data, months, p) {
+    console.log(data);
+
+    data.sort((a, b) => {
+        if (b.expected !== a.expected) {
+            return b.expected - a.expected;
+        } else {
+            return (a.upper - a.lower) - (b.upper - b.lower);
+        }
+    });
+
+    const BAR_COLOR = '#999999';
+
+    const baseBar = [];
+    const valueBar = [];
+    data.forEach(d => {
+        if (d.upper * d.lower > 0) {
+            baseBar.push(d.lower > 0 ? d.lower : d.upper)
+            valueBar.push(d.lower > 0 ? d.upper - d.lower : d.lower - d.upper)
+        } else {
+            baseBar.push({
+                value: d.upper,
+                itemStyle: {
+                    borderColor: 'transparent',
+                    color: BAR_COLOR
+                },
+                emphasis: {
+                    itemStyle: {
+                        borderColor: 'transparent',
+                        color: BAR_COLOR
+                    }
+                },
+            });
+            valueBar.push(d.lower);
+        }
+    });
+
+    const option = {
+        title: {
+            text: `${months}个月预期收益率\n{small|\n（${(p * 100)}%置信度）}`,
+            x: 'center',
+            y: 'top',
+            textStyle: {
+                rich: {
+                    small: {
+                        fontSize: 12,
+                        color: '#999'
+                    }
+                }
+            }
+        },
+        xAxis: {
+            type: 'category',
+            data: data.map(d => INSTRUMENT_INDICATOR_TRANSLATION_SHORT[d.code]),
+            axisTick: {
+                show: false
+            },
+            axisLabel: {
+                interval: 0,
+                rotate: 35,
+                width: 110,
+                overflow: 'break'
+            },
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: value => {
+                    return (value * 100).toFixed(2) + '%';
+                }
+            },
+            axisPointer: {
+                label: {
+                    formatter: params => {
+                        return (params.value * 100).toFixed(2) + '%';
+                    }
+                }
+            }
+        },
+        series: [
+            {
+                type: 'bar',
+                data: baseBar,
+                stack: 'interval',
+                itemStyle: {
+                    borderColor: 'transparent',
+                    color: 'transparent'
+                },
+                emphasis: {
+                    itemStyle: {
+                        borderColor: 'transparent',
+                        color: 'transparent'
+                    }
+                },
+                barWidth: 1
+            },
+            {
+                type: 'bar',
+                data: valueBar,
+                stack: 'interval',
+                itemStyle: {
+                    borderColor: 'transparent',
+                    color: BAR_COLOR
+                },
+                emphasis: {
+                    itemStyle: {
+                        borderColor: 'transparent',
+                        color: BAR_COLOR
+                    }
+                },
+                barWidth: 1
+            },
+            {
+                type: 'scatter',
+                data: data.map(d => d.expected),
+                symbol: 'rect',
+                symbolSize: [15, 2],
+            }
+
+        ],
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985',
+                    show: true
+                }
+            },
+            formatter: params => {
+                const index = params.dataIndex;
+                const name = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${INSTRUMENT_INDICATOR_TRANSLATION_SHORT[data[index].code]}</b></td>
+                        </tr>
+                <tr>
+                        <td align="left">
+                        <b>${(data[index].expected * 100).toFixed(2)}%</b>
+                        <small>(${(data[index].lower * 100).toFixed(2)}% ~ ${(data[index].upper * 100).toFixed(2)}%)</small>
+                        </td>
+                    </tr>
+                </tbody></table>`;
+                return name;
+            }
+        },
+    }
     chart.setOption(option);
     return chart;
 }
