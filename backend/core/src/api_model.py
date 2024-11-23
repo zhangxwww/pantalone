@@ -138,6 +138,13 @@ class PercentileRequestData(BaseModel):
     data: list[_PercentileData]
 
 
+class ExpectedReturnRequestData(BaseModel):
+    data: list[_PercentileData]
+    target: float = 0.1
+    p: float = 0.95
+    dt: int = 252
+
+
 class GetStockBondInfoRequestData(BaseModel):
     stocks: list[str]
     bonds: list[str]

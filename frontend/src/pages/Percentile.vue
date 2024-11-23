@@ -25,7 +25,10 @@
 import VersionFooter from '../components/VersionFooter.vue';
 import SideChat from '../components/SideChat.vue';
 import { initGraph, drawPercentileGraph } from '../scripts/graph';
-import { getPricePercentileRequest } from '../scripts/requests';
+import {
+  getPricePercentileRequest,
+  getExpectedReturnRequest
+} from '../scripts/requests';
 import { FOLLOWED_DATA, PERCENTILE_PERIOD_WINDOW } from '../scripts/constant';
 
 export default {
@@ -41,11 +44,11 @@ export default {
       })),
 
       prepareData: async (pw) => {
-        const data = await getPricePercentileRequest({
+        const percentileData = await getPricePercentileRequest({
           'period_window': pw,
           'data': FOLLOWED_DATA.filter(item => !item.skipPercentile)
         });
-        for (const item of data.data) {
+        for (const item of percentileData.data) {
           const index = this.percentileData.findIndex(p => p.period === item.period && p.window === item.window);
           this.percentileData[index].percentile = item.percentile;
         }
@@ -62,6 +65,11 @@ export default {
         drawPercentileGraph(this.graph, this.percentileData);
       },
       draw: async () => {
+        const expReturnData = await getExpectedReturnRequest({
+          'data': FOLLOWED_DATA.filter(item => !item.skipExpReturn)
+        });
+        console.log(expReturnData);
+
         for (const periodWindow of PERCENTILE_PERIOD_WINDOW) {
           await this.prepareData([periodWindow]);
           await this.drawPercentileGraph();

@@ -115,6 +115,13 @@ async def get_price_percentile(data: api_model.PercentileRequestData, db: AsyncS
     return {'data': await calculation_controller.get_percentile(db, data)}
 
 
+@router.post('/expected-return')
+@log_request
+@timeit
+async def get_expected_return(data: api_model.ExpectedReturnRequestData, db: AsyncSession = Depends(get_db)):
+    return {'data': await calculation_controller.get_expected_return(db, data)}
+
+
 @router.post('/stock-bond-info')
 @log_request
 @timeit

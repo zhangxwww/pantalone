@@ -3,6 +3,7 @@ export const FOLLOWED_DATA = [
         category: 'A股指数',
         isKLine: true,
         skipPercentile: false,
+        skipExpReturn: false,
         content: [
             {
                 name: '上证综指',
@@ -55,6 +56,7 @@ export const FOLLOWED_DATA = [
         category: '美股指数',
         isKLine: true,
         skipPercentile: false,
+        skipExpReturn: false,
         content: [
             {
                 name: '纳斯达克综合指数',
@@ -82,6 +84,7 @@ export const FOLLOWED_DATA = [
         category: '港股指数',
         isKLine: true,
         skipPercentile: false,
+        skipExpReturn: false,
         content: [
             {
                 name: '恒生指数',
@@ -114,6 +117,7 @@ export const FOLLOWED_DATA = [
         category: '波动率指数',
         isKLine: true,
         skipPercentile: false,
+        skipExpReturn: true,
         content: [
             {
                 name: '50ETF期权波动率指数QVIX',
@@ -131,6 +135,7 @@ export const FOLLOWED_DATA = [
         category: '债券指数',
         isKLine: true,
         skipPercentile: false,
+        skipExpReturn: false,
         content: [
             {
                 name: '国债指数',
@@ -153,6 +158,7 @@ export const FOLLOWED_DATA = [
         category: '商品期货',
         isKLine: true,
         skipPercentile: false,
+        skipExpReturn: false,
         content: [
             {
                 name: '黄金连续',
@@ -180,6 +186,7 @@ export const FOLLOWED_DATA = [
         category: '股指期货',
         isKLine: true,
         skipPercentile: false,
+        skipExpReturn: false,
         content: [
             {
                 name: '沪深300指数期货',
@@ -202,6 +209,7 @@ export const FOLLOWED_DATA = [
         category: '国债期货',
         isKLine: true,
         skipPercentile: false,
+        skipExpReturn: false,
         content: [
             {
                 name: '5年期国债期货',
@@ -219,6 +227,7 @@ export const FOLLOWED_DATA = [
         category: '利率',
         isKLine: false,
         skipPercentile: true,
+        skipExpReturn: true,
         content: [
             {
                 name: 'LPR品种',
@@ -231,6 +240,7 @@ export const FOLLOWED_DATA = [
         category: '外汇',
         isKLine: false,
         skipPercentile: false,
+        skipExpReturn: false,
         content: [
             {
                 name: '美元',
@@ -268,6 +278,7 @@ export const FOLLOWED_DATA = [
         category: '宏观',
         isKLine: false,
         skipPercentile: true,
+        skipExpReturn: true,
         content: [
             {
                 name: '宏观杠杆率',
@@ -345,6 +356,7 @@ export const FOLLOWED_DATA = [
         category: '全球宏观',
         isKLine: false,
         skipPercentile: true,
+        skipExpReturn: true,
         content: []
     }
 ];

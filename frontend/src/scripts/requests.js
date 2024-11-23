@@ -56,6 +56,11 @@ export async function getPricePercentileRequest (data) {
     return res.data;
 }
 
+export async function getExpectedReturnRequest (data) {
+    const res = await axios.post('/api/expected-return', data);
+    return res.data;
+}
+
 export async function getStockBondInfoRequest (stocks, bonds) {
     const res = await axios.post('/api/stock-bond-info', { 'stocks': stocks, 'bonds': bonds });
     return res.data;
