@@ -1,0 +1,1 @@
+DELETE from bond_info_data where code = 'US912797HP56';
