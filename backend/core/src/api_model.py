@@ -108,21 +108,24 @@ class GetMarketData(BaseModel):
     instrument: str
 
 
-class _KLinePercentileContentData(BaseModel):
+class _Contentdata(BaseModel):
     name: str
+
+
+class _KLineContentData(_Contentdata):
     code: str
     market: str
 
 
-class _MarketPercentileContentData(BaseModel):
+class _MarketContentData(_Contentdata):
     name: str
     code: str
     instrument: str
 
 
-class _PercentileData(BaseModel):
+class _CategoryData(BaseModel):
     isKLine: bool
-    content: list[_KLinePercentileContentData | _MarketPercentileContentData]
+    content: list[_KLineContentData | _MarketContentData]
 
     class Config:
         extra = 'ignore'
@@ -135,11 +138,11 @@ class _PercentilePeriodWindowData(BaseModel):
 
 class PercentileRequestData(BaseModel):
     period_window: list[_PercentilePeriodWindowData]
-    data: list[_PercentileData]
+    data: list[_CategoryData]
 
 
 class ExpectedReturnRequestData(BaseModel):
-    data: list[_PercentileData]
+    data: list[_CategoryData]
     target: float = 0.1
     p: float = 0.95
     dt: int = 252

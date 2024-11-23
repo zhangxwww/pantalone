@@ -19,6 +19,22 @@ from libs.math.interval import normal_interval
 from libs.constant import INSTRUMENT_CODES, INDICATOR_NAME_TO_CODE
 
 
+async def _load_data_for_content_data(db, item, is_kline, p):
+    if is_kline:
+        logger.debug(f'Get kline data: {item.code} {item.market} {p}')
+        d = await crud.get_kline_data(db, item.code, p, item.market)
+        d = [{'date': dd.date, 'value': dd.close} for dd in d]
+    else:
+        logger.debug(f'Get market data: {item.code} {item.instrument} {p}')
+        d = await crud.get_market_data(db, INSTRUMENT_CODES[item.instrument][0])
+        d = [{'date': dd.date, 'value': dd.price} for dd in d]
+    return d
+
+async def _load_data(db, item, is_kline, p):
+    if isinstance(item, api_model._Contentdata):
+        return await _load_data_for_content_data(db, item, is_kline, p)
+    raise NotImplementedError
+
 async def get_percentile(db, query: api_model.PercentileRequestData):
 
     def _resample(daily_df, period):
@@ -47,17 +63,6 @@ async def get_percentile(db, query: api_model.PercentileRequestData):
         last_value = df['value'].iloc[-1]
         percentile = (df['value'] < last_value).sum() / df.shape[0] * 100
         return percentile
-
-    async def _load_data(db, item, is_kline, p):
-        if is_kline:
-            logger.debug(f'Get kline data: {item.code} {item.market} {p}')
-            d = await crud.get_kline_data(db, item.code, p, item.market)
-            d = [{'date': dd.date, 'value': dd.close} for dd in d]
-        else:
-            logger.debug(f'Get market data: {item.code} {item.instrument} {p}')
-            d = await crud.get_market_data(db, INSTRUMENT_CODES[item.instrument][0])
-            d = [{'date': dd.date, 'value': dd.price} for dd in d]
-        return d
 
     def _calculate_pct(name, is_kline, p, w, d):
         logger.debug(f'Calculate pct of {name} {p} {w}')
@@ -209,17 +214,6 @@ async def get_ucp_query_result(db, ucp_string_list, sample_interval, sample_func
     return {'status': 'success', 'value': res}
 
 async def get_expected_return(db, query: api_model.ExpectedReturnRequestData):
-
-    async def _load_data(db, item, is_kline, p):
-        if is_kline:
-            logger.debug(f'Get kline data: {item.code} {item.market} {p}')
-            d = await crud.get_kline_data(db, item.code, p, item.market)
-            d = [{'date': dd.date, 'value': dd.close} for dd in d]
-        else:
-            logger.debug(f'Get market data: {item.code} {item.instrument} {p}')
-            d = await crud.get_market_data(db, INSTRUMENT_CODES[item.instrument][0])
-            d = [{'date': dd.date, 'value': dd.price} for dd in d]
-        return d
 
     data = query.data
     p = query.p
