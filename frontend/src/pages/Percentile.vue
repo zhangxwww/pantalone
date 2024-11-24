@@ -14,6 +14,7 @@
       </el-row>
       <div v-for="m in months" :key="m" :id="`expected-return-${m}-chart`"
         style="width: 100%; height: 270px; margin-top: 20px;"></div>
+      <el-divider style="width: 80%; margin-left: 10%; margin-top: 40px"></el-divider>
       <el-row style="margin-top: 40px;">
         <el-col>
           <span style="font-size: var(--el-font-size-large); font-weight: bold;">TL;DR</span>
@@ -199,7 +200,9 @@ export default {
   },
   unmounted () {
     this.percentileGraph.dispose();
-    this.expectedReturnGraph.dispose();
+    for (const m of this.months) {
+      this.expectedReturnGraphGroup[m].dispose();
+    }
   },
   components: {
     VersionFooter,

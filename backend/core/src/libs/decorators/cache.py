@@ -12,24 +12,25 @@ class CacheWithExpiration:
             cls._instance = super(CacheWithExpiration, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, expiration_time: int = 3600):
+    def __init__(self):
         if not hasattr(self, 'initialized'):
-            self.expiration_time = expiration_time
             self.cache = {}
             self.initialized = True
 
-    def __call__(self, func):
-        @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
-            key = self._key(func, *args, **kwargs)
-            if key in self.cache:
-                if time.time() - self.cache[key]['time'] < self.expiration_time:
-                    return self.cache[key]['value']
+    def __call__(self, expiration_time: int = 3600):
+        def decorator(func):
+            @functools.wraps(func)
+            async def wrapper(*args, **kwargs):
+                key = self._key(func, *args, **kwargs)
+                if key in self.cache:
+                    if time.time() - self.cache[key]['time'] < expiration_time:
+                        return self.cache[key]['value']
 
-            result = await func(*args, **kwargs)
-            self.cache[key] = {'value': result, 'time': time.time()}
-            return result
-        return wrapper
+                result = await func(*args, **kwargs)
+                self.cache[key] = {'value': result, 'time': time.time()}
+                return result
+            return wrapper
+        return decorator
 
     @staticmethod
     def _key(func, *args, **kwargs):
