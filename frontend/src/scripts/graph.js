@@ -17,7 +17,7 @@ import { CanvasRenderer } from "echarts/renderers";
 import { LabelLayout, UniversalTransition } from "echarts/features";
 
 import { timeFormat } from "@/scripts/formatter";
-import { PERCENTILE_CHART_TRANSLATION, FOLLOWED_DATA_NAME_2_CATEGORY, PERCENTILE_CHART_CATEGORY_COLOR, INSTRUMENT_INDICATOR_TRANSLATION_SHORT } from "./constant";
+import { FOLLOWED_DATA_NAME_2_CATEGORY, PERCENTILE_CHART_CATEGORY_COLOR, INSTRUMENT_INDICATOR_TRANSLATION_SHORT } from "./constant";
 
 echarts.use([
     TitleComponent,
@@ -1273,7 +1273,7 @@ export function drawMarketPriceLineGraph (chart, data, title) {
     return chart;
 }
 
-export function drawPercentileGraph (chart, data) {
+export function drawPercentileGraph (chart, data, titles) {
     const title = [
         {
             text: '标的价格百分位',
@@ -1289,7 +1289,8 @@ export function drawPercentileGraph (chart, data) {
         title.push({
             textBaseline: 'middle',
             top: ((idx + 0.5) * 95) / nLines + 5 + '%',
-            text: `${PERCENTILE_CHART_TRANSLATION[d.period]}价格（${d.window > 0 ? d.window + '年' : '至今'}）`
+            // text: `${PERCENTILE_CHART_TRANSLATION[d.period]}价格（${d.window > 0 ? d.window + '年' : '至今'}）`
+            text: titles[idx]
         });
         singleAxis.push({
             left: 150,
