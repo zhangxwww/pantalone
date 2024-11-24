@@ -20,7 +20,7 @@ from libs.utils.date_transform import trans_str_date_to_trade_date, get_one_quar
 from libs.constant import INDEX_CODES, CURRENCY_DICT, INSTRUMENT_CODES, KLINE_START
 
 
-cache = CacheWithExpiration(expiration_time=3600)
+cache = CacheWithExpiration()
 
 async def get_china_bond_yield_data(db, dates):
     query_dates = [trans_str_date_to_trade_date(d) for d in dates]
@@ -189,6 +189,7 @@ async def get_latest_currency_rate(db, symbol):
 
     return res[-1]['rate']
 
+@cache(expiration_time=3600 * 24 * 7)
 async def get_fund_name(db, symbol):
     db_data = await crud.get_fund_name(db, symbol)
     if db_data is not None:
@@ -213,6 +214,7 @@ async def get_refreshed_fund_net_value(symbols):
     ret = Parallel(n_jobs=-1)(delayed(_f)(symbol) for symbol in symbols)
     return ret
 
+@cache(expiration_time=3600 * 24 * 7)
 async def get_fund_holding_data(db, symbols):
 
     now = datetime.now()
@@ -416,7 +418,7 @@ async def get_fund_holding_relevance_data(fund_holding_data):
         'order': list(fund_holding_data.keys())
     }
 
-@cache
+@cache(expiration_time=3600)
 async def get_kline_data(db, query):
     code = query.code
     period = query.period
@@ -465,7 +467,7 @@ async def get_kline_data(db, query):
 
     return res
 
-@cache
+@cache(expiration_time=3600)
 async def get_market_data(db, instrument):
     codes = INSTRUMENT_CODES[instrument]
 
@@ -516,6 +518,7 @@ async def get_market_data(db, instrument):
 
     return res
 
+@cache(expiration_time=3600 * 24 * 7)
 async def get_stock_bond_info(db, stocks, bonds):
     stock_info = []
     stock_found = set()

@@ -6,7 +6,7 @@ from libs.decorators.cache import CacheWithExpiration
 from ._decorators import _retry_when_db_locked
 
 
-cache = CacheWithExpiration(expiration_time=3600)
+cache = CacheWithExpiration()
 
 # ********** kline data **********
 
@@ -35,7 +35,7 @@ async def create_kline_data_from_list(
         db.add(item)
     await db.commit()
 
-@cache
+@cache(expiration_time=3600)
 async def get_kline_data(
     db: AsyncSession,
     code: str,
@@ -50,7 +50,7 @@ async def get_kline_data(
     results = await db.execute(query)
     return results.scalars().all()
 
-@cache
+@cache(expiration_time=3600)
 async def get_daily_kline_data_by_code(
     db: AsyncSession,
     code: str
