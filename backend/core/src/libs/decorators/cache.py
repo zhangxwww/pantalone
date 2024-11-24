@@ -1,7 +1,6 @@
 import time
 import functools
 
-from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -25,10 +24,8 @@ class CacheWithExpiration:
             key = self._key(func, *args, **kwargs)
             if key in self.cache:
                 if time.time() - self.cache[key]['time'] < self.expiration_time:
-                    logger.info(f"Cache hit: {key}")
                     return self.cache[key]['value']
 
-            logger.info(f"Cache miss: {key}")
             result = await func(*args, **kwargs)
             self.cache[key] = {'value': result, 'time': time.time()}
             return result
