@@ -11,6 +11,7 @@ import pandas as pd
 import api_model
 import sql_app.crud as crud
 from libs.protocol.ucp import UCP
+from libs.df import resample, cut_by_window, percentile
 from libs.expr.expr import Executor, Preprocessor
 from libs.expr.supported_operations import SUPPORTED_OPERATIONS
 from libs.math.estimation import estimate_normal_distribution
@@ -21,11 +22,9 @@ from libs.constant import INSTRUMENT_CODES, INDICATOR_NAME_TO_CODE
 
 async def _load_data_for_content_data(db, item, is_kline, p):
     if is_kline:
-        logger.debug(f'Get kline data: {item.code} {item.market} {p}')
         d = await crud.get_kline_data(db, item.code, p, item.market)
         d = [{'date': dd.date, 'value': dd.close} for dd in d]
     else:
-        logger.debug(f'Get market data: {item.code} {item.instrument} {p}')
         d = await crud.get_market_data(db, INSTRUMENT_CODES[item.instrument][0])
         d = [{'date': dd.date, 'value': dd.price} for dd in d]
     return d
@@ -37,40 +36,12 @@ async def _load_data(db, item, is_kline, p):
 
 async def get_percentile(db, query: api_model.PercentileRequestData):
 
-    def _resample(daily_df, period):
-        df = daily_df.copy()
-        if period == 'daily':
-            return df
-        df['date'] = pd.to_datetime(df['date'])
-        df = df.set_index('date')
-        sample = 'W' if period == 'weekly' else 'ME'
-        agg_df = df.resample(sample).agg({
-            'value': 'last'
-        }).dropna()
-        agg_df = agg_df.reset_index()
-        agg_df['date'] = agg_df['date'].dt.date
-        return agg_df
-
-    def _cut_by_window(df, window):
-        if window == -1:
-            return df.copy()
-        current_data = pd.Timestamp.now()
-        start_date = current_data - pd.DateOffset(year=window)
-        filtered = df[df['date'] >= start_date.date()]
-        return filtered
-
-    def _percentile(df):
-        last_value = df['value'].iloc[-1]
-        percentile = (df['value'] < last_value).sum() / df.shape[0] * 100
-        return percentile
-
-    def _calculate_pct(name, is_kline, p, w, d):
-        logger.debug(f'Calculate pct of {name} {p} {w}')
+    def _calculate_pct(is_kline, p, w, d):
         df = pd.DataFrame(d)
         if not is_kline:
-            df = _resample(df, p)
-        df = _cut_by_window(df, w)
-        pct = _percentile(df)
+            df = resample(df, p)
+        df = cut_by_window(df, w)
+        pct = percentile(df)
         return pct
 
     data = query.data
@@ -85,7 +56,7 @@ async def get_percentile(db, query: api_model.PercentileRequestData):
             is_kline = cat.isKLine
             for item in cat.content:
                 d = await _load_data(db, item, is_kline, p)
-                pct = _calculate_pct(item.name, is_kline, p, w, d)
+                pct = _calculate_pct(is_kline, p, w, d)
                 r['percentile'][item.name] = pct
         res.append(r)
 
@@ -227,6 +198,7 @@ async def get_expected_return(db, query: api_model.ExpectedReturnRequestData):
     ]
 
     def _f(code, df, p, dt):
+        df = cut_by_window(df, dt * 3, 'day')
         df['value'] = df['value'].interpolate(method='linear')
         df = df.dropna()
         log_ret = np.log(df['value'] / df['value'].shift(1))
@@ -248,5 +220,8 @@ async def get_expected_return(db, query: api_model.ExpectedReturnRequestData):
         }
 
     res = Parallel(n_jobs=-1)(delayed(_f)(item['code'], item['df'], p, dt) for item in data)
+
+    for r in res:
+        logger.debug(f'{r["code"]} {r["expected"]:.4f} {r["lower"]:.4f} {r["upper"]:.4f}')
 
     return res
