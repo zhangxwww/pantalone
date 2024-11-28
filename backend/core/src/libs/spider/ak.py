@@ -1,5 +1,10 @@
 import datetime
 
+from libs.patch import patch_module, nop
+
+import tqdm
+patch_module(tqdm, 'tqdm', nop)
+
 import akshare as ak
 import pandas as pd
 from loguru import logger
