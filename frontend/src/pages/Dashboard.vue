@@ -303,6 +303,21 @@ export default {
           children: commonOperatorMenuChildren,
         });
 
+        const ucpFunctionList = data.ucp_list.function;
+        console.log(ucpFunctionList);
+        const commonFunctionMenuChildren = [];
+        for (const ucp of ucpFunctionList) {
+          commonFunctionMenuChildren.push({
+            value: ucp.ucp,
+            label: ucp.code,
+          });
+        }
+        this.operatorMenu.push({
+          label: '函数',
+          value: 'function',
+          children: commonFunctionMenuChildren,
+        });
+
         const v2l = (node) => {
           if (node.children) {
             node.children.forEach(v2l);
@@ -413,11 +428,19 @@ export default {
       },
 
       onAddOperator: () => {
+        const type = parseUCPString(this.selectedOperatorValue).type;
         this.formular.push({
           label: this.value2label[this.selectedOperatorValue],
           value: this.selectedOperatorValue,
-          type: 'operator'
+          type: type
         });
+        if (type === 'function') {
+          this.formular.push({
+            label: '(',
+            value: 'ucp:operation/l_paren/l_paren',
+            type: 'operator'
+          });
+        }
         this.selectedOperatorValue = null;
       },
 

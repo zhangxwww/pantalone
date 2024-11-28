@@ -1289,7 +1289,6 @@ export function drawPercentileGraph (chart, data, titles) {
         title.push({
             textBaseline: 'middle',
             top: ((idx + 0.5) * 95) / nLines + 5 + '%',
-            // text: `${PERCENTILE_CHART_TRANSLATION[d.period]}价格（${d.window > 0 ? d.window + '年' : '至今'}）`
             text: titles[idx]
         });
         singleAxis.push({
@@ -1556,7 +1555,6 @@ export function drawGeneralLineGraph (chart, data, legend) {
             }
         },
     };
-    console.log(option);
     chart.setOption(option);
     return chart;
 }

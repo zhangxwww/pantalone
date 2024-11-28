@@ -14,6 +14,7 @@ from libs.protocol.ucp import UCP
 from libs.df import resample, cut_by_window, percentile
 from libs.expr.expr import Executor, Preprocessor
 from libs.expr.supported_operations import SUPPORTED_OPERATIONS
+from libs.expr.supported_functions import SUPPORTED_FUNCTIONS
 from libs.math.estimation import estimate_normal_distribution
 from libs.math.geometric_random_walk import exp_geometric_random_walk, std_geometric_random_walk
 from libs.math.interval import normal_interval
@@ -93,9 +94,20 @@ async def get_ucp_list(db):
         } for u in operation_ucp
     ]
 
+    function_ucp = [
+        UCP.from_kwargs(type_='function', code=name, column=name)
+        for name in SUPPORTED_FUNCTIONS.keys()
+    ]
+    function_res = [
+        {
+            'ucp': u.ucp, 'code': u.code
+        } for u in function_ucp
+    ]
+
     return {
         'indicator': indicator_res,
-        'operation': operation_res
+        'operation': operation_res,
+        'function': function_res
     }
 
 async def get_ucp_query_result(db, ucp_string_list, sample_interval, sample_func, start, end):
@@ -138,8 +150,8 @@ async def get_ucp_query_result(db, ucp_string_list, sample_interval, sample_func
     resample_dict = {
         'daily': 'D',
         'weekly': 'W',
-        'monthly': 'M',
-        'yearly': 'Y'
+        'monthly': 'ME',
+        'yearly': 'YE'
     }
     resampled_df = result_df.resample(resample_dict[sample_interval], on='date')
 
