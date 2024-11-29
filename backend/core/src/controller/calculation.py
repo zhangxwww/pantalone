@@ -15,8 +15,8 @@ from libs.df import resample, cut_by_window, percentile
 from libs.expr.expr import Executor, Preprocessor
 from libs.expr.supported_operations import SUPPORTED_OPERATIONS
 from libs.expr.supported_functions import SUPPORTED_FUNCTIONS
-from libs.math.estimation import estimate_normal_distribution
-from libs.math.geometric_random_walk import exp_geometric_random_walk, std_geometric_random_walk
+from libs.math.estimation import estimate_log_normal_distribution
+from libs.math.geometric_random_walk import exp_geometric_random_walk, std_geometric_random_walk, mean_geometric_random_walk
 from libs.math.interval import normal_interval
 from libs.constant import INSTRUMENT_CODES, INDICATOR_NAME_TO_CODE
 
@@ -214,16 +214,18 @@ async def get_expected_return(db, query: api_model.ExpectedReturnRequestData):
         df = df.copy()
         df['value'] = df['value'].interpolate(method='linear')
         df = df.dropna()
-        log_ret = np.log(df['value'] / df['value'].shift(1))
-        log_ret = log_ret.dropna()
-        mu, sigma = estimate_normal_distribution(log_ret)
-        n = log_ret.shape[0]
+        ret = df['value'] / df['value'].shift(1)
+        ret = ret.dropna()
+        mu, sigma = estimate_log_normal_distribution(ret)
+
         exp = math.exp(exp_geometric_random_walk(mu, dt)) - 1
 
         std = std_geometric_random_walk(sigma, dt)
+        mean = mean_geometric_random_walk(mu, sigma, dt)
         lower, upper = normal_interval(p)
-        lower = math.exp(mu * dt + lower * std / n ** 0.5) - 1
-        upper = math.exp(mu * dt + upper * std / n ** 0.5) - 1
+
+        lower = math.exp(mean + lower * std) - 1
+        upper = math.exp(mean + upper * std) - 1
 
         return {
             'code': code,

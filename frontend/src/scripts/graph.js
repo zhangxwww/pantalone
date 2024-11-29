@@ -1564,9 +1564,9 @@ export function drawExpectedReturnGraph (chart, data, months, p) {
 
     data.sort((a, b) => {
         if (b.expected !== a.expected) {
-            return b.expected - a.expected;
+            return b.upper - a.upper;
         } else {
-            return (a.upper - a.lower) - (b.upper - b.lower);
+            return a.lower - b.lower;
         }
     });
 

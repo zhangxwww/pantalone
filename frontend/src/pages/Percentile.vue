@@ -94,7 +94,7 @@ export default {
         percentile: {}
       })),
       months: [6, 12, 24],
-      p: 0.95,
+      p: 0.9,
       expectedReturnGraphGroup: {},
 
       TLDRTopK: 5,
