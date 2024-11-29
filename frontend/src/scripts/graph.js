@@ -1570,7 +1570,7 @@ export function drawExpectedReturnGraph (chart, data, months, p) {
         }
     });
 
-    const BAR_COLOR = '#999999';
+    const BAR_COLOR = '#889bd8';
 
     const baseBar = [];
     const valueBar = [];
@@ -1673,11 +1673,36 @@ export function drawExpectedReturnGraph (chart, data, months, p) {
             },
             {
                 type: 'scatter',
-                data: data.map(d => d.expected),
+                data: data.map(d => d.lower),
                 symbol: 'rect',
-                symbolSize: [15, 2],
+                symbolSize: [10, 1],
+                itemStyle: {
+                    borderColor: 'transparent',
+                    color: BAR_COLOR
+                },
+                emphasis: {
+                    itemStyle: {
+                        borderColor: 'transparent',
+                        color: BAR_COLOR
+                    }
+                },
+            },
+            {
+                type: 'scatter',
+                data: data.map(d => d.upper),
+                symbol: 'rect',
+                symbolSize: [10, 1],
+                itemStyle: {
+                    borderColor: 'transparent',
+                    color: BAR_COLOR
+                },
+                emphasis: {
+                    itemStyle: {
+                        borderColor: 'transparent',
+                        color: BAR_COLOR
+                    }
+                },
             }
-
         ],
         tooltip: {
             trigger: 'axis',
