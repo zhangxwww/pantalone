@@ -140,6 +140,35 @@
                 <tab-table :data="data" @edit="handleEdit"></tab-table>
             </el-row>
 
+            <el-divider style="width: 60%; margin-left: 20%;"></el-divider>
+
+            <el-row style="width: 60%; margin-left: 20%;">
+                <el-col :span="6">
+                    <el-statistic title="累计投资天数" :value="357" />
+                </el-col>
+                <el-col :span="6">
+                    <el-statistic title="最近一年资产变化" :value="123456" value-style="color: #d12c2f">
+                        <template #prefix>
+                            <div style="color: #d12c2f">+</div>
+                        </template>
+                    </el-statistic>
+                </el-col>
+                <el-col :span="6">
+                    <el-statistic title="最近一年收益" :value="268500" value-style="color: #d12c2f">
+                        <template #prefix>
+                            <div style="color: #d12c2f">+</div>
+                        </template>
+                    </el-statistic>
+                </el-col>
+                <el-col :span="6">
+                    <el-statistic title="累计收益" :value="268500" value-style="color: #d12c2f">
+                        <template #prefix>
+                            <div style="color: #d12c2f">+</div>
+                        </template>
+                    </el-statistic>
+                </el-col>
+            </el-row>
+
             <add-cash-dialog ref="addCashDialog" @add="onAddData"></add-cash-dialog>
 
             <add-monetary-dialog ref="addMonetaryDialog" @add="onAddData"></add-monetary-dialog>
