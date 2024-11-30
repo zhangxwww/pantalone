@@ -345,7 +345,7 @@ export default class Data {
                 currentNetValue: newNetValue,
                 currentShares: u.currentShares,
                 holding: u.holding,
-                lockupPeriod: u.lockupPeriod - Math.max(Math.ceil(deltaTime), 2),
+                lockupPeriod: Math.max(u.lockupPeriod - Math.ceil(deltaTime), 2),
                 dividendRatio: 0
             }
             console.log(toBeAdded);
