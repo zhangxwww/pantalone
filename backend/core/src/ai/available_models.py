@@ -6,6 +6,7 @@ class AvailableChatModel(enum.Enum):
     QWEN25_7B = "qwen2.5:7b"
     QWEN25_32B = "qwen2.5:32b-instruct-q2_K"
     QWEN25_72B = "qwen2.5:72b-instruct-q3_K_S"
+    QWQ = "qwq"
 
 
 class AvailableEmbeddingModel(enum.Enum):
