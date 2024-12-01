@@ -140,6 +140,39 @@
                 <tab-table :data="data" @edit="handleEdit"></tab-table>
             </el-row>
 
+            <el-divider style="width: 40%; margin-left: 30%;"></el-divider>
+
+            <el-row style="width: 40%; margin-left: 30%;">
+                <el-col :span="6">
+                    <el-statistic title="累计投资天数" :value="statistic.totalInvestmentDays"
+                        value-style="font-weight: bold" />
+                </el-col>
+                <el-col :span="6">
+                    <el-statistic title="最近一年资产变化" :value="statistic.lastYearAssetChange"
+                        value-style="color: #d12c2f; font-weight: bold">
+                        <template #prefix>
+                            <div style="color: #d12c2f; font-weight: bold">+</div>
+                        </template>
+                    </el-statistic>
+                </el-col>
+                <el-col :span="6">
+                    <el-statistic title="最近一年收益" :value="statistic.lastYearReturn"
+                        value-style="color: #d12c2f; font-weight: bold">
+                        <template #prefix>
+                            <div style="color: #d12c2f; font-weight: bold">+</div>
+                        </template>
+                    </el-statistic>
+                </el-col>
+                <el-col :span="6">
+                    <el-statistic title="累计收益" :value="statistic.totalReturn"
+                        value-style="color: #d12c2f; font-weight: bold">
+                        <template #prefix>
+                            <div style="color: #d12c2f; font-weight: bold">+</div>
+                        </template>
+                    </el-statistic>
+                </el-col>
+            </el-row>
+
             <add-cash-dialog ref="addCashDialog" @add="onAddData"></add-cash-dialog>
 
             <add-monetary-dialog ref="addMonetaryDialog" @add="onAddData"></add-monetary-dialog>
@@ -204,6 +237,12 @@ export default {
                 monetaryFundData: [],
                 fixedDepositData: [],
                 fundData: []
+            },
+            statistic: {
+                totalInvestmentDays: 0,
+                lastYearAssetChange: 0,
+                lastYearReturn: 0,
+                totalReturn: 0
             },
 
             editId: null,
@@ -507,6 +546,7 @@ export default {
         this.drawEmpty();
         await this.record.load();
         this.data = this.record.getData();
+        this.statistic = this.record.getStatisdicData();
         await this.draw();
         await this.checkGitStates();
     },

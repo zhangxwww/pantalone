@@ -925,4 +925,98 @@ export default class Data {
             drawdownArithmetic: cal(cumReturnData.cumReturn.arithmetic),
         }
     }
+
+    getStatisdicData () {
+        let earlist = new Date();
+
+        const oneYearBefore = new Date();
+        oneYearBefore.setFullYear(oneYearBefore.getFullYear() - 1);
+
+        let lastYearAsset = 0;
+        let latestAsset = 0;
+
+        let cumReturn = 0;
+        let lastYearBeforeCumReturn = 0;
+
+        for (const cData of this.data.cashData) {
+            const first = cData.history[0];
+            const latest = cData.history[cData.history.length - 1];
+            if (first.beginningTime < earlist) {
+                earlist = first.beginningTime;
+            }
+            const lastYearBeforeHistory = cData.history.filter(h => h.beginningTime <= oneYearBefore);
+            const lastYearBefore = lastYearBeforeHistory[lastYearBeforeHistory.length - 1];
+            if (lastYearBefore && lastYearBefore.amount > 0) {
+                lastYearAsset += lastYearBefore.amount;
+            }
+            if (latest && latest.amount > 0) {
+                latestAsset += latest.amount;
+            }
+        }
+        for (const mData of this.data.monetaryFundData) {
+            const first = mData.history[0];
+            const latest = mData.history[mData.history.length - 1];
+            if (first.beginningTime < earlist) {
+                earlist = first.beginningTime;
+            }
+            const lastYearBeforeHistory = mData.history.filter(h => h.currentTime <= oneYearBefore);
+            const lastYearBefore = lastYearBeforeHistory[lastYearBeforeHistory.length - 1];
+            if (lastYearBefore && lastYearBefore.holding && lastYearBefore.currentAmount > 0) {
+                lastYearAsset += lastYearBefore.currentAmount;
+            }
+            if (latest && latest.holding && latest.currentAmount > 0) {
+                latestAsset += latest.currentAmount;
+            }
+            if (lastYearBefore) {
+                lastYearBeforeCumReturn += lastYearBefore.cumReturn;
+            }
+            if (latest) {
+                cumReturn += latest.cumReturn;
+                console.log(latest.name, latest.cumReturn);
+            }
+        }
+        for (const fData of this.data.fixedDepositData) {
+            const first = fData.history[0];
+            const latest = fData.history[fData.history.length - 1];
+            if (first.beginningTime < earlist) {
+                earlist = first.beginningTime;
+            }
+            const lastYearBeforeHistory = fData.history.filter(h => h.beginningTime <= oneYearBefore && h.endingTime >= oneYearBefore);
+            const lastYearBefore = lastYearBeforeHistory[lastYearBeforeHistory.length - 1];
+            if (lastYearBefore && lastYearBefore.beginningAmount > 0) {
+                lastYearAsset += lastYearBefore.beginningAmount;
+            }
+            if (latest && latest.beginningAmount > 0) {
+                latestAsset += latest.beginningAmount;
+            }
+        }
+        for (const uData of this.data.fundData) {
+            const first = uData.history[0];
+            const latest = uData.history[uData.history.length - 1];
+            if (first.currentTime < earlist) {
+                earlist = first.currentTime;
+            }
+            const lastYearBeforeHistory = uData.history.filter(h => h.currentTime <= oneYearBefore);
+            const lastYearBefore = lastYearBeforeHistory[lastYearBeforeHistory.length - 1];
+            if (lastYearBefore && lastYearBefore.holding && lastYearBefore.currentAmount > 0) {
+                lastYearAsset += lastYearBefore.currentAmount;
+            }
+            if (latest && latest.holding && latest.currentAmount > 0) {
+                latestAsset += latest.currentAmount;
+            }
+            if (lastYearBefore) {
+                lastYearBeforeCumReturn += lastYearBefore.cumReturn;
+            }
+            if (latest) {
+                cumReturn += latest.cumReturn;
+                console.log(latest.name, latest.cumReturn);
+            }
+        }
+        return {
+            totalInvestmentDays: Math.ceil((new Date() - earlist) / (1000 * 3600 * 24)),
+            lastYearAssetChange: latestAsset - lastYearAsset,
+            lastYearReturn: cumReturn - lastYearBeforeCumReturn,
+            totalReturn: cumReturn
+        }
+    }
 }

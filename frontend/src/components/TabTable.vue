@@ -1,6 +1,6 @@
 <template>
     <el-tabs v-model="tabName" @tab-change="onTabChange" type="border-card"
-        style="width: 98%; margin-left: 1%; margin-bottom: 5%">
+        style="width: 98%; margin-left: 1%; margin-bottom: 10px">
         <el-tab-pane label="现金">
             <el-table :data="data.cashData" table-layout="auto" style="width: 100%">
                 <el-table-column v-for="header, i in headers.cash" :key="i" :prop="header.prop" :label="header.label"
