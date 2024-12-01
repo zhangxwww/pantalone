@@ -345,11 +345,7 @@ export default class Data {
                 currentNetValue: newNetValue,
                 currentShares: u.currentShares,
                 holding: u.holding,
-<<<<<<< Updated upstream
-                lockupPeriod: Math.max(u.lockupPeriod - Math.ceil(deltaTime), 2),
-=======
                 lockupPeriod: u.lockupPeriod - Math.max(Math.floor(deltaTime), 2),
->>>>>>> Stashed changes
                 dividendRatio: 0
             }
             console.log(toBeAdded);
