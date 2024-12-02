@@ -364,6 +364,7 @@ export default {
                 } else {
                     this.setAllGraphUnLoading();
                 }
+                this.statistic = this.record.getStatisdicData();
                 this.refreshing = false;
             },
             initGraph: () => {
