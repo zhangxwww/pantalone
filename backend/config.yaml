@@ -1,3 +1,14 @@
 core:
   host: "localhost"
   port: 9876
+
+  paths:
+    logs:
+      dir: "logs"
+    db:
+      dir: "db"
+      name: "pantalone.db"
+    temp:
+      dir: "temp"
+    clean_docs:
+      dir: "docs"
