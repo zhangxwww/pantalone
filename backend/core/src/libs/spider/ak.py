@@ -1,6 +1,6 @@
 import datetime
 
-from libs.patch import patch_module, nop
+from libs.utils.patch import patch_module, nop
 
 import tqdm
 patch_module(tqdm, 'tqdm', nop)
