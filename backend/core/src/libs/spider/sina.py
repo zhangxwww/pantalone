@@ -1,3 +1,6 @@
+import re
+import datetime
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -27,12 +30,24 @@ def get_bank_or_currency_or_future_news_list(page, category):
     s = BeautifulSoup(res.text, 'html.parser')
     ul = s.select('#listcontent')[0]
     lis = ul.find_all('li')
+
     res = []
+    pattern = r"^(.*?)\((.*?)\)$"
     for li in lis:
-        title = li.text.encode('latin1').decode('utf-8').strip()
+        title_date = li.text.encode('latin1').decode('utf-8').strip()
+        match = re.search(pattern, title_date)
+        if match:
+            title = match.group(1).strip()
+            dt = match.group(2).strip()
+            dt = datetime.datetime.strptime(dt, '%m月%d日 %H:%M')
+            if dt > datetime.datetime.now():
+                dt = dt.replace(year=datetime.datetime.now().year - 1)
+        else:
+            title = title_date
+            dt = datetime.datetime.now()
         a = li.find('a')
         url = a['href'] if a else ''
-        res.append({'title': title, 'url': url})
+        res.append({'title': title, 'url': url, 'datetime': dt})
     return res
 
 
