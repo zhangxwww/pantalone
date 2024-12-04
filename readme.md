@@ -19,8 +19,14 @@ pip install -r requirements.txt
 
 ### Prepare Services:
 
-Refer to [here](backend/service/readme.md) for details.
+Refer to [here](backend/third-party/readme.md) for details.
 
+### Prepare Data:
+
+```bash
+cd backend/core/src
+python -m rag.prepare
+```
 
 ### Start:
 
@@ -46,10 +52,8 @@ cd backend/core
   - playground
     - correlation, linear regression
     - ()
-    - rmax, rmin, rmean, rstd, rsum, csum, yoy, mom
     - chart type
   - percentile => oppertunity
-    - probability of return > threshold
     - normalty test
     - connection among subcharts
 - minor

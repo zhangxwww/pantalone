@@ -1,4 +1,3 @@
-import re
 import datetime
 
 import requests
@@ -32,14 +31,14 @@ def get_bank_or_currency_or_future_news_list(page, category):
     lis = ul.find_all('li')
 
     res = []
-    pattern = r"^(.*?)\((.*?)\)$"
     for li in lis:
         title_date = li.text.encode('latin1').decode('utf-8').strip()
-        match = re.search(pattern, title_date)
-        if match:
-            title = match.group(1).strip()
-            dt = match.group(2).strip()
+        last_left_bracket = title_date.rfind('(')
+        if last_left_bracket != -1:
+            title = title_date[:last_left_bracket].strip()
+            dt = title_date[last_left_bracket + 1:-1]
             dt = datetime.datetime.strptime(dt, '%m月%d日 %H:%M')
+            dt = dt.replace(year=datetime.datetime.now().year)
             if dt > datetime.datetime.now():
                 dt = dt.replace(year=datetime.datetime.now().year - 1)
         else:
