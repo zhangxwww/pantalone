@@ -7,4 +7,4 @@ def run_async_task(func, *args):
     except RuntimeError:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-    loop.create_task(func(*args))
+    loop.run_until_complete(func(*args))
