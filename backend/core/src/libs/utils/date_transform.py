@@ -38,3 +38,16 @@ def get_one_quarter_before(year, quarter):
         return year, quarter - 1
     else:
         return year - 1, 4
+
+def get_dates_between_str(start_date: str, end_date: str):
+    start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+    end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
+
+    dates = []
+
+    current_date_obj = start_date_obj
+    while current_date_obj <= end_date_obj:
+        dates.append(current_date_obj)
+        current_date_obj += timedelta(days=1)
+
+    return dates
