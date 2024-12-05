@@ -74,11 +74,9 @@ app.mount('/', staticfiles.StaticFiles(directory='../../../frontend/dist/', html
 
 if __name__ == '__main__':
     import uvicorn
-    import yaml
 
-    with open('../../config.yaml', 'r') as f:
-        config = yaml.safe_load(f)
+    from config import CONFIG
 
-    host = config['core']['host']
-    port = config['core']['port']
+    host = CONFIG['core']['host']
+    port = CONFIG['core']['port']
     uvicorn.run('app:app', host=host, port=port, reload=False)

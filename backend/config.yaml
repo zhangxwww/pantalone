@@ -3,6 +3,8 @@ core:
   port: 9876
 
   paths:
+    base:
+      dir: "pantalone"
     logs:
       dir: "logs"
     db:
