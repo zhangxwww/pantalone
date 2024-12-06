@@ -34,7 +34,8 @@ class Crawler:
 
             page = 1
             n_continue_exists = 0
-            while True:
+            should_break = False
+            while not should_break:
                 logger.info(f'[{category}] page {page}')
                 try:
                     report_list, referer, done = get_report_list(page, category)
@@ -51,10 +52,10 @@ class Crawler:
                         continue
                     if url in exists:
                         n_continue_exists += 1
-                        if n_continue_exists > 3:
+                        if n_continue_exists >= 3:
+                            should_break = True
                             break
                         continue
-                    n_continue_exists = 0
 
                     url = report.url
                     logger.info(f'[{category} ({page})] {i + 1}/{len(report_list)} {report.title} from {url}')
@@ -77,60 +78,6 @@ class Crawler:
 
                     sleep(0.3)
                 page += 1
-
-        if failed:
-            logger.error('Failed list:')
-            for f in failed:
-                logger.error(f)
-
-    def _crawl_bank_currency_future_news(self):
-        n_pages = 20
-
-        failed = []
-
-        for category in ['bank', 'currency', 'future']:
-            exists = set(info['title'] for info in self.metadata_list[category])
-            file_dir = os.path.join(self.raw_path, category)
-            if not os.path.exists(file_dir):
-                os.makedirs(file_dir)
-
-            for page in range(1, n_pages + 1):
-                try:
-                    news_list = get_bank_or_currency_or_future_news_list(page, category)
-                except Exception as e:
-                    logger.error(f'[{category}] Page {page} error: {e}')
-                    failed.append((category, page))
-                    continue
-
-                for i, news in enumerate(news_list):
-                    title = news['title']
-                    if title in exists:
-                        continue
-
-                    url = news['url']
-                    logger.info(f'[{category} ({page}/{n_pages})] {i + 1}/{len(news_list)} {title} from {url}')
-
-                    if not url:
-                        continue
-
-                    id_ = len(self.metadata_list[category])
-                    try:
-                        detail = get_detail(url)
-                    except Exception as e:
-                        logger.error(f'[{category}] {i + 1}/{len(news_list)} from {url} error: {e}')
-                        detail = ''
-                        failed.append((category, page, title, url))
-                        continue
-                    with open(os.path.join(file_dir, f'{id_}.html'), 'w', encoding='utf-8') as f:
-                        f.write(detail)
-
-                    news['id'] = id_
-                    news['datetime'] = news['datetime'].strftime('%Y-%m-%d')
-                    exists.add(title)
-                    self.metadata_list[category].append(news)
-                    self._save_metadata_list()
-
-                    sleep(0.15)
 
         if failed:
             logger.error('Failed list:')
