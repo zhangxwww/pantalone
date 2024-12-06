@@ -23,14 +23,20 @@ def get_db_path():
         os.makedirs(db_dir)
     return os.path.join(db_dir, PATH_CONFIG['db']['name'])
 
-def get_temp_path():
-    temp_dir = os.path.join(BASE_DIR, PATH_CONFIG['temp']['dir'])
-    if not os.path.exists(temp_dir):
-        os.makedirs(temp_dir)
-    return temp_dir
+def get_rag_path():
+    d = os.path.join(BASE_DIR, PATH_CONFIG['rag']['dir'])
+    if not os.path.exists(d):
+        os.makedirs(d)
+    return d
 
-def get_docs_path():
-    docs_dir = os.path.join(BASE_DIR, PATH_CONFIG['docs']['dir'])
-    if not os.path.exists(docs_dir):
-        os.makedirs(docs_dir)
-    return docs_dir
+def get_rag_raw_path():
+    d = os.path.join(get_rag_path(), PATH_CONFIG['rag']['raw']['dir'])
+    if not os.path.exists(d):
+        os.makedirs(d)
+    return d
+
+def get_rag_processed_path():
+    d = os.path.join(get_rag_path(), PATH_CONFIG['rag']['processed']['dir'])
+    if not os.path.exists(d):
+        os.makedirs(d)
+    return d

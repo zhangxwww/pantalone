@@ -3,8 +3,10 @@ import datetime
 import requests
 from bs4 import BeautifulSoup
 
+from rag.type import DocumentMetaData
 
-_HEADER = {
+
+BCF_HEADER = {
     'Host': 'finance.sina.com.cn',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -15,6 +17,41 @@ _HEADER = {
     'Upgrade-Insecure-Requests': '1'
 }
 
+REPORT_HEADER = {
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br, zstd',
+    'Accept-Language': 'zh-CN,en-US;q=0.7,en;q=0.3',
+    'Connection': 'keep-alive',
+    'DNT': '1',
+    'Host': 'stock.finance.sina.com.cn',
+    'Priority': 'u=0, i',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'none',
+    'Sec-Fetch-User': '?1',
+    'Sec-GPC': '1',
+    'Upgrade-Insecure-Requests': '1',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0',
+}
+
+REPORT_DETAIL_HEADER = {
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br, zstd',
+    'Accept-Language': 'zh-CN,en-US;q=0.7,en;q=0.3',
+    'Connection': 'keep-alive',
+    'DNT': '1',
+    'Host': 'stock.finance.sina.com.cn',
+    'Priority': 'u=0, i',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sec-Fetch-User': '?1',
+    'Sec-GPC': '1',
+    'TE': 'trailers',
+    'Upgrade-Insecure-Requests': '1',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0'
+}
+
 _CID = {
     'bank': 56684,
     'currency': 56982,
@@ -22,10 +59,11 @@ _CID = {
 }
 
 def get_bank_or_currency_or_future_news_list(page, category):
+
     if page <= 0 or page > 20:
         raise ValueError('Page should be in [1, 20]')
     url = f'https://finance.sina.com.cn/roll/index.d.html?cid={_CID[category]}&page={page}'
-    res = requests.get(url, headers=_HEADER)
+    res = requests.get(url, headers=BCF_HEADER)
     s = BeautifulSoup(res.text, 'html.parser')
     ul = s.select('#listcontent')[0]
     lis = ul.find_all('li')
@@ -49,7 +87,56 @@ def get_bank_or_currency_or_future_news_list(page, category):
         res.append({'title': title, 'url': url, 'datetime': dt})
     return res
 
-
-def get_bank_or_currency_or_future_news_detail(url):
-    res = requests.get(url, headers=_HEADER)
+def get_detail(url):
+    res = requests.get(url, headers=BCF_HEADER)
     return res.text.encode('latin1').decode('utf-8')
+
+def get_report_list(page, category):
+    category2kind = {
+        'industry': 'industry',
+        'macro': 'macro',
+        'engineer': '11'
+    }
+    def _filter_industry(doc):
+        key_words = ['黄金', '贵金属', '有色金属', '石油', '原油', '油气', '大宗商品']
+        for word in key_words:
+            if word in doc.title:
+                return True
+        return False
+    category2filter = {
+        'industry': _filter_industry,
+        'macro': lambda _: True,
+        'engineer': lambda _: False
+    }
+
+    url = f'https://stock.finance.sina.com.cn/stock/go.php/vReport_List/kind/{category2kind[category]}/index.phtml?p={page}'
+    response = requests.get(url, headers=REPORT_HEADER)
+    html = response.text
+    soup = BeautifulSoup(html, 'html.parser')
+    trs = soup.find_all('tr')
+    res = []
+    for tr in trs:
+        tds = tr.find_all('td')
+        if len(tds) != 6:
+            continue
+        index = tds[0].text.strip()
+        if not index.isdigit():
+            continue
+        title = tds[1].a.text.strip()
+        link = tds[1].a['href']
+        link = f'https:{link}'
+        dt = tds[3].text.strip()
+        institution = tds[4].text.strip()
+        authors = tds[5].text.strip().split('/')
+        res.append(DocumentMetaData(title=title, date=dt, authors=authors, url=link, institution=institution))
+
+    end = len(res) == 0
+    res = [doc for doc in res if category2filter[category](doc)]
+    return res, url, end
+
+def get_report_detail(url, referer):
+    headers = REPORT_DETAIL_HEADER.copy()
+    headers['Referer'] = referer
+    response = requests.get(url, headers=headers)
+    text = response.text
+    return text

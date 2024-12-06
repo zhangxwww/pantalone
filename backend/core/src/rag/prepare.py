@@ -10,8 +10,8 @@ def prepare(dates):
     crawler = Crawler()
     crawler.crawl()
 
-    # parser = Parser()
-    # parser.parse()
+    parser = Parser()
+    parser.parse()
 
 
 if __name__ == '__main__':

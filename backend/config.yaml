@@ -10,7 +10,11 @@ core:
     db:
       dir: "db"
       name: "pantalone.db"
+    rag:
+      dir: "rag"
+      raw:
+        dir: "raw"
+      processed:
+        dir: "processed"
     temp:
       dir: "temp"
-    clean_docs:
-      dir: "docs"

@@ -1,60 +1,55 @@
 import os
-import shutil
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from loguru import logger
 
-from libs.utils.path import get_temp_path, get_docs_path
+from libs.utils.path import get_rag_processed_path, get_rag_path, get_rag_raw_path
 from rag.parser.html import parse_html
 
 
 class Parser:
     def __init__(self):
-        self.temp_path = get_temp_path()
-        self.docs_path = get_docs_path()
+        self.rag_path = get_rag_path()
+        self.raw_path = get_rag_raw_path()
+        self.processed_path = get_rag_processed_path()
 
     def parse(self):
-        for d in os.listdir(self.temp_path):
-            if os.path.isfile(os.path.join(self.temp_path, d)):
-                self._copy_json(d)
-            else:
-                self._parse_dir(d)
-
-    def _copy_json(self, file):
-        origin_path = os.path.join(self.temp_path, file)
-        target_path = os.path.join(self.docs_path, file)
-        shutil.copy(origin_path, target_path)
-
-    def _parse_dir(self, d):
-        logger.info(f'Parsing {d}')
+        incremental = self._find_incremental()
+        logger.info(f'Found {len(incremental)} incremental files')
         failed = []
-        for file in os.listdir(os.path.join(self.temp_path, d)):
-            success = self._parse_file_and_save(file, d)
-            if not success:
-                failed.append((d, file))
+        with ProcessPoolExecutor(max_workers=16) as executor:
+            futures = [executor.submit(self._parse_file_and_save, inc) for inc in incremental]
+            for future in as_completed(futures):
+                id_, success = future.result()
+                if not success:
+                    failed.append(id_)
         if failed:
             logger.error(f'Failed list:')
             for f in failed:
                 logger.error(f)
 
-    def _parse_file_and_save(self, file, d):
-        if not file.endswith('.html'):
-            return False
-        logger.info(f'Parsing {file}')
+    def _find_incremental(self):
+        raws = [os.path.splitext(f)[0] for f in os.listdir(self.raw_path)]
+        processed = [os.path.splitext(f)[0] for f in os.listdir(self.processed_path)]
+        incremental = list(set(raws) - set(processed))
+        return incremental
 
-        with open(os.path.join(self.temp_path, d, file), 'r', encoding='utf-8') as f:
+    def _parse_file_and_save(self, id_):
+        raw_filename = f'{id_}.html'
+        processed_filename = f'{id_}.txt'
+
+        logger.info(f'Parsing {raw_filename}')
+
+        with open(os.path.join(self.raw_path, raw_filename), 'r') as f:
             html = f.read()
 
         try:
             text = parse_html(html)
         except Exception as e:
-            logger.error(f'Parse {file} error: {e}')
-            return False
+            logger.error(f'Parse {raw_filename} error: {e}')
+            return id_, False
 
-        doc_dir = os.path.join(self.docs_path, d)
-        if not os.path.exists(doc_dir):
-            os.makedirs(doc_dir)
-
-        with open(os.path.join(doc_dir, f'{os.path.splitext(d)[0]}.txt'), 'w', encoding='utf-8') as f:
+        with open(os.path.join(self.processed_path, processed_filename), 'w', encoding='utf-8') as f:
             f.write(text)
 
-        return True
+        return id_, True
