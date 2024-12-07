@@ -40,3 +40,9 @@ def get_rag_processed_path():
     if not os.path.exists(d):
         os.makedirs(d)
     return d
+
+def get_temp_path():
+    d = os.path.join(BASE_DIR, PATH_CONFIG['temp']['dir'])
+    if not os.path.exists(d):
+        os.makedirs(d)
+    return d

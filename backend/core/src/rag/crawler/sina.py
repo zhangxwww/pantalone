@@ -1,11 +1,19 @@
+import os
+import re
+import json
 import datetime
 
 import requests
 from bs4 import BeautifulSoup
 
 from rag.type import DocumentMetaData
-from rag.crawler.headers import BCF_HEADER, REPORT_HEADER, REPORT_DETAIL_HEADER
+from rag.crawler.headers import BCF_HEADER, REPORT_HEADER, REPORT_DETAIL_HEADER, NEWS_HEADER, NEWS_DETAIL_HEADER
+from libs.utils.path import get_temp_path
 
+
+def _check_status_code(response, url):
+    if response.status_code != 200:
+        raise ValueError(f'Failed to get report list from {url} (status code: {response.status_code})')
 
 def get_bank_or_currency_or_future_news_list(page, category):
 
@@ -42,7 +50,7 @@ def get_bank_or_currency_or_future_news_list(page, category):
         res.append({'title': title, 'url': url, 'datetime': dt})
     return res
 
-def get_detail(url):
+def get_bcf_detail(url):
     res = requests.get(url, headers=BCF_HEADER)
     return res.text.encode('latin1').decode('utf-8')
 
@@ -52,20 +60,21 @@ def get_report_list(page, category):
         'macro': 'macro',
         'engineer': '11'
     }
-    def _filter_industry(doc):
+    def _filter_goods(doc):
         key_words = ['黄金', '贵金属', '有色金属', '石油', '原油', '油气', '大宗商品']
         for word in key_words:
             if word in doc.title:
                 return True
         return False
     category2filter = {
-        'industry': _filter_industry,
+        'industry': _filter_goods,
         'macro': lambda _: True,
-        'engineer': lambda _: True
+        'engineer': _filter_goods
     }
 
     url = f'https://stock.finance.sina.com.cn/stock/go.php/vReport_List/kind/{category2kind[category]}/index.phtml?p={page}'
     response = requests.get(url, headers=REPORT_HEADER)
+    _check_status_code(response, url)
     html = response.text
     soup = BeautifulSoup(html, 'html.parser')
     trs = soup.find_all('tr')
@@ -83,7 +92,8 @@ def get_report_list(page, category):
         dt = tds[3].text.strip()
         institution = tds[4].text.strip()
         authors = tds[5].text.strip().split('/')
-        res.append(DocumentMetaData(category=category, title=title, date=dt, authors=authors, url=link, institution=institution))
+        cat = f'report-{category}'
+        res.append(DocumentMetaData(category=cat, title=title, date=dt, authors=authors, url=link, institution=institution))
 
     end = len(res) == 0
     res = [doc for doc in res if category2filter[category](doc)]
@@ -93,5 +103,48 @@ def get_report_detail(url, referer):
     headers = REPORT_DETAIL_HEADER.copy()
     headers['Referer'] = referer
     response = requests.get(url, headers=headers)
+    _check_status_code(response, url)
     text = response.text
+    return text
+
+def get_news_list(date: datetime.datetime, category, topk=100):
+    cat2top = {
+        'news': 'finance_news_0_suda',
+        'money': 'finance_money_suda',
+        'stock': 'finance_stock_conten_suda'
+    }
+    url = f'https://top.finance.sina.com.cn/ws/GetTopDataList.php?top_type=day&top_cat={cat2top[category]}&top_time={date.strftime("%Y%m%d")}&get_new=1&top_show_num={topk}&top_order=DESC&js_var=all_1_data'
+    response = requests.get(url, headers=NEWS_HEADER)
+    _check_status_code(response, url)
+    text = response.text.split('= ')[1]
+    data = text \
+        .replace(r'\/', '/') \
+        .encode().decode('unicode-escape') \
+        .replace(';', '')
+    data = re.sub(r'\s', '', data)
+    data = re.sub(r'[\x00-\x1F\u200E\u200F\u2028\u202F]', '', data, flags=re.UNICODE)
+    data = re.sub(r'("title":"[^"]*?)"([^,"]*?)"([^"]*?")', r'\1“\2”\3', data)
+    data = re.sub(r'("title":"[^"]*?)"([^,"]*?)"([^"]*?")', r'\1“\2”\3', data)
+    data = re.sub(r'("title":"[^"]*?)"([^,"]*?)"([^"]*?")', r'\1“\2”\3', data)
+    try:
+        data = json.loads(data)
+    except Exception as e:
+        with open(os.path.join(get_temp_path(), f'{category}_{date.strftime("%Y%m%d")}_{topk}.json'), 'w') as f:
+            f.write(data)
+        raise e
+    res = []
+    for d in data['data']:
+        title = d['title']
+        dt = d['create_date']
+        author = []
+        url = d['url']
+        institution = d['media']
+        cat = f'news-{category}'
+        res.append(DocumentMetaData(category=cat, title=title, date=dt, authors=author, url=url, institution=institution))
+    return res
+
+def get_news_detail(url):
+    response = requests.get(url, headers=NEWS_DETAIL_HEADER)
+    _check_status_code(response, url)
+    text = response.text.encode('iso-8859-1').decode('utf-8')
     return text

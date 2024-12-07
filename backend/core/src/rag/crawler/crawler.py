@@ -1,33 +1,34 @@
 import os
 import json
 import shutil
+import datetime
 from time import sleep
 
 from loguru import logger
 
 from libs.utils.path import get_rag_raw_path, get_rag_path
+from libs.utils.date_transform import get_dates_between_str
 from rag.type import DocumentMetaData
 from rag.crawler.sina import (
-    get_bank_or_currency_or_future_news_list,
     get_report_list,
-    get_report_detail
+    get_report_detail,
+    get_news_list,
+    get_news_detail
 )
 
 
 class Crawler:
-    def __init__(self):
+    def __init__(self, earlist_news_date='2020-01-01'):
         self.rag_path = get_rag_path()
         self.raw_path = get_rag_raw_path()
         self.metadata_list = self._load_metadata_list()
+        self.earlist_news_date = earlist_news_date
 
     def crawl(self):
         self._crawl_report()
+        self._crawl_news()
 
     def _crawl_report(self):
-        file_dir = self.raw_path
-        if not os.path.exists(file_dir):
-            os.makedirs(file_dir)
-
         failed = []
         exists = set([info.url for info in self.metadata_list])
         for category in ['industry', 'macro', 'engineer']:
@@ -57,9 +58,6 @@ class Crawler:
                             break
                         continue
 
-                    url = report.url
-                    logger.info(f'[{category} ({page})] {i + 1}/{len(report_list)} {report.title} from {url}')
-
                     id_ = len(self.metadata_list)
                     try:
                         detail = get_report_detail(url, referer)
@@ -68,7 +66,7 @@ class Crawler:
                         detail = ''
                         failed.append((category, page, report.title, url))
                         continue
-                    with open(os.path.join(file_dir, f'{id_}.html'), 'w') as f:
+                    with open(os.path.join(self.raw_path, f'{id_}.html'), 'w') as f:
                         f.write(detail)
 
                     report.id = id_
@@ -83,6 +81,55 @@ class Crawler:
             logger.error('Failed list:')
             for f in failed:
                 logger.error(f)
+
+    def _crawl_news(self):
+        failed = []
+        exists = set([info.url for info in self.metadata_list])
+
+        latest_date = self._get_latest_news_date()
+        current_date = datetime.datetime.now() - datetime.timedelta(days=1)
+        current_date = current_date.strftime('%Y-%m-%d')
+        dates_between = get_dates_between_str(latest_date, current_date)
+        for date in dates_between:
+            for category in ['news', 'money', 'stock']:
+                logger.info(f'[{category}] {date.strftime("%Y-%m-%d")}')
+                try:
+                    news_list = get_news_list(date, category, topk=20)
+                except Exception as e:
+                    logger.error(f'[{category}] error: {e}')
+                    continue
+                for i, news in enumerate(news_list):
+                    url = news.url
+                    if not url or url in exists:
+                        continue
+
+                    id_ = len(self.metadata_list)
+                    try:
+                        detail = get_news_detail(url)
+                    except Exception as e:
+                        logger.error(f'[{category}] {i + 1}/{len(news_list)} from {url} error: {e}')
+                        detail = ''
+                        failed.append((category, news.title, url))
+                        continue
+                    with open(os.path.join(self.raw_path, f'{id_}.html'), 'w', encoding='utf-8') as f:
+                        f.write(detail)
+
+                    news.id = id_
+                    exists.add(url)
+                    self.metadata_list.append(news)
+                    self._save_metadata_list()
+
+        if failed:
+            logger.error('Failed list:')
+            for f in failed:
+                logger.error(f)
+
+    def _get_latest_news_date(self):
+        dates = [metadata.date for metadata in self.metadata_list if metadata.category.startswith('news-') and metadata.date]
+        if not dates:
+            return self.earlist_news_date
+        dates = sorted(dates, reverse=True)
+        return dates[0]
 
     def _load_metadata_list(self):
         DEFAULT_metadata_list = []
@@ -101,6 +148,6 @@ class Crawler:
 
     def _save_metadata_list(self):
         filename = os.path.join(self.rag_path, 'metadata.json')
-        li = [metadata.dict() for metadata in self.metadata_list]
+        li = [metadata.model_dump() for metadata in self.metadata_list]
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(li, f, ensure_ascii=False, indent=4)

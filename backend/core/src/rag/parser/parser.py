@@ -38,8 +38,6 @@ class Parser:
         raw_filename = f'{id_}.html'
         processed_filename = f'{id_}.txt'
 
-        logger.info(f'Parsing {raw_filename}')
-
         with open(os.path.join(self.raw_path, raw_filename), 'r') as f:
             html = f.read()
 
