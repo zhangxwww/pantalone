@@ -8,6 +8,8 @@ from loguru import logger
 
 from libs.utils.path import get_rag_raw_path, get_rag_path
 from libs.utils.date_transform import get_dates_between_str
+from libs.utils.run_manager import RunWithoutInterrupt
+
 from rag.type import DocumentMetaData
 from rag.crawler.sina import (
     get_report_list,
@@ -155,8 +157,6 @@ class Crawler:
     def _save_metadata_list(self):
         filename = os.path.join(self.rag_path, 'metadata.json')
         li = [metadata.model_dump() for metadata in self.metadata_list]
-        try:
-            with open(filename, 'w', encoding='utf-8') as f:
+        with open(filename, 'w', encoding='utf-8') as f:
+            with RunWithoutInterrupt():
                 json.dump(li, f, ensure_ascii=False, indent=4)
-        except KeyboardInterrupt:
-            pass
