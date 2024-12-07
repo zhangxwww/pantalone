@@ -82,7 +82,7 @@ class Crawler:
             for f in failed:
                 logger.error(f)
 
-    def _crawl_news(self):
+    def _crawl_news(self, topk=20):
         failed = []
         exists = set([info.url for info in self.metadata_list])
 
@@ -94,10 +94,16 @@ class Crawler:
             for category in ['news', 'money', 'stock']:
                 logger.info(f'[{category}] {date.strftime("%Y-%m-%d")}')
                 try:
-                    news_list = get_news_list(date, category, topk=20)
+                    news_list = get_news_list(date, category, topk=topk)
                 except Exception as e:
-                    logger.error(f'[{category}] error: {e}')
-                    continue
+                    logger.error(f'[{category}] ({topk}) error: {e}')
+                    failed.append((category, date.strftime("%Y-%m-%d"), topk))
+                    try:
+                        news_list = get_news_list(date, category, topk=topk // 2)
+                    except:
+                        logger.error(f'[{category}] ({topk // 2}) error: {e}')
+                        failed.append((category, date.strftime("%Y-%m-%d"), topk // 2))
+                        continue
                 for i, news in enumerate(news_list):
                     url = news.url
                     if not url or url in exists:
@@ -149,5 +155,8 @@ class Crawler:
     def _save_metadata_list(self):
         filename = os.path.join(self.rag_path, 'metadata.json')
         li = [metadata.model_dump() for metadata in self.metadata_list]
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(li, f, ensure_ascii=False, indent=4)
+        try:
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(li, f, ensure_ascii=False, indent=4)
+        except KeyboardInterrupt:
+            pass
