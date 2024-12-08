@@ -16,5 +16,9 @@ core:
         dir: "raw"
       processed:
         dir: "processed"
+      inverted_index:
+        dir: "inverted_index"
+      vector_db:
+        dir: "vector_db"
     temp:
       dir: "temp"

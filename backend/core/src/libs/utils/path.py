@@ -29,17 +29,23 @@ def get_rag_path():
         os.makedirs(d)
     return d
 
-def get_rag_raw_path():
-    d = os.path.join(get_rag_path(), PATH_CONFIG['rag']['raw']['dir'])
+def _get_rag_child_path(child):
+    d = os.path.join(get_rag_path(), PATH_CONFIG['rag'][child]['dir'])
     if not os.path.exists(d):
         os.makedirs(d)
     return d
 
+def get_rag_raw_path():
+    return _get_rag_child_path('raw')
+
 def get_rag_processed_path():
-    d = os.path.join(get_rag_path(), PATH_CONFIG['rag']['processed']['dir'])
-    if not os.path.exists(d):
-        os.makedirs(d)
-    return d
+    return _get_rag_child_path('processed')
+
+def get_rag_inverted_index_path():
+    return _get_rag_child_path('inverted_index')
+
+def get_rag_vector_db_path():
+    return _get_rag_child_path('vector_db')
 
 def get_temp_path():
     d = os.path.join(BASE_DIR, PATH_CONFIG['temp']['dir'])

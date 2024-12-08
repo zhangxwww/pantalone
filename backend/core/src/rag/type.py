@@ -10,3 +10,8 @@ class DocumentMetaData(BaseModel):
     url: str = ''
     abstract: str = ''
     institution: str = ''
+
+
+class Document(BaseModel):
+    metadata: DocumentMetaData
+    content: str = ''
