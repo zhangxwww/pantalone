@@ -28,7 +28,7 @@ class Crawler:
 
     def crawl(self):
         self._crawl_report()
-        self._crawl_news()
+        # self._crawl_news()
 
     def _crawl_report(self):
         failed = []

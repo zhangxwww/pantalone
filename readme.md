@@ -25,7 +25,7 @@ Refer to [here](backend/third-party/readme.md) for details.
 
 ```bash
 cd backend/core/src
-python -m rag.prepare
+python -m rag.prepare --crawl --parse
 ```
 
 ### Start:
@@ -50,8 +50,7 @@ cd backend/core
 - major
   - chat with context (pandasai)
   - playground
-    - correlation, linear regression
-    - ()
+    - linear regression
     - chart type
   - percentile => oppertunity
     - normalty test

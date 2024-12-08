@@ -2,8 +2,10 @@ import os
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from loguru import logger
+from rich.progress import track
 
 from libs.utils.path import get_rag_processed_path, get_rag_path, get_rag_raw_path
+from libs.utils.run_manager import RunWithoutInterrupt
 from rag.parser.html import parse_html
 
 
@@ -15,11 +17,12 @@ class Parser:
 
     def parse(self):
         incremental = self._find_incremental()
-        logger.info(f'Found {len(incremental)} incremental files')
+        n_incremental = len(incremental)
+        logger.info(f'Found {n_incremental} incremental files')
         failed = []
-        with ProcessPoolExecutor(max_workers=16) as executor:
+        with ProcessPoolExecutor() as executor:
             futures = [executor.submit(self._parse_file_and_save, inc) for inc in incremental]
-            for future in as_completed(futures):
+            for future in track(as_completed(futures), total=n_incremental, description='Parsing'):
                 id_, success = future.result()
                 if not success:
                     failed.append(id_)
@@ -38,16 +41,23 @@ class Parser:
         raw_filename = f'{id_}.html'
         processed_filename = f'{id_}.txt'
 
-        with open(os.path.join(self.raw_path, raw_filename), 'r') as f:
-            html = f.read()
-
+        try:
+            with open(os.path.join(self.raw_path, raw_filename), 'r', encoding='utf-8') as f:
+                html = f.read()
+        except UnicodeDecodeError:
+            with open(os.path.join(self.raw_path, raw_filename), 'r', encoding='gbk') as f:
+                html = f.read()
+                html = html.encode('utf-8')
         try:
             text = parse_html(html)
+        except KeyboardInterrupt as e:
+            raise e
         except Exception as e:
             logger.error(f'Parse {raw_filename} error: {e}')
             return id_, False
 
         with open(os.path.join(self.processed_path, processed_filename), 'w', encoding='utf-8') as f:
-            f.write(text)
+            with RunWithoutInterrupt():
+                f.write(text)
 
         return id_, True

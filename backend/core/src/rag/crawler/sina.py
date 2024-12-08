@@ -133,14 +133,15 @@ def get_news_list(date: datetime.datetime, category, topk=100):
             f.write(data)
         raise e
     res = []
-    for d in data['data']:
-        title = d['title']
-        dt = d['create_date']
-        author = []
-        url = d['url']
-        institution = d['media']
-        cat = f'news-{category}'
-        res.append(DocumentMetaData(category=cat, title=title, date=dt, authors=author, url=url, institution=institution))
+    if 'data' in data:
+        for d in data['data']:
+            title = d['title']
+            dt = d['create_date']
+            author = []
+            url = d['url']
+            institution = d['media']
+            cat = f'news-{category}'
+            res.append(DocumentMetaData(category=cat, title=title, date=dt, authors=author, url=url, institution=institution))
     return res
 
 def get_news_detail(url):
