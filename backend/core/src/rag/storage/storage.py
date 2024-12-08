@@ -9,6 +9,8 @@ from whoosh.index import create_in, open_dir, EmptyIndexError
 from whoosh.fields import Schema, TEXT, ID, STORED, KEYWORD, DATETIME
 
 from rag.type import Document, DocumentMetaData
+from rag.text_split.simple_splitter import SimpleSplitter
+
 from libs.utils.path import get_rag_inverted_index_path, get_rag_storage_json_path, get_rag_metadata_json_path, get_rag_processed_path
 from libs.utils.run_manager import RunWithoutInterrupt
 
@@ -18,12 +20,15 @@ class InvertedIndex:
         self.path = get_rag_inverted_index_path()
         self._load_db()
         self.storage_list = self._load_storage_json()
+        self.splitter = SimpleSplitter()
 
     def update(self):
         updated = self.get_updated_metadata_list()
+        documents = []
         with ThreadPoolExecutor() as executor:
             futures = [executor.submit(self.load_document, metadata) for metadata in updated]
-            documents = list(as_completed(futures))
+            for doc in track(as_completed(futures), description='Loading'):
+                documents.extend(doc)
         self.add_documents(documents)
 
     def get_updated_metadata_list(self):
@@ -39,7 +44,7 @@ class InvertedIndex:
         path = get_rag_processed_path()
         with open(os.path.join(path, f'{metadata.id}.txt'), 'r', encoding='utf-8') as f:
             content = f.read()
-        return Document(metadata=metadata, content=content)
+        return [Document(metadata=metadata, content=c) for c in self.splitter.split(content)]
 
     def add_documents(self, docs: list[Document]):
         writer = self.ix.writer()
