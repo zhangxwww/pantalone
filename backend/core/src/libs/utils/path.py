@@ -29,6 +29,12 @@ def get_rag_path():
         os.makedirs(d)
     return d
 
+def get_rag_metadata_json_path():
+    return os.path.join(get_rag_path(), PATH_CONFIG['rag']['metadata']['name'])
+
+def get_rag_storage_json_path():
+    return os.path.join(get_rag_path(), PATH_CONFIG['rag']['storage']['name'])
+
 def _get_rag_child_path(child):
     d = os.path.join(get_rag_path(), PATH_CONFIG['rag'][child]['dir'])
     if not os.path.exists(d):

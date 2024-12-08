@@ -6,7 +6,7 @@ from time import sleep
 
 from loguru import logger
 
-from libs.utils.path import get_rag_raw_path, get_rag_path
+from libs.utils.path import get_rag_raw_path, get_rag_path, get_rag_metadata_json_path
 from libs.utils.date_transform import get_dates_between_str
 from libs.utils.run_manager import RunWithoutInterrupt
 
@@ -140,11 +140,11 @@ class Crawler:
         return dates[0]
 
     def _load_metadata_list(self):
-        DEFAULT_metadata_list = []
+        DEFAULT_METADATA_LIST = []
 
-        filename = os.path.join(self.rag_path, 'metadata.json')
+        filename = get_rag_metadata_json_path()
         if not os.path.exists(filename):
-            return DEFAULT_metadata_list
+            return DEFAULT_METADATA_LIST
         shutil.copy(filename, filename + '.bak')
         with open(filename, 'r', encoding='utf-8') as f:
             try:
@@ -152,10 +152,10 @@ class Crawler:
                 data = [DocumentMetaData(**d) for d in data]
                 return data
             except UnicodeDecodeError:
-                return DEFAULT_metadata_list
+                return DEFAULT_METADATA_LIST
 
     def _save_metadata_list(self):
-        filename = os.path.join(self.rag_path, 'metadata.json')
+        filename = get_rag_metadata_json_path()
         li = [metadata.model_dump() for metadata in self.metadata_list]
         with open(filename, 'w', encoding='utf-8') as f:
             with RunWithoutInterrupt():

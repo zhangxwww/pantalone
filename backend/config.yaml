@@ -12,6 +12,10 @@ core:
       name: "pantalone.db"
     rag:
       dir: "rag"
+      metadata:
+        name: "metadata.json"
+      storage:
+        name: "storage.json"
       raw:
         dir: "raw"
       processed:
