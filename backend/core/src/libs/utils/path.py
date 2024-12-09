@@ -32,9 +32,6 @@ def get_rag_path():
 def get_rag_metadata_json_path():
     return os.path.join(get_rag_path(), PATH_CONFIG['rag']['metadata']['name'])
 
-def get_rag_storage_json_path():
-    return os.path.join(get_rag_path(), PATH_CONFIG['rag']['storage']['name'])
-
 def _get_rag_child_path(child):
     d = os.path.join(get_rag_path(), PATH_CONFIG['rag'][child]['dir'])
     if not os.path.exists(d):
@@ -50,8 +47,14 @@ def get_rag_processed_path():
 def get_rag_inverted_index_path():
     return _get_rag_child_path('inverted_index')
 
+def get_rag_inverted_index_json_path():
+    return os.path.join(get_rag_path(), PATH_CONFIG['rag']['inverted_index']['name'])
+
 def get_rag_vector_db_path():
     return _get_rag_child_path('vector_db')
+
+def get_rag_vector_db_json_path():
+    return os.path.join(get_rag_path(), PATH_CONFIG['rag']['vector_db']['name'])
 
 def get_temp_path():
     d = os.path.join(BASE_DIR, PATH_CONFIG['temp']['dir'])

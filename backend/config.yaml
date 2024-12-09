@@ -14,15 +14,15 @@ core:
       dir: "rag"
       metadata:
         name: "metadata.json"
-      storage:
-        name: "storage.json"
       raw:
         dir: "raw"
       processed:
         dir: "processed"
       inverted_index:
         dir: "inverted_index"
+        name: "inverted_index.json"
       vector_db:
         dir: "vector_db"
+        name: "vector_db.json"
     temp:
       dir: "temp"
