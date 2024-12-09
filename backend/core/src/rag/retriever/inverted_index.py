@@ -1,7 +1,7 @@
 import os
 import json
 import shutil
-from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from rich.progress import track
 from loguru import logger
@@ -30,17 +30,8 @@ class InvertedIndex:
         with ThreadPoolExecutor() as executor:
             futures = [executor.submit(self.load_document, metadata) for metadata in updated]
             n_future = len(futures)
-            for future in track(as_completed(futures, timeout=10), description='Loading', total=n_future):
-                try:
-                    documents.extend(future.result())
-                except TimeoutError:
-                    pass
-
-        timeout_doc_id = set(u.id for u in updated) - set(d.metadata.id for d in documents)
-        if timeout_doc_id:
-            logger.error('Timeout list:')
-            for i in timeout_doc_id:
-                logger.error(f'{i}')
+            for future in track(as_completed(futures), description='Loading', total=n_future):
+                documents.extend(future.result())
 
         self.add_documents(documents)
 
@@ -62,8 +53,7 @@ class InvertedIndex:
             content = f.read()
         if not content.strip():
             return []
-        docs = [Document(metadata=metadata, content=c) for c in self.splitter.split(content)]
-        return [doc for doc in docs if doc.content]
+        return [Document(metadata=metadata, content=c) for c in self.splitter.split(content) if content]
 
     def add_documents(self, docs: list[Document]):
         writer = self.ix.writer()
