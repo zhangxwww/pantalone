@@ -36,12 +36,13 @@ class InvertedIndex:
                 except TimeoutError:
                     pass
 
-        self.add_documents(documents)
         timeout_doc_id = set(u.id for u in updated) - set(d.metadata.id for d in documents)
         if timeout_doc_id:
             logger.error('Timeout list:')
             for i in timeout_doc_id:
                 logger.error(f'{i}')
+
+        self.add_documents(documents)
 
     def get_updated_metadata_list(self):
         with open(get_rag_metadata_json_path(), 'r', encoding='utf-8') as f:
@@ -59,7 +60,10 @@ class InvertedIndex:
         path = get_rag_processed_path()
         with open(os.path.join(path, f'{metadata.id}.txt'), 'r', encoding='utf-8') as f:
             content = f.read()
-        return [Document(metadata=metadata, content=c) for c in self.splitter.split(content)]
+        if not content.strip():
+            return []
+        docs = [Document(metadata=metadata, content=c) for c in self.splitter.split(content)]
+        return [doc for doc in docs if doc.content]
 
     def add_documents(self, docs: list[Document]):
         writer = self.ix.writer()

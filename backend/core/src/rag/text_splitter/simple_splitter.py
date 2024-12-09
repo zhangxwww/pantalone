@@ -25,6 +25,8 @@ class SimpleSplitter:
         return [t for t in strip if t]
 
     def _merge_to_chunk(self, texts):
+        if not texts:
+            return []
         text_lengths = {text: len(text) for text in texts}
         text_num = len(texts)
         chunks = []
