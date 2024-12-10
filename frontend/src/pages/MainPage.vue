@@ -344,6 +344,7 @@ export default {
                 }
                 this.setMonthChangeGraphLoading();
                 this.data = this.record.getData();
+                this.statistic = this.record.getStatisdicData();
                 await this.draw();
                 this.editId = null;
             },
@@ -360,11 +361,11 @@ export default {
                 const update = await this.record.refreshFundNetValue(this.data, this.getFundSymbols());
                 if (update) {
                     this.data = this.record.getData();
+                    this.statistic = this.record.getStatisdicData();
                     await this.draw();
                 } else {
                     this.setAllGraphUnLoading();
                 }
-                this.statistic = this.record.getStatisdicData();
                 this.refreshing = false;
             },
             initGraph: () => {
