@@ -5,7 +5,7 @@ from loguru import logger
 from rich.progress import track
 
 from libs.utils.path import get_rag_processed_path, get_rag_path, get_rag_raw_path
-from libs.utils.run_manager import RunWithoutInterrupt
+from libs.utils.context_manager import RunWithoutInterrupt
 from rag.parser.html import parse_html
 
 

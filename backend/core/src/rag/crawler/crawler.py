@@ -8,9 +8,8 @@ from loguru import logger
 
 from libs.utils.path import get_rag_raw_path, get_rag_path, get_rag_metadata_json_path
 from libs.utils.date_transform import get_dates_between_str
-from libs.utils.run_manager import RunWithoutInterrupt
 
-from rag.type import DocumentMetaData
+from rag.mixin.json_manager import DocumentMetaDataJsonManagerMixin
 from rag.crawler.sina import (
     get_report_list,
     get_report_detail,
@@ -19,11 +18,12 @@ from rag.crawler.sina import (
 )
 
 
-class Crawler:
+class Crawler(DocumentMetaDataJsonManagerMixin):
     def __init__(self, earlist_news_date='2020-01-01'):
         self.rag_path = get_rag_path()
         self.raw_path = get_rag_raw_path()
-        self.metadata_list = self._load_metadata_list()
+        self.json_path = get_rag_metadata_json_path()
+        self.metadata_list = self.load_json()
         self.earlist_news_date = earlist_news_date
 
     def crawl(self):
@@ -74,7 +74,7 @@ class Crawler:
                     report.id = id_
                     exists.add(url)
                     self.metadata_list.append(report)
-                    self._save_metadata_list()
+                    self.save_json(self.metadata_list)
 
                     sleep(0.3)
                 page += 1
@@ -125,7 +125,7 @@ class Crawler:
                     news.id = id_
                     exists.add(url)
                     self.metadata_list.append(news)
-                    self._save_metadata_list()
+                    self.save_json(self.metadata_list)
 
         if failed:
             logger.error('Failed list:')
@@ -138,25 +138,3 @@ class Crawler:
             return self.earlist_news_date
         dates = sorted(dates, reverse=True)
         return dates[0]
-
-    def _load_metadata_list(self):
-        DEFAULT_METADATA_LIST = []
-
-        filename = get_rag_metadata_json_path()
-        if not os.path.exists(filename):
-            return DEFAULT_METADATA_LIST
-        shutil.copy(filename, filename + '.bak')
-        with open(filename, 'r', encoding='utf-8') as f:
-            try:
-                data = json.load(f)
-                data = [DocumentMetaData(**d) for d in data]
-                return data
-            except UnicodeDecodeError:
-                return DEFAULT_METADATA_LIST
-
-    def _save_metadata_list(self):
-        filename = get_rag_metadata_json_path()
-        li = [metadata.model_dump() for metadata in self.metadata_list]
-        with open(filename, 'w', encoding='utf-8') as f:
-            with RunWithoutInterrupt():
-                json.dump(li, f, ensure_ascii=False, indent=4)

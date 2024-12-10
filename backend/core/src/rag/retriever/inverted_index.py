@@ -12,16 +12,17 @@ from jieba.analyse import ChineseAnalyzer
 
 from rag.type import Document, DocumentMetaData
 from rag.text_splitter.simple_splitter import SimpleSplitter
+from rag.mixin.json_manager import DocumentMetaDataJsonManagerMixin
 
 from libs.utils.path import get_rag_inverted_index_path, get_rag_inverted_index_json_path, get_rag_metadata_json_path, get_rag_processed_path
-from libs.utils.run_manager import RunWithoutInterrupt
 
 
-class InvertedIndex:
+class InvertedIndex(DocumentMetaDataJsonManagerMixin):
     def __init__(self):
         self.path = get_rag_inverted_index_path()
         self._load_db()
-        self.storage_list = self._load_storage_json()
+        self.json_path = get_rag_inverted_index_json_path()
+        self.storage_list = self.load_json()
         self.splitter = SimpleSplitter()
 
     def update(self):
@@ -67,7 +68,7 @@ class InvertedIndex:
         logger.info(f'Committing')
         writer.commit()
         logger.info(f'Finish committing')
-        self._save_storage_list()
+        self.save_json(self.storage_list)
 
     def query(self):
         pass
@@ -93,25 +94,3 @@ class InvertedIndex:
             content=TEXT(stored=True, analyzer=ChineseAnalyzer()),
         )
         self.ix = create_in(self.path, schema)
-
-    def _load_storage_json(self):
-        DEFAULT_STORAGE_LIST = []
-
-        filename = get_rag_inverted_index_json_path()
-        if not os.path.exists(filename):
-            return DEFAULT_STORAGE_LIST
-        shutil.copy(filename, filename + '.bak')
-        with open(filename, 'r', encoding='utf-8') as f:
-            try:
-                data = json.load(f)
-                data = [DocumentMetaData(**d) for d in data]
-                return data
-            except UnicodeDecodeError:
-                return DEFAULT_STORAGE_LIST
-
-    def _save_storage_list(self):
-        filename = get_rag_inverted_index_json_path()
-        li = [metadata.model_dump() for metadata in self.storage_list]
-        with open(filename, 'w', encoding='utf-8') as f:
-            with RunWithoutInterrupt():
-                json.dump(li, f, ensure_ascii=False, indent=4)
