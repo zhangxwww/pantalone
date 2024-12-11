@@ -2,6 +2,8 @@ import os
 import json
 import shutil
 
+from loguru import logger
+
 from libs.utils.context_manager import RunWithoutInterrupt
 
 from rag.type import DocumentMetaData
@@ -26,3 +28,15 @@ class DocumentMetaDataJsonManagerMixin:
         with open(self.json_path, 'w', encoding='utf-8') as f:
             with RunWithoutInterrupt():
                 json.dump(li, f, ensure_ascii=False, indent=4)
+
+    def get_update_list(self, current_data):
+        with open(self.reference_json_path, 'r', encoding='utf-8') as f:
+            metadata_list = json.load(f)
+        metadata_list = [DocumentMetaData(**metadata) for metadata in metadata_list]
+        url_set = set(doc.url for doc in current_data)
+        updated = []
+        for metadata in metadata_list:
+            if metadata.url not in url_set:
+                updated.append(metadata)
+        logger.info(f'Found {len(updated)} updated documents')
+        return updated

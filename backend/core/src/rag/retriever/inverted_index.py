@@ -22,11 +22,12 @@ class InvertedIndex(DocumentMetaDataJsonManagerMixin):
         self.path = get_rag_inverted_index_path()
         self._load_db()
         self.json_path = get_rag_inverted_index_json_path()
+        self.reference_json_path = get_rag_metadata_json_path()
         self.storage_list = self.load_json()
         self.splitter = SimpleSplitter()
 
     def update(self):
-        updated = self.get_updated_metadata_list()
+        updated = self.get_update_list(self.storage_list)
         documents = []
         with ThreadPoolExecutor() as executor:
             futures = [executor.submit(self.load_document, metadata) for metadata in updated]
@@ -35,18 +36,6 @@ class InvertedIndex(DocumentMetaDataJsonManagerMixin):
                 documents.extend(future.result())
 
         self.add_documents(documents)
-
-    def get_updated_metadata_list(self):
-        with open(get_rag_metadata_json_path(), 'r', encoding='utf-8') as f:
-            metadata_list = json.load(f)
-        metadata_list = [DocumentMetaData(**metadata) for metadata in metadata_list]
-        storage_url_set = set(doc.url for doc in self.storage_list)
-        updated = []
-        for metadata in metadata_list:
-            if metadata.url not in storage_url_set:
-                updated.append(metadata)
-        logger.info(f'Found {len(updated)} updated documents')
-        return updated
 
     def load_document(self, metadata):
         path = get_rag_processed_path()
