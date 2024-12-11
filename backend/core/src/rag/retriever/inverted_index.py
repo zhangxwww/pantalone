@@ -1,6 +1,4 @@
 import os
-import json
-import shutil
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from rich.progress import track
@@ -14,6 +12,7 @@ from rag.type import Document, DocumentMetaData
 from rag.text_splitter.simple_splitter import SimpleSplitter
 from rag.mixin.json_manager import DocumentMetaDataJsonManagerMixin
 
+from libs.utils.context_manager import Silence
 from libs.utils.path import get_rag_inverted_index_path, get_rag_inverted_index_json_path, get_rag_metadata_json_path, get_rag_processed_path
 
 
@@ -49,10 +48,11 @@ class InvertedIndex(DocumentMetaDataJsonManagerMixin):
         writer = self.ix.writer()
         for doc in track(docs, description='Indexing'):
             if doc.content:
-                writer.update_document(
-                    **doc.metadata.model_dump(),
-                    content=doc.content,
-                )
+                with Silence():
+                    writer.update_document(
+                        **doc.metadata.model_dump(),
+                        content=doc.content,
+                    )
                 self.storage_list.append(doc.metadata)
         logger.info(f'Committing')
         writer.commit()

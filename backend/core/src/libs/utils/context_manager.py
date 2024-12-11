@@ -1,4 +1,6 @@
+import io
 import signal
+from contextlib import redirect_stdout
 
 
 class RunWithoutInterrupt:
@@ -19,3 +21,12 @@ class RunWithoutInterrupt:
         if self.interupted:
             raise KeyboardInterrupt
         return False
+
+
+class Silence:
+    def __enter__(self):
+        self.re = redirect_stdout(io.StringIO())
+        return self.re.__enter__()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        return self.re.__exit__(exc_type, exc_value, traceback)
