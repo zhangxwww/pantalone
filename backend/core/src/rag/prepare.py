@@ -1,11 +1,7 @@
-import logging
-
 from rag.crawler.crawler import Crawler
 from rag.parser.parser import Parser
 from rag.retriever.retriever import Retriever
 
-
-logging.getLogger('jieba').disabled = True
 
 def prepare(args):
     if args.crawl:

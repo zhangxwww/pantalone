@@ -1,5 +1,4 @@
-import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import logging
 
 from rich.progress import track
 from loguru import logger
@@ -9,41 +8,35 @@ from whoosh.fields import Schema, TEXT, ID, STORED, KEYWORD, DATETIME
 from jieba.analyse import ChineseAnalyzer
 
 from rag.type import Document
-from rag.text_splitter.simple_splitter import SimpleSplitter
 from rag.mixin.json_manager import DocumentMetaDataJsonManagerMixin
+from rag.mixin.document_loader import DocumentLoaderMixin
 
 from libs.utils.path import get_rag_inverted_index_path, get_rag_inverted_index_json_path, get_rag_metadata_json_path, get_rag_processed_path
 
 
-class InvertedIndex(DocumentMetaDataJsonManagerMixin):
+logging.getLogger('jieba').disabled = True
+
+
+class InvertedIndex(
+    DocumentMetaDataJsonManagerMixin,
+    DocumentLoaderMixin
+):
     def __init__(self):
         self.path = get_rag_inverted_index_path()
         self._load_db()
         self.json_path = get_rag_inverted_index_json_path()
         self.reference_json_path = get_rag_metadata_json_path()
         self.storage_list = self.load_json()
-        self.splitter = SimpleSplitter()
+        super().__init__()
 
     def update(self):
         updated = self.get_update_list(self.storage_list)
-        documents = []
-        with ThreadPoolExecutor() as executor:
-            futures = [executor.submit(self.load_document, metadata) for metadata in updated]
-            n_future = len(futures)
-            for future in track(as_completed(futures), description='Loading', total=n_future):
-                documents.extend(future.result())
+        documents = self.load_documents(updated, get_rag_processed_path())
 
         self.add_documents(documents)
 
-    def load_document(self, metadata):
-        path = get_rag_processed_path()
-        with open(os.path.join(path, f'{metadata.id}.txt'), 'r', encoding='utf-8') as f:
-            content = f.read()
-        if not content.strip():
-            return []
-        return [Document(metadata=metadata, content=c) for c in self.splitter.split(content) if content]
-
     def add_documents(self, docs: list[Document]):
+        added = False
         writer = self.ix.writer()
         for doc in track(docs, description='Indexing'):
             if doc.content:
@@ -51,11 +44,13 @@ class InvertedIndex(DocumentMetaDataJsonManagerMixin):
                     **doc.metadata.model_dump(),
                     content=doc.content,
                 )
+                added = True
                 self.storage_list.append(doc.metadata)
-        logger.info(f'Committing')
-        writer.commit()
-        logger.info(f'Finish committing')
-        self.save_json(self.storage_list)
+        if added:
+            logger.info(f'Committing')
+            writer.commit()
+            logger.info(f'Finish committing')
+            self.save_json(self.storage_list)
 
     def query(self):
         pass
