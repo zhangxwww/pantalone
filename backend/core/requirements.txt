@@ -21,3 +21,4 @@ langchain-text-splitters==0.3.0
 pytest==8.3.3
 whoosh-reloaded==2.7.5
 jieba==0.42.1
+nano-vectordb==0.0.4.3

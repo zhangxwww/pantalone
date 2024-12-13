@@ -8,7 +8,8 @@ from ai.prompts import CHAT_MODEL_SYSTEM_PROMPT
 async def chat(
     messages,
     model=AvailableChatModel.QWEN25_7B.value,
-    system_prompt=CHAT_MODEL_SYSTEM_PROMPT):
+    system_prompt=CHAT_MODEL_SYSTEM_PROMPT
+):
 
     logger.info(f"Chat with model {model}")
 

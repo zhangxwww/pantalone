@@ -8,11 +8,10 @@ from whoosh.index import create_in, open_dir, EmptyIndexError
 from whoosh.fields import Schema, TEXT, ID, STORED, KEYWORD, DATETIME
 from jieba.analyse import ChineseAnalyzer
 
-from rag.type import Document, DocumentMetaData
+from rag.type import Document
 from rag.text_splitter.simple_splitter import SimpleSplitter
 from rag.mixin.json_manager import DocumentMetaDataJsonManagerMixin
 
-from libs.utils.context_manager import Silence
 from libs.utils.path import get_rag_inverted_index_path, get_rag_inverted_index_json_path, get_rag_metadata_json_path, get_rag_processed_path
 
 
@@ -48,11 +47,10 @@ class InvertedIndex(DocumentMetaDataJsonManagerMixin):
         writer = self.ix.writer()
         for doc in track(docs, description='Indexing'):
             if doc.content:
-                with Silence():
-                    writer.update_document(
-                        **doc.metadata.model_dump(),
-                        content=doc.content,
-                    )
+                writer.update_document(
+                    **doc.metadata.model_dump(),
+                    content=doc.content,
+                )
                 self.storage_list.append(doc.metadata)
         logger.info(f'Committing')
         writer.commit()
