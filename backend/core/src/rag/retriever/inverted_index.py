@@ -36,17 +36,15 @@ class InvertedIndex(
         self.add_documents(documents)
 
     def add_documents(self, docs: list[Document]):
-        added = False
         writer = self.ix.writer()
-        for doc in track(docs, description='Indexing'):
-            if doc.content:
+        docs = [doc for doc in docs if doc.content]
+        if docs:
+            for doc in track(docs, description='Indexing'):
                 writer.update_document(
                     **doc.metadata.model_dump(),
                     content=doc.content,
                 )
-                added = True
                 self.storage_list.append(doc.metadata)
-        if added:
             logger.info(f'Committing')
             writer.commit()
             logger.info(f'Finish committing')

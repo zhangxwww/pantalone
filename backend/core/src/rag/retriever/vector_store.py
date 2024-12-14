@@ -54,14 +54,16 @@ class VectorStore(
     def get_embeddings(self, docs):
         logger.info('Embedding documents')
         texts = [doc.content for doc in docs]
-        return self.embedding.embed_documents(texts)
+        return self.embedding.embed_documents_batch(texts)
 
     def add_data(self, docs, embeddings):
-        date = [{
+        data = [{
             '__vector__': emb,
             **doc.metadata.model_dump()
         } for emb, doc in zip(embeddings, docs)]
 
         logger.info('Upserting data')
-        self.vdb.upsert(date)
+        self.vdb.upsert(data)
         self.vdb.save()
+        self.storage_list.extend([doc.metadata for doc in docs])
+        self.save_json(self.storage_list)
