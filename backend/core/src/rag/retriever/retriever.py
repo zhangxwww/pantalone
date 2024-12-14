@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor, wait
 
-from rich.progress import Progress
+from rich.progress import Progress, TimeElapsedColumn
 
 from rag.retriever.inverted_index import InvertedIndex
 from rag.retriever.vector_store import VectorStore
@@ -40,7 +40,13 @@ class Retriever:
     def add_documents(self, docs):
         n_docs = len(docs)
         n_batches = n_docs // self.batch_size + 1
-        with Progress(auto_refresh=False, speed_estimate_period=300) as progress:
+        progress = Progress(
+            *Progress.get_default_columns(),
+            TimeElapsedColumn(),
+            auto_refresh=False,
+            speed_estimate_period=300,
+        )
+        with progress:
             task = progress.add_task(f"Adding documents", total=n_docs)
             with ThreadPoolExecutor(max_workers=2) as executor:
                 for i in range(n_batches):
