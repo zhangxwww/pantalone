@@ -32,7 +32,9 @@ class Retriever:
     def update(self, update_num):
         updated = self.json_manager.get_update_list(self.storage_list, update_num)
         next_chunk_id = self.json_manager.get_next_chunk_id(self.storage_list)
-        documents = self.loader.load_documents(updated, get_rag_processed_path(), next_chunk_id)
+        documents = self.loader.load_documents_into_chunks(
+            updated, get_rag_processed_path(), next_chunk_id
+        )
         self.add_documents(documents)
 
     def add_documents(self, docs):

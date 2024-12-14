@@ -28,6 +28,7 @@ cd backend/core/src
 python -m rag.prepare
   [--crawl]
   [--parse]
+  [--clean]
   [--store [--store-num <num>] [--store-batch-size <size>]]
 ```
 
