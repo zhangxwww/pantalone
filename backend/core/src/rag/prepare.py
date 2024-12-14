@@ -14,7 +14,8 @@ def prepare(args):
 
     if args.store:
         retriever = Retriever()
-        retriever.update()
+        store_num = args.store_num if args.store_num != -1 else None
+        retriever.update(store_num)
 
 
 if __name__ == '__main__':
@@ -24,6 +25,7 @@ if __name__ == '__main__':
     parser.add_argument('--crawl', action='store_true')
     parser.add_argument('--parse', action='store_true')
     parser.add_argument('--store', action='store_true')
+    parser.add_argument('--store-num', type=int, default=-1)
     args = parser.parse_args()
 
     prepare(args)

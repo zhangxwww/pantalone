@@ -27,8 +27,8 @@ class Retriever:
         self.inverted_index = InvertedIndex()
         self.vector_store = VectorStore()
 
-    def update(self):
-        updated = self.json_manager.get_update_list(self.storage_list)
+    def update(self, update_num):
+        updated = self.json_manager.get_update_list(self.storage_list, update_num)
         next_chunk_id = self.json_manager.get_next_chunk_id(self.storage_list)
         documents = self.loader.load_documents(updated, get_rag_processed_path(), next_chunk_id)
         self.add_documents(documents)

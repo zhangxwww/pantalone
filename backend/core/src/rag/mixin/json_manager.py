@@ -33,7 +33,7 @@ class DocumentMetaDataJsonManager:
             with RunWithoutInterrupt():
                 json.dump(li, f, ensure_ascii=False, indent=4)
 
-    def get_update_list(self, current_data):
+    def get_update_list(self, current_data, update_num):
         with open(self.reference_json_path, 'r', encoding='utf-8') as f:
             metadata_list = json.load(f)
         metadata_list = [DocumentMetaData(**metadata) for metadata in metadata_list]
@@ -43,6 +43,9 @@ class DocumentMetaDataJsonManager:
             if metadata.url not in url_set:
                 updated.append(metadata)
         logger.info(f'Found {len(updated)} updated documents')
+        if update_num:
+            updated = updated[:update_num]
+            logger.info(f'Update {update_num} documents')
         return updated
 
     def get_next_chunk_id(self, metadata_list):

@@ -1,6 +1,7 @@
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from loguru import logger
 from rich.progress import track
 
 from rag.type import Document
@@ -16,7 +17,7 @@ class DocumentLoader:
             content = f.read()
         if not content.strip():
             return []
-        return [Document(metadata=metadata, content=c) for c in self.splitter.split(content) if content]
+        return [Document(metadata=metadata.copy(deep=True), content=c) for c in self.splitter.split(content) if content]
 
     def load_documents(self, metadata_list, path, next_chunk_id):
         documents = []
@@ -33,4 +34,5 @@ class DocumentLoader:
                 documents.extend(future.result())
         for i, doc in enumerate(documents):
             doc.metadata.chunk_id = next_chunk_id + i
+        logger.info(f'Loaded {len(documents)} documents')
         return documents
