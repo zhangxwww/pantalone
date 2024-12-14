@@ -34,5 +34,5 @@ class Embedding(OllamaEmbeddings):
                 batch = texts[start:end]
                 embedded_docs = self.embed_documents(batch)
                 embeddings.extend(embedded_docs)
-                progress.update(task, advance=end - start)
+                progress.update(task, advance=len(batch))
         return embeddings
