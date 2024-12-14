@@ -9,7 +9,11 @@ from libs.utils.context_manager import RunWithoutInterrupt
 from rag.type import DocumentMetaData
 
 
-class DocumentMetaDataJsonManagerMixin:
+class DocumentMetaDataJsonManager:
+    def __init__(self, json_path, reference_json_path):
+        self.json_path = json_path
+        self.reference_json_path = reference_json_path
+
     def load_json(self, *, default=None):
         default = default or []
         if not os.path.exists(self.json_path):
@@ -40,3 +44,8 @@ class DocumentMetaDataJsonManagerMixin:
                 updated.append(metadata)
         logger.info(f'Found {len(updated)} updated documents')
         return updated
+
+    def get_next_chunk_id(self, metadata_list):
+        if not metadata_list:
+            return 0
+        return max([metadata.chunk_id for metadata in metadata_list]) + 1

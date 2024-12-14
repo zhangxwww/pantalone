@@ -9,7 +9,7 @@ from loguru import logger
 from libs.utils.path import get_rag_raw_path, get_rag_path, get_rag_metadata_json_path
 from libs.utils.date_transform import get_dates_between_str
 
-from rag.mixin.json_manager import DocumentMetaDataJsonManagerMixin
+from rag.mixin.json_manager import DocumentMetaDataJsonManager
 from rag.crawler.sina import (
     get_report_list,
     get_report_detail,
@@ -18,7 +18,7 @@ from rag.crawler.sina import (
 )
 
 
-class Crawler(DocumentMetaDataJsonManagerMixin):
+class Crawler(DocumentMetaDataJsonManager):
     def __init__(self, earlist_news_date='2020-01-01'):
         self.rag_path = get_rag_path()
         self.raw_path = get_rag_raw_path()

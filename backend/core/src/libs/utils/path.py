@@ -56,6 +56,12 @@ def get_rag_vector_db_path():
 def get_rag_vector_db_json_path():
     return os.path.join(get_rag_path(), PATH_CONFIG['rag']['vector_db']['name'])
 
+def get_rag_retiever_path():
+    return _get_rag_child_path('retriever')
+
+def get_rag_retriever_json_path():
+    return os.path.join(get_rag_path(), PATH_CONFIG['rag']['retriever']['name'])
+
 def get_temp_path():
     d = os.path.join(BASE_DIR, PATH_CONFIG['temp']['dir'])
     if not os.path.exists(d):

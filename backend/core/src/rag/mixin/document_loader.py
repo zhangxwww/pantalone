@@ -7,7 +7,7 @@ from rag.type import Document
 from rag.text_splitter.simple_splitter import SimpleSplitter
 
 
-class DocumentLoaderMixin:
+class DocumentLoader:
     def __init__(self):
         self.splitter = SimpleSplitter()
 
@@ -18,7 +18,7 @@ class DocumentLoaderMixin:
             return []
         return [Document(metadata=metadata, content=c) for c in self.splitter.split(content) if content]
 
-    def load_documents(self, metadata_list, path):
+    def load_documents(self, metadata_list, path, next_chunk_id):
         documents = []
         with ThreadPoolExecutor() as executor:
             futures = [
@@ -31,4 +31,6 @@ class DocumentLoaderMixin:
             n_future = len(futures)
             for future in track(as_completed(futures), description='Loading', total=n_future):
                 documents.extend(future.result())
+        for i, doc in enumerate(documents):
+            doc.metadata.chunk_id = next_chunk_id + i
         return documents

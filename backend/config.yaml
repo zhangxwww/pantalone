@@ -24,5 +24,8 @@ core:
       vector_db:
         dir: "vector_db"
         name: "vector_db.json"
+      retriever:
+        dir: "retriever"
+        name: "retriever.json"
     temp:
       dir: "temp"
