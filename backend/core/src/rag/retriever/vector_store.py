@@ -1,6 +1,7 @@
 import os
 import logging
 
+import numpy as np
 from nano_vectordb import NanoVectorDB
 
 from ai.embedings import Embedding
@@ -8,6 +9,7 @@ from ai.available_models import AvailableEmbeddingModel
 from libs.utils.path import (
     get_rag_vector_db_path,
 )
+from rag.type import Document
 
 
 logging.getLogger('nano-vectordb').disabled = True
@@ -19,7 +21,7 @@ class VectorStore:
         self._init_emb()
         self._init_db()
 
-    def add_documents(self, docs):
+    def add_documents(self, docs: list[Document]):
         embedding = self.embedding.embed_documents([doc.content for doc in docs])
         self.add_data(docs, embedding)
 
@@ -33,7 +35,7 @@ class VectorStore:
         file_path = os.path.join(get_rag_vector_db_path(), 'vector_db.json')
         self.vdb = NanoVectorDB(self.embedding.dim, storage_file=file_path)
 
-    def add_data(self, docs, embeddings):
+    def add_data(self, docs: list[Document], embeddings: np.array):
         assert len(docs) == len(embeddings)
         data = [{
             '__id__': doc.metadata.chunk_id,

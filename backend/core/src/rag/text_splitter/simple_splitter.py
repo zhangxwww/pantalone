@@ -1,16 +1,21 @@
 class SimpleSplitter:
-    def __init__(self, max_tokens=1000, max_overlap=200, split_tokens=['。', '?', '？', '!', '！', '\n']):
+    def __init__(
+        self,
+        max_tokens: int = 1000,
+        max_overlap: int = 200,
+        split_tokens: list[str] =['。', '?', '？', '!', '！', '\n']
+    ):
         self.max_tokens = max_tokens
         self.max_overlap = max_overlap
         self.split_tokens = split_tokens
 
-    def split(self, text):
+    def split(self, text: str) -> list[str]:
         texts = self._split_by_tokens(text)
         texts = self._filter_blank(texts)
         chunks = self._merge_to_chunk(texts)
         return chunks
 
-    def _split_by_tokens(self, text):
+    def _split_by_tokens(self, text: str) -> list[str]:
         text = text.replace('\r', '')
         texts = [text]
         for s in self.split_tokens:
@@ -20,11 +25,11 @@ class SimpleSplitter:
             texts = new_splits
         return texts
 
-    def _filter_blank(self, texts):
+    def _filter_blank(self, texts: list[str]) -> list[str]:
         strip = [t.strip() for t in texts if t]
         return [t for t in strip if t]
 
-    def _merge_to_chunk(self, texts):
+    def _merge_to_chunk(self, texts: list[str]) -> list[str]:
         if not texts:
             return []
         text_lengths = {text: len(text) for text in texts}

@@ -4,7 +4,6 @@ from contextlib import redirect_stdout
 
 
 class RunWithoutInterrupt:
-
     def __init__(self):
         self.interupted = False
 

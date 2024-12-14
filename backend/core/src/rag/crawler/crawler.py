@@ -1,6 +1,4 @@
 import os
-import json
-import shutil
 import datetime
 from time import sleep
 

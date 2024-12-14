@@ -1,26 +1,14 @@
 import logging
-from functools import wraps
+from typing import Generator
 
-import numpy as np
 from rich.progress import Progress
 from pydantic import model_validator
 from langchain_ollama.embeddings import OllamaEmbeddings
 
+from libs.decorators.return_type import return_numpy_array, yield_numpy_array
+
 
 logging.getLogger('httpx').disabled = True
-
-
-def return_numpy_array(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        return np.array(func(*args, **kwargs))
-    return wrapper
-
-def yield_numpy_array(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        yield from (np.array(x) for x in func(*args, **kwargs))
-    return wrapper
 
 
 class Embedding(OllamaEmbeddings):
@@ -38,11 +26,15 @@ class Embedding(OllamaEmbeddings):
         return values
 
     @return_numpy_array
-    def embed_documents(self, texts):
+    def embed_text(self, text: str) -> list[float]:
+        return super().embed_text(text)
+
+    @return_numpy_array
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
         return super().embed_documents(texts)
 
     @return_numpy_array
-    def embed_documents_batch(self, texts):
+    def embed_documents_batch(self, texts: list[str]) -> list[list[float]]:
         n_texts = len(texts)
         n_batch = n_texts // self.batch_size + 1
         embeddings = []
@@ -58,7 +50,7 @@ class Embedding(OllamaEmbeddings):
         return embeddings
 
     @yield_numpy_array
-    def embed_documents_generator(self, texts):
+    def embed_documents_generator(self, texts: list[str]) -> Generator:
         n_texts = len(texts)
         n_batch = n_texts // self.batch_size + 1
         with Progress() as progress:

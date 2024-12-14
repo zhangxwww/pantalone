@@ -25,7 +25,10 @@ Refer to [here](backend/third-party/readme.md) for details.
 
 ```bash
 cd backend/core/src
-python -m rag.prepare --crawl --parse
+python -m rag.prepare
+  [--crawl]
+  [--parse]
+  [--store [--store-num <num>] [--store-batch-size <size>]]
 ```
 
 ### Start:
