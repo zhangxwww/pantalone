@@ -32,7 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('--clean', action='store_true')
     parser.add_argument('--store', action='store_true')
     parser.add_argument('--store-num', type=int, default=-1)
-    parser.add_argument('--store-batch-size', type=int, default=256)
+    parser.add_argument('--store-batch-size', type=int, default=128)
     args = parser.parse_args()
 
     prepare(args)

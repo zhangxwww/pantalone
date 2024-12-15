@@ -43,8 +43,8 @@ class Retriever:
         progress = Progress(
             *Progress.get_default_columns(),
             TimeElapsedColumn(),
-            auto_refresh=False,
-            speed_estimate_period=300,
+            speed_estimate_period=600,
+            refresh_per_second=1
         )
         with progress:
             task = progress.add_task(f"Adding documents", total=n_docs)
