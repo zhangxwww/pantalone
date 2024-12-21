@@ -53,6 +53,11 @@ class DocumentMetaDataJsonManager:
             logger.info(f'Update {update_num} documents')
         return updated
 
+    def get_next_id(self, metadata_list: list[DocumentMetaData]) -> int:
+        if not metadata_list:
+            return 0
+        return max([metadata.id for metadata in metadata_list]) + 1
+
     def get_next_chunk_id(self, metadata_list: list[DocumentMetaData]) -> int:
         if not metadata_list:
             return 0

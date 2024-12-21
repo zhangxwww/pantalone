@@ -16,12 +16,14 @@ from rag.crawler.sina import (
 )
 
 
-class Crawler(DocumentMetaDataJsonManager):
+class Crawler:
     def __init__(self, earlist_news_date='2020-01-01'):
         self.rag_path = get_rag_path()
         self.raw_path = get_rag_raw_path()
         self.json_path = get_rag_metadata_json_path()
-        self.metadata_list = self.load_json()
+
+        self.json_manager = DocumentMetaDataJsonManager(self.json_path, None)
+        self.metadata_list = self.json_manager.load_json()
         self.earlist_news_date = earlist_news_date
 
     def crawl(self):
@@ -31,6 +33,7 @@ class Crawler(DocumentMetaDataJsonManager):
     def _crawl_report(self):
         failed = []
         exists = set([info.url for info in self.metadata_list])
+        id_ = self.json_manager.get_next_id(self.metadata_list)
         for category in ['industry', 'macro', 'engineer']:
 
             page = 1
@@ -58,7 +61,6 @@ class Crawler(DocumentMetaDataJsonManager):
                             break
                         continue
 
-                    id_ = len(self.metadata_list)
                     try:
                         detail = get_report_detail(url, referer)
                     except Exception as e:
@@ -71,8 +73,9 @@ class Crawler(DocumentMetaDataJsonManager):
 
                     report.id = id_
                     exists.add(url)
+                    id_ += 1
                     self.metadata_list.append(report)
-                    self.save_json(self.metadata_list)
+                    self.json_manager.save_json(self.metadata_list)
 
                     sleep(0.3)
                 page += 1
@@ -85,6 +88,7 @@ class Crawler(DocumentMetaDataJsonManager):
     def _crawl_news(self, topk=20):
         failed = []
         exists = set([info.url for info in self.metadata_list])
+        id_ = self.json_manager.get_next_id(self.metadata_list)
 
         latest_date = self._get_latest_news_date()
         current_date = datetime.datetime.now() - datetime.timedelta(days=1)
@@ -109,7 +113,6 @@ class Crawler(DocumentMetaDataJsonManager):
                     if not url or url in exists:
                         continue
 
-                    id_ = len(self.metadata_list)
                     try:
                         detail = get_news_detail(url)
                     except Exception as e:
@@ -121,9 +124,10 @@ class Crawler(DocumentMetaDataJsonManager):
                         f.write(detail)
 
                     news.id = id_
+                    id_ += 1
                     exists.add(url)
                     self.metadata_list.append(news)
-                    self.save_json(self.metadata_list)
+                    self.json_manager.save_json(self.metadata_list)
 
         if failed:
             logger.error('Failed list:')
