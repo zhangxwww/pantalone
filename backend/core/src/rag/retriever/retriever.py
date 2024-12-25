@@ -7,6 +7,7 @@ from rag.retriever.vector_store import VectorStore
 from rag.mixin.json_manager import DocumentMetaDataJsonManager
 from rag.mixin.document_loader import DocumentLoader
 
+from libs.utils.batcher import batcher
 from libs.utils.path import (
     get_rag_retriever_json_path,
     get_rag_metadata_json_path,
@@ -38,8 +39,6 @@ class Retriever:
         self.add_documents(documents)
 
     def add_documents(self, docs):
-        n_docs = len(docs)
-        n_batches = n_docs // self.batch_size + 1
         progress = Progress(
             *Progress.get_default_columns(),
             TimeElapsedColumn(),
@@ -47,15 +46,12 @@ class Retriever:
             refresh_per_second=1
         )
         with progress:
-            task = progress.add_task(f"Adding documents", total=n_docs)
+            task = progress.add_task(f"Adding documents", total=len(docs))
             with ThreadPoolExecutor(max_workers=2) as executor:
-                for i in range(n_batches):
-                    start = i * self.batch_size
-                    end = min((i + 1) * self.batch_size, n_docs)
-                    batch = docs[start:end]
+                for batch in batcher(docs, self.batch_size):
                     self.update_storage(batch, executor)
                     self.update_json(batch)
-                    progress.update(task, completed=end, refresh=True)
+                    progress.update(task, advance=len(batch), refresh=True)
 
     def update_storage(self, docs, executor):
         futures = [
