@@ -3,6 +3,7 @@ from sqlalchemy.future import select
 
 from sql_app import models, schemas
 from libs.decorators.cache import CacheWithExpiration
+from libs.decorators.return_type import return_copy_async
 from ._decorators import _retry_when_db_locked
 
 
@@ -34,6 +35,7 @@ async def create_market_data_from_list(
     await db.commit()
 
 @cache(expiration_time=3600)
+@return_copy_async
 async def get_market_data(
     db: AsyncSession,
     code: str
