@@ -9,7 +9,6 @@ import akshare as ak
 import pandas as pd
 from loguru import logger
 
-from libs.patch import patch_module
 from libs.constant import CURRENCY_DICT
 
 
