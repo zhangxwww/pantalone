@@ -201,30 +201,33 @@ export function drawAssetDeltaChangeBarGraph (chart, data) {
         series: [
             {
                 name: "现金",
-                type: "bar",
+                type: "line",
                 data: data.cashDeltaData,
-                barGap: '10%',
-                barCategoryGap: '60%'
+                smooth: true
             },
             {
                 name: "货币基金",
-                type: "bar",
+                type: "line",
                 data: data.monetaryFundDeltaData,
+                smooth: true
             },
             {
                 name: "定期存款",
-                type: "bar",
+                type: "line",
                 data: data.fixedDepositDeltaData,
+                smooth: true
             },
             {
                 name: "基金",
-                type: "bar",
+                type: "line",
                 data: data.fundDeltaData,
+                smooth: true
             },
             {
                 name: "总资产",
-                type: "bar",
-                data: data.totalDeltaData
+                type: "line",
+                data: data.totalDeltaData,
+                smooth: true
             }
         ]
     }
