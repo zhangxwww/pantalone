@@ -97,8 +97,12 @@ export function drawAssetChangeLineGraph (chart, data) {
             boundaryGap: false,
             data: data.time,
             axisLabel: {
-                interval: index => { return index % 2 == 1 }
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yyyy}-{MM}');
+                }
             },
+            min: 'dataMin',
+            max: 'dataMax'
         },
         yAxis: {
             type: "value",
@@ -189,8 +193,12 @@ export function drawAssetDeltaChangeBarGraph (chart, data) {
                 onZero: true
             },
             axisLabel: {
-                interval: index => { return index % 2 == 1 }
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yyyy}-{MM}');
+                }
             },
+            min: 'dataMin',
+            max: 'dataMax'
         },
         yAxis: {
             type: "value",
@@ -386,8 +394,12 @@ export function drawAverageReturnLineGraph (chart, data) {
             boundaryGap: false,
             data: data.time,
             axisLabel: {
-                interval: index => { return index % 2 == 1 }
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yyyy}-{MM}');
+                }
             },
+            min: 'dataMin',
+            max: 'dataMax'
         },
         yAxis: {
             type: "value",
@@ -469,8 +481,12 @@ export function drawCumulativeReturnLineGraph (chart, data) {
             boundaryGap: false,
             data: data.time,
             axisLabel: {
-                interval: index => { return index % 2 == 1 }
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yyyy}-{MM}');
+                }
             },
+            min: 'dataMin',
+            max: 'dataMax'
         },
         yAxis: {
             type: "value",
@@ -552,8 +568,12 @@ export function drawDrawdownLineGraph (chart, data) {
             boundaryGap: false,
             data: data.time,
             axisLabel: {
-                interval: index => { return index % 2 == 1 }
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yyyy}-{MM}');
+                }
             },
+            min: 'dataMin',
+            max: 'dataMax'
         },
         yAxis: {
             type: "value",
@@ -641,8 +661,12 @@ export function drawRiskIndicatorLineGraph (chart, data) {
             boundaryGap: false,
             data: data.time,
             axisLabel: {
-                interval: index => { return index % 2 == 1 }
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yyyy}-{MM}');
+                }
             },
+            min: 'dataMin',
+            max: 'dataMax'
         },
         yAxis: {
             type: "value",

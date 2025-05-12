@@ -393,7 +393,7 @@ export default class Data {
         let dates = [];
         let currentDate = new Date();
 
-        const interval = Math.ceil(months / 12);
+        const interval = 1;
         for (let i = 0; i < months; i += interval) {
             let newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, currentDate.getDate(), 23, 59, 59);
             dates.unshift(newDate);

@@ -246,7 +246,8 @@ export default {
             },
 
             editId: null,
-            drawMonths: 12,
+            drawMonths: null,
+            defaultDrawMonths: 24,
             refreshing: false,
 
             getFundSymbols: () => {
@@ -394,7 +395,7 @@ export default {
                 this.setAllGraphLoading();
             },
             draw: async () => {
-                const period = 12;
+                const riskCalculationPeriod = 12;
                 const p = 0.95;
 
                 const assetChange = this.record.getAssetChangeData(this.drawMonths);
@@ -431,7 +432,7 @@ export default {
                 drawCumulativeReturnLineGraph(this.cumulativeReturnLineGraph, cumulativeReturn);
                 this.cumulativeReturnLineGraph.hideLoading();
 
-                const riskIndicator = await this.record.getRiskIndicatorData(averageReturn, period, p);
+                const riskIndicator = await this.record.getRiskIndicatorData(averageReturn, riskCalculationPeriod, p);
                 drawRiskIndicatorLineGraph(this.riskIndicatorLineGraph, riskIndicator);
                 this.riskIndicatorLineGraph.hideLoading();
 
@@ -470,6 +471,7 @@ export default {
                 this.liquidityReturnPositionScatterGraph.hideLoading();
             },
             onDrawMonthsChange: async () => {
+                localStorage.setItem('drawMonths', this.drawMonths);
                 this.setMonthChangeGraphLoading();
                 await this.draw();
             },
@@ -491,6 +493,9 @@ export default {
                         localStorage.setItem("lastNotifyDate", now.toISOString());
                     }
                 }
+            },
+            loadDrawMonths: () => {
+                this.drawMonths = localStorage.getItem('drawMonths') || this.defaultDrawMonths;
             },
             dropdownMenus: [
                 {
@@ -549,6 +554,7 @@ export default {
         await this.record.load();
         this.data = this.record.getData();
         this.statistic = this.record.getStatisdicData();
+        this.loadDrawMonths();
         await this.draw();
         await this.checkGitStates();
     },
