@@ -1,6 +1,7 @@
 core:
   host: "localhost"
   port: 9876
+  workers: 4
 
   paths:
     base:

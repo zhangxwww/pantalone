@@ -19,64 +19,71 @@ from views.ai import router as ai_router
 
 
 logger.add(
-    os.path.join(get_log_file_path(), '{time}.log'),
-    level='DEBUG',
-    rotation='1 day',
-    retention='1 week',
-    compression='zip')
+    os.path.join(get_log_file_path(), "{time}.log"),
+    level="DEBUG",
+    rotation="1 day",
+    retention="1 week",
+    compression="zip",
+)
 
 app = FastAPI()
 
-@app.on_event('startup')
+
+@app.on_event("startup")
 async def startup():
-    logger.debug('startup')
+    logger.debug("startup")
     async with engine.begin() as conn:
         await conn.run_sync(models.Base.metadata.create_all)
-        await conn.execute(text('PRAGMA journal_mode=WAL'))
+        await conn.execute(text("PRAGMA journal_mode=WAL"))
 
-@app.on_event('shutdown')
+
+@app.on_event("shutdown")
 async def shutdown():
     await engine.dispose()
 
 
-app.include_router(statistic_router, prefix='/api')
-app.include_router(local_data_router, prefix='/api')
-app.include_router(network_data_router, prefix='/api')
-app.include_router(file_router, prefix='/api')
-app.include_router(git_state_router, prefix='/api')
-app.include_router(version_router, prefix='/api')
-app.include_router(ai_router, prefix='/api')
+app.include_router(statistic_router, prefix="/api")
+app.include_router(local_data_router, prefix="/api")
+app.include_router(network_data_router, prefix="/api")
+app.include_router(file_router, prefix="/api")
+app.include_router(git_state_router, prefix="/api")
+app.include_router(version_router, prefix="/api")
+app.include_router(ai_router, prefix="/api")
 
 
-@app.get('/position')
+@app.get("/position")
 async def position():
-    logger.debug('frontend')
-    return FileResponse('../../../frontend/dist/index.html')
+    logger.debug("frontend")
+    return FileResponse("../../../frontend/dist/index.html")
 
-@app.get('/market')
+
+@app.get("/market")
 async def market():
-    logger.debug('frontend')
-    return FileResponse('../../../frontend/dist/index.html')
+    logger.debug("frontend")
+    return FileResponse("../../../frontend/dist/index.html")
 
-@app.get('/percentile')
+
+@app.get("/percentile")
 async def percentile():
-    logger.debug('frontend')
-    return FileResponse('../../../frontend/dist/index.html')
+    logger.debug("frontend")
+    return FileResponse("../../../frontend/dist/index.html")
 
-@app.get('/dashboard')
+
+@app.get("/dashboard")
 async def percentile():
-    logger.debug('frontend')
-    return FileResponse('../../../frontend/dist/index.html')
+    logger.debug("frontend")
+    return FileResponse("../../../frontend/dist/index.html")
 
 
-app.mount('/', staticfiles.StaticFiles(directory='../../../frontend/dist/', html=True), name='static')
+app.mount("/", staticfiles.StaticFiles(directory="../../../frontend/dist/", html=True), name="static")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import uvicorn
 
     from config import CONFIG
 
-    host = CONFIG['core']['host']
-    port = CONFIG['core']['port']
-    uvicorn.run('app:app', host=host, port=port, reload=False)
+    host = CONFIG["core"]["host"]
+    port = CONFIG["core"]["port"]
+    workers = CONFIG["core"]["workers"]
+    uvicorn.run("app:app", host=host, port=port, reload=False, workers=workers)
