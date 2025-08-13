@@ -1,4 +1,6 @@
+import os
 import yaml
 
-with open('../../config.yaml', 'r') as f:
+path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../config.yaml")
+with open(path, "r") as f:
     CONFIG = yaml.safe_load(f)

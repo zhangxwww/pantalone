@@ -1,6 +1,9 @@
 import os
 
-from config import CONFIG
+try:
+    from config import CONFIG
+except ImportError:
+    from src.config import CONFIG
 
 
 PATH_CONFIG = CONFIG['core']['paths']
