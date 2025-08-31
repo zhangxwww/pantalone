@@ -257,7 +257,7 @@ export default {
                     {
                         prop: 'symbol',
                         label: '代码',
-                        width: '80',
+                        width: '70',
                         sortable: false,
                         sort_method: placeHolder
                     },
@@ -318,9 +318,30 @@ export default {
                         sort_method: sortByFmtPercentile
                     },
                     {
+                        prop: 'returnDrawdown',
+                        label: '收益回撤',
+                        width: '105',
+                        sortable: true,
+                        sort_method: sortByDefault
+                    },
+                    {
+                        prop: 'drawdown',
+                        label: '净值回撤',
+                        width: '105',
+                        sortable: true,
+                        sort_method: sortByDefault
+                    },
+                    {
+                        prop: 'maxDrawdown',
+                        label: '最大回撤',
+                        width: '105',
+                        sortable: true,
+                        sort_method: sortByDefault
+                    },
+                    {
                         prop: 'residualLockupPeriod',
-                        label: '剩余锁定期',
-                        width: '120',
+                        label: '锁定期',
+                        width: '95',
                         sortable: true,
                         sort_method: sortByDefault
                     }

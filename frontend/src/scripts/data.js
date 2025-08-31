@@ -135,6 +135,7 @@ export default class Data {
                     uHis.latestReturnRate = 0;
                     uHis.averageHoldingCost = uHis.currentNetValue;
                     uHis.cumNetValue = uHis.currentNetValue + uHis.cumDividendRatio;
+                    uHis.maxNetValue = uHis.currentNetValue;
                 } else {
                     const first = uData.history[0];
                     const firstSpan = (uHis.currentTime - first.currentTime) / (1000 * 3600 * 24);
@@ -160,6 +161,8 @@ export default class Data {
                     uHis.cumReturnRate = latest.cumReturnRate * (currentRet + 1);
 
                     uHis.latestReturnRate = currentRet / currentSpan * 365;
+
+                    uHis.maxNetValue = Math.max(latest.maxNetValue, uHis.currentNetValue);
                 }
                 uHis.currentAmountFmt = uHis.currentAmount.toFixed(2);
                 uHis.currentSharesFmt = uHis.currentShares.toFixed(2);
@@ -175,6 +178,15 @@ export default class Data {
                 uHis.residualLockupPeriod = Math.max(Math.ceil((endingTime - new Date()) / (1000 * 3600 * 24)), 2);
 
                 uHis.annualizedReturnRateFmt = (uHis.annualizedReturnRate * 100).toFixed(2) + '%';
+
+                uHis.drawdown = (uHis.maxNetValue - uHis.currentNetValue) / uHis.maxNetValue;
+                uHis.drawdownFmt = (uHis.drawdown * 100).toFixed(2) + '%';
+                uHis.maxDrawdown = Math.max(latest ? latest.maxDrawdown : 0, uHis.drawdown);
+                uHis.maxDrawdownFmt = (uHis.maxDrawdown * 100).toFixed(2) + '%';
+
+                uHis.maxCumReturn = Math.max(uHis.cumReturn, latest ? latest.maxCumReturn : 0);
+                uHis.returnDrawdown = (uHis.maxCumReturn - uHis.cumReturn) / uHis.maxCumReturn;
+                uHis.returnDrawdownFmt = (uHis.returnDrawdown * 100).toFixed(2) + '%';
             }
         }
         console.log(data);
@@ -311,7 +323,10 @@ export default class Data {
                 annualizedReturnRateFmt: last.annualizedReturnRateFmt,
                 latestReturnRate: last.latestReturnRate,
                 latestReturnRateFmt: last.latestReturnRateFmt,
-                holding: last.holding
+                holding: last.holding,
+                drawdown: last.drawdownFmt,
+                maxDrawdown: last.maxDrawdownFmt,
+                returnDrawdown: last.returnDrawdownFmt
             };
             d.id = udata.id;
             data.fundData.push(d);
@@ -411,8 +426,6 @@ export default class Data {
         console.log(dates);
 
         for (let date of dates) {
-            console.log(date);
-
             let cash = 0;
             for (let cData of this.data.cashData) {
                 const candidate = cData.history.filter(h => h.beginningTime <= date);
