@@ -14,12 +14,20 @@
                     <div id="average-return-line-graph" style="width: 100%; height: 300px"></div>
                 </el-col>
                 <el-col :span="12">
-                    <div id="rick-indicator-line-graph" style="width: 100%; height: 300px"></div>
+                    <div id="cumulative-return-line-graph" style="width: 100%; height: 300px"></div>
                 </el-col>
             </el-row>
             <el-row style="margin-top: 60px">
                 <el-col :span="12">
-                    <div id="cumulative-return-line-graph" style="width: 100%; height: 300px"></div>
+                    <div id="fund-amount-change-by-asset-line-graph" style="width: 100%; height: 300px"></div>
+                </el-col>
+                <el-col :span="12">
+                    <div id="fund-return-change-by-asset-line-graph" style="width: 100%; height: 300px"></div>
+                </el-col>
+            </el-row>
+            <el-row style="margin-top: 60px">
+                <el-col :span="12">
+                    <div id="rick-indicator-line-graph" style="width: 100%; height: 300px"></div>
                 </el-col>
                 <el-col :span="12">
                     <div id="drawdown-line-graph" style="width: 100%; height: 300px"></div>
@@ -205,6 +213,8 @@ import {
     drawAssetDeltaChangeBarGraph,
     drawRiskIndicatorLineGraph,
     drawDrawdownLineGraph,
+    drawFundAmountChangeByAssetLineGraph,
+    drawFundReturnChangeByAssetLineGraph,
 
     drawEmptyAssetChangeLineGraph,
     drawEmptyAssetDeltaChangeBarGraph,
@@ -214,7 +224,9 @@ import {
     drawEmptyAverageReturnLineGraph,
     drawEmptyCumulativeReturnLineGraph,
     drawEmptyRiskIndicatorLineGraph,
-    drawEmptyDrawdownLineGraph
+    drawEmptyDrawdownLineGraph,
+    drawEmptyFundAmountChangeByAssetLineGraph,
+    drawEmptyFundReturnChangeByAssetLineGraph
 } from '@/scripts/graph.js'
 import { getGitUpdatedRequest } from '../scripts/requests'
 
@@ -379,6 +391,8 @@ export default {
                 this.cumulativeReturnLineGraph = initGraph('cumulative-return-line-graph');
                 this.riskIndicatorLineGraph = initGraph('rick-indicator-line-graph');
                 this.drawdownLineGraph = initGraph('drawdown-line-graph');
+                this.fundAmountChangeByAssetLineGraph = initGraph('fund-amount-change-by-asset-line-graph');
+                this.fundReturnChangeByAssetLineGraph = initGraph('fund-return-change-by-asset-line-graph');
             },
             drawEmpty: () => {
                 const dates = this.record.sampleDates(this.drawMonths);
@@ -392,6 +406,8 @@ export default {
                 drawEmptyCumulativeReturnLineGraph(this.cumulativeReturnLineGraph, dates);
                 drawEmptyRiskIndicatorLineGraph(this.riskIndicatorLineGraph, dates);
                 drawEmptyDrawdownLineGraph(this.drawdownLineGraph, dates);
+                drawEmptyFundAmountChangeByAssetLineGraph(this.fundAmountChangeByAssetLineGraph, dates);
+                drawEmptyFundReturnChangeByAssetLineGraph(this.fundReturnChangeByAssetLineGraph, dates)
                 this.setAllGraphLoading();
             },
             draw: async () => {
@@ -439,6 +455,14 @@ export default {
                 const drawdown = this.record.getDrawdownData(cumulativeReturn);
                 drawDrawdownLineGraph(this.drawdownLineGraph, drawdown);
                 this.drawdownLineGraph.hideLoading();
+
+                const fundAmountChangeByAsset = this.record.getFundClassChangeData(this.drawMonths);
+                drawFundAmountChangeByAssetLineGraph(this.fundAmountChangeByAssetLineGraph, fundAmountChangeByAsset);
+                this.fundAmountChangeByAssetLineGraph.hideLoading();
+
+                const fundReturnChangeyAsset = this.record.getFundClassReturnData(this.drawMonths);
+                drawFundReturnChangeByAssetLineGraph(this.fundReturnChangeByAssetLineGraph, fundReturnChangeyAsset);
+                this.fundReturnChangeByAssetLineGraph.hideLoading();
             },
             setMonthChangeGraphLoading: () => {
                 this.assetChangeLineGraph.showLoading();
@@ -447,6 +471,8 @@ export default {
                 this.cumulativeReturnLineGraph.showLoading();
                 this.riskIndicatorLineGraph.showLoading();
                 this.drawdownLineGraph.showLoading();
+                this.fundAmountChangeByAssetLineGraph.showLoading();
+                this.fundReturnChangeByAssetLineGraph.showLoading();
             },
             setAllGraphLoading: () => {
                 this.assetChangeLineGraph.showLoading();
@@ -458,6 +484,8 @@ export default {
                 this.residualMaturatyPieGraph.showLoading();
                 this.expectedReturnPieGraph.showLoading();
                 this.liquidityReturnPositionScatterGraph.showLoading();
+                this.fundAmountChangeByAssetLineGraph.showLoading();
+                this.fundReturnChangeByAssetLineGraph.showLoading();
             },
             setAllGraphUnLoading: () => {
                 this.assetChangeLineGraph.hideLoading();
@@ -469,6 +497,8 @@ export default {
                 this.residualMaturatyPieGraph.hideLoading();
                 this.expectedReturnPieGraph.hideLoading();
                 this.liquidityReturnPositionScatterGraph.hideLoading();
+                this.fundAmountChangeByAssetLineGraph.hideLoading();
+                this.fundReturnChangeByAssetLineGraph.hideLoading();
             },
             onDrawMonthsChange: async () => {
                 localStorage.setItem('drawMonths', this.drawMonths);
@@ -515,7 +545,6 @@ export default {
                     label: '基金'
                 }
             ],
-
             drawMonthsRadio: [
                 {
                     label: '过去12个月',
@@ -548,13 +577,13 @@ export default {
     },
 
     async mounted () {
+        this.loadDrawMonths();
         this.record = new Data();
         this.initGraph();
         this.drawEmpty();
         await this.record.load();
         this.data = this.record.getData();
         this.statistic = this.record.getStatisdicData();
-        this.loadDrawMonths();
         await this.draw();
         await this.checkGitStates();
     },
@@ -569,6 +598,8 @@ export default {
         this.cumulativeReturnLineGraph.dispose();
         this.riskIndicatorLineGraph.dispose();
         this.drawdownLineGraph.dispose();
+        this.fundAmountChangeByAssetLineGraph.dispose();
+        this.fundReturnChangeByAssetLineGraph.dispose();
     },
 
 }

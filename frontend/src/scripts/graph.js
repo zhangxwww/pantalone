@@ -739,6 +739,160 @@ export function drawRiskIndicatorLineGraph (chart, data) {
     return chart;
 }
 
+export function drawFundAmountChangeByAssetLineGraph (chart, data) {
+    console.log(data);
+    const option = {
+        title: {
+            text: "大类资产配比",
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        tooltip: {
+            trigger: "axis",
+            textStyle: {
+                align: "left"
+            },
+            formatter: params => {
+                let name = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${params[0].name}</b></td>
+                        </tr>
+                `;
+                for (let i = 0; i < params.length; i++) {
+                    name += `<tr>
+                        <td align="left">${params[i].marker}${params[i].seriesName}：</td>
+                        <td align="right"><b>${params[i].value.toFixed(2)}</b></td>
+                    </tr>`;
+                }
+                name += "</tbody></table>";
+                return name;
+            }
+        },
+        legend: {
+            x: "center",
+            y: "bottom"
+        },
+        xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: data.time,
+            axisLine: {
+                onZero: true
+            },
+            axisLabel: {
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yyyy}-{MM}');
+                }
+            },
+            min: 'dataMin',
+            max: 'dataMax'
+        },
+        yAxis: {
+            type: "value",
+            name: "资产规模",
+            position: "left",
+            boundaryGap: false
+        },
+        series: []
+    }
+    for (const [cls, seriesData] of Object.entries(data.data)) {
+        option.series.push({
+            name: cls,
+            type: "line",
+            data: seriesData,
+            smooth: true,
+            stack: "x",
+            areaStyle: {}
+        });
+    }
+    console.log(option.series);
+    chart.setOption(option);
+    return chart;
+}
+
+export function drawFundReturnChangeByAssetLineGraph (chart, data) {
+    console.log(data);
+    const option = {
+        title: {
+            text: "大类资产收益",
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        tooltip: {
+            trigger: "axis",
+            textStyle: {
+                align: "left"
+            },
+            formatter: params => {
+                let name = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${params[0].name}</b></td>
+                        </tr>
+                `;
+                for (let i = 0; i < params.length; i++) {
+                    if (Number.isNaN(params[i].value)) {
+                        continue;
+                    }
+                    name += `<tr>
+                        <td align="left">${params[i].marker}${params[i].seriesName}：</td>
+                        <td align="right"><b>${(params[i].value * 100).toFixed(2)}%</b></td>
+                    </tr>`;
+                }
+                name += "</tbody></table>";
+                return name;
+            }
+        },
+        legend: {
+            x: "center",
+            y: "bottom"
+        },
+        xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: data.time,
+            axisLine: {
+                onZero: true
+            },
+            axisLabel: {
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yyyy}-{MM}');
+                }
+            },
+            min: 'dataMin',
+            max: 'dataMax'
+        },
+        yAxis: {
+            type: "value",
+            name: "资产收益",
+            position: "left",
+            boundaryGap: false,
+            axisLabel: {
+                formatter: value => {
+                    return (value * 100).toFixed(1) + "%";
+                }
+            }
+        },
+        series: []
+    }
+    for (const [cls, seriesData] of Object.entries(data.data)) {
+        option.series.push({
+            name: cls,
+            type: "line",
+            data: seriesData,
+            smooth: true,
+        });
+    }
+    console.log(option.series);
+    chart.setOption(option);
+    return chart;
+}
+
 export function drawRelevanceScatterGraph (chart, data, states, title, key) {
     console.log(data);
 
@@ -1862,6 +2016,24 @@ export function drawEmptyRiskIndicatorLineGraph (chart, dates) {
         sharpeConfidence: Array(dates.length).fill({ lower: Number.NaN, upper: Number.NaN })
     }
     return drawRiskIndicatorLineGraph(chart, data);
+}
+
+export function drawEmptyFundAmountChangeByAssetLineGraph (chart, dates) {
+    const data = {
+        time: dates.map(date => timeFormat(date, true)),
+        data: {}
+    }
+    console.log(data);
+    return drawFundAmountChangeByAssetLineGraph(chart, data);
+}
+
+export function drawEmptyFundReturnChangeByAssetLineGraph (chart, dates) {
+    const data = {
+        time: dates.map(date => timeFormat(date, true)),
+        data: {}
+    }
+    console.log(data);
+    return drawFundReturnChangeByAssetLineGraph(chart, data);
 }
 
 export function drawEmptyRelevanceScatterGraph (chart, title, key) {

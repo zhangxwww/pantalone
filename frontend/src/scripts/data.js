@@ -1,5 +1,6 @@
 import statistic from './statistic.js';
 import { timeFormat } from './formatter.js';
+import { classifyFund, allClasses } from './fundClassifier.js';
 import {
     getChinaBondYieldDataRequest,
     getLPRDataRequest,
@@ -915,6 +916,67 @@ export default class Data {
                 '000012': allIndexCumReturnRate['000012']
             }
         }
+    }
+
+    getFundClassChangeData (months) {
+        const dates = this.sampleDates(months);
+        const fundClassChangeData = {};
+        for (const cls of allClasses) {
+            fundClassChangeData[cls] = Array(dates.length).fill(0);
+        }
+        for (let [dateIdx, date] of dates.entries()) {
+            for (const uData of this.data.fundData) {
+                const candidate = uData.history.filter(h => h.currentTime <= date);
+                const d = candidate[candidate.length - 1];
+                if (d && d.holding && d.currentAmount > 0) {
+                    const cls = classifyFund(d.name);
+                    const amount = d.currentAmount;
+                    fundClassChangeData[cls][dateIdx] += amount;
+                }
+            }
+        }
+        return {
+            time: dates.map(t => timeFormat(t, false)),
+            data: fundClassChangeData
+        };
+    }
+
+    getFundClassReturnData (months) {
+        const dates = this.sampleDates(months);
+        const weighted = {};
+        const weights = {};
+        for (const cls of allClasses) {
+            weighted[cls] = Array(dates.length).fill(0);
+            weights[cls] = Array(dates.length).fill(0);
+        }
+        for (let [dateIdx, date] of dates.entries()) {
+            for (const uData of this.data.fundData) {
+                const candidate = uData.history.filter(h => h.currentTime <= date);
+                const d = candidate[candidate.length - 1];
+                if (d && d.holding && d.currentAmount > 0) {
+                    const cls = classifyFund(d.name);
+                    const amount = d.currentAmount;
+                    const returnRate = d.annualizedReturnRate;
+                    weighted[cls][dateIdx] += amount * returnRate;
+                    weights[cls][dateIdx] += amount;
+                }
+            }
+        }
+        const fundClassReturnData = {};
+        for (const cls of allClasses) {
+            fundClassReturnData[cls] = Array(dates.length).fill(0);
+            for (let i = 0; i < dates.length; i++) {
+                fundClassReturnData[cls][i] = weighted[cls][i] / weights[cls][i];
+            }
+        }
+        console.log(weighted);
+        console.log(weights);
+        console.log(fundClassReturnData);
+
+        return {
+            time: dates.map(t => timeFormat(t, false)),
+            data: fundClassReturnData
+        };
     }
 
     getDrawdownData (cumReturnData) {
