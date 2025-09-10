@@ -42,6 +42,7 @@ export function classifyFund (fund) {
             return className;
         }
     }
+    throw new Error(`Unknown fund class: ${fund}`);
 }
 
 export const allClasses = Object.keys(classMap);
