@@ -619,6 +619,18 @@ async def get_stock_bond_info(db, stocks, bonds):
         else:
             logger.warning(f"Not found bond: {code}")
 
+    logger.warning("Missing stock info:")
+    for stock in stock_info:
+        for v in stock.values():
+            if v is None:
+                logger.warning(stock)
+                break
+    logger.warning("Missing bond info:")
+    for bond in bond_info:
+        for v in bond.values():
+            if v is None:
+                logger.warning(bond)
+                break
     await crud.create_stock_info_data_from_list(db, stock_info)
     await crud.create_bond_info_data_from_list(db, bond_info)
 

@@ -170,9 +170,9 @@ def _get_us_stock_info(code):
     return {
         "股票代码": data["SECURITY_CODE"],
         "股票简称": data["ORG_EN_ABBR"],
-        "公司名称": data["ORG_NAME"],
+        "公司名称": data["ORG_NAME"] or data["ORG_EN_ABBR"],
         "所在市场": "美股",
-        "所属行业": data["BELONG_INDUSTRY"],
+        "所属行业": data["BELONG_INDUSTRY"] or "",
     }
 
 
