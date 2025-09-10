@@ -366,6 +366,7 @@ export default {
                 this.record.download();
             },
             onUpload: (file) => {
+                this.setAllGraphLoading();
                 this.record.upload(file, () => { location.reload(); });
             },
             onRefresh: async () => {

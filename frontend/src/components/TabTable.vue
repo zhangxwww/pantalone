@@ -322,21 +322,21 @@ export default {
                         label: '收益回撤',
                         width: '105',
                         sortable: true,
-                        sort_method: sortByDefault
+                        sort_method: sortByFmtPercentile
                     },
                     {
                         prop: 'drawdown',
                         label: '净值回撤',
                         width: '105',
                         sortable: true,
-                        sort_method: sortByDefault
+                        sort_method: sortByFmtPercentile
                     },
                     {
                         prop: 'maxDrawdown',
                         label: '最大回撤',
                         width: '105',
                         sortable: true,
-                        sort_method: sortByDefault
+                        sort_method: sortByFmtPercentile
                     },
                     {
                         prop: 'residualLockupPeriod',
