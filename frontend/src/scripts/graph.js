@@ -743,7 +743,7 @@ export function drawFundAmountChangeByAssetLineGraph (chart, data) {
     console.log(data);
     const option = {
         title: {
-            text: "大类资产配比",
+            text: "大类资产总额",
             x: "center",
             y: "top",
             textAlign: "center"
@@ -813,6 +813,87 @@ export function drawFundAmountChangeByAssetLineGraph (chart, data) {
     return chart;
 }
 
+
+export function drawFundAmountRatioChangeByAssetLineGraph (chart, data) {
+    console.log(data);
+    const option = {
+        title: {
+            text: "大类资产占比",
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        tooltip: {
+            trigger: "axis",
+            textStyle: {
+                align: "left"
+            },
+            formatter: params => {
+                let name = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${params[0].name}</b></td>
+                        </tr>
+                `;
+                for (let i = 0; i < params.length; i++) {
+                    name += `<tr>
+                        <td align="left">${params[i].marker}${params[i].seriesName}：</td>
+                        <td align="right"><b>${(params[i].value * 100).toFixed(2)}%</b></td>
+                    </tr>`;
+                }
+                name += "</tbody></table>";
+                return name;
+            }
+        },
+        legend: {
+            x: "center",
+            y: "bottom"
+        },
+        xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: data.time,
+            axisLine: {
+                onZero: true
+            },
+            axisLabel: {
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yyyy}-{MM}');
+                }
+            },
+            min: 'dataMin',
+            max: 'dataMax'
+        },
+        yAxis: {
+            type: "value",
+            name: "资产占比",
+            position: "left",
+            boundaryGap: false,
+            axisLabel: {
+                formatter: value => {
+                    return (value * 100).toFixed(1) + "%";
+                }
+            }
+        },
+        series: []
+    }
+    for (const [cls, seriesData] of Object.entries(data.data)) {
+        option.series.push({
+            name: cls,
+            type: "line",
+            data: seriesData,
+            smooth: true,
+            stack: "x",
+            areaStyle: {}
+        });
+    }
+    console.log(option.series);
+    chart.setOption(option);
+    return chart;
+}
+
+
 export function drawFundReturnChangeByAssetLineGraph (chart, data) {
     console.log(data);
     const option = {
@@ -870,6 +951,87 @@ export function drawFundReturnChangeByAssetLineGraph (chart, data) {
         yAxis: {
             type: "value",
             name: "资产收益",
+            position: "left",
+            boundaryGap: false,
+            axisLabel: {
+                formatter: value => {
+                    return (value * 100).toFixed(1) + "%";
+                }
+            }
+        },
+        series: []
+    }
+    for (const [cls, seriesData] of Object.entries(data.data)) {
+        option.series.push({
+            name: cls,
+            type: "line",
+            data: seriesData,
+            smooth: true,
+        });
+    }
+    console.log(option.series);
+    chart.setOption(option);
+    return chart;
+}
+
+
+export function drawFundDrawdownChangeByAssetLineGraph (chart, data) {
+    console.log(data);
+    const option = {
+        title: {
+            text: "大类资产收益回撤",
+            x: "center",
+            y: "top",
+            textAlign: "center"
+        },
+        tooltip: {
+            trigger: "axis",
+            textStyle: {
+                align: "left"
+            },
+            formatter: params => {
+                let name = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td align="left"><b>${params[0].name}</b></td>
+                        </tr>
+                `;
+                for (let i = 0; i < params.length; i++) {
+                    if (Number.isNaN(params[i].value)) {
+                        continue;
+                    }
+                    name += `<tr>
+                        <td align="left">${params[i].marker}${params[i].seriesName}：</td>
+                        <td align="right"><b>${(params[i].value * 100).toFixed(2)}%</b></td>
+                    </tr>`;
+                }
+                name += "</tbody></table>";
+                return name;
+            }
+        },
+        legend: {
+            x: "center",
+            y: "bottom"
+        },
+        xAxis: {
+            type: "category",
+            boundaryGap: false,
+            data: data.time,
+            axisLine: {
+                onZero: true
+            },
+            axisLabel: {
+                formatter: function (value) {
+                    return echarts.time.format(value, '{yyyy}-{MM}');
+                }
+            },
+            min: 'dataMin',
+            max: 'dataMax'
+        },
+        yAxis: {
+            type: "value",
+            name: "收益回撤",
             position: "left",
             boundaryGap: false,
             axisLabel: {
@@ -2027,6 +2189,15 @@ export function drawEmptyFundAmountChangeByAssetLineGraph (chart, dates) {
     return drawFundAmountChangeByAssetLineGraph(chart, data);
 }
 
+export function drawEmptyFundAmountRatioChangeByAssetLineGraph (chart, dates) {
+    const data = {
+        time: dates.map(date => timeFormat(date, true)),
+        data: {}
+    }
+    console.log(data);
+    return drawFundAmountRatioChangeByAssetLineGraph(chart, data);
+}
+
 export function drawEmptyFundReturnChangeByAssetLineGraph (chart, dates) {
     const data = {
         time: dates.map(date => timeFormat(date, true)),
@@ -2034,6 +2205,15 @@ export function drawEmptyFundReturnChangeByAssetLineGraph (chart, dates) {
     }
     console.log(data);
     return drawFundReturnChangeByAssetLineGraph(chart, data);
+}
+
+export function drawEmptyFundDrawdownChangeByAssetLineGraph (chart, dates) {
+    const data = {
+        time: dates.map(date => timeFormat(date, true)),
+        data: {}
+    }
+    console.log(data);
+    return drawFundDrawdownChangeByAssetLineGraph(chart, data);
 }
 
 export function drawEmptyRelevanceScatterGraph (chart, title, key) {

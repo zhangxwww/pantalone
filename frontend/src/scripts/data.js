@@ -979,25 +979,38 @@ export default class Data {
         };
     }
 
-    getDrawdownData (cumReturnData) {
-
-        function cal (array) {
-            const cum = array;
-            let peak = cum[0];
-            const drawdown = [Number.NaN];
-            for (let i = 1; i < cum.length; i++) {
-                if (isNaN(peak) || cum[i] > peak) {
-                    peak = cum[i];
-                }
-                drawdown.push((peak - cum[i]) / peak);
-            }
-            return drawdown;
+    getFundClassRatioChangeData (fundClassChangeData) {
+        const ratio = {};
+        for (const cls of allClasses) {
+            ratio[cls] = Array(fundClassChangeData.time.length).fill(0);
         }
+        for (let i = 0; i < fundClassChangeData.time.length; i++) {
+            let sum = 0;
+            for (const clsData of Object.values(fundClassChangeData.data)) {
+                sum += isNaN(clsData[i]) ? 0 : clsData[i];
+            }
+            for (const [cls, clsData] of Object.entries(fundClassChangeData.data)) {
+                ratio[cls][i] = clsData[i] / sum;
+            }
+        }
+        return { time: fundClassChangeData.time, data: ratio };
+    }
+
+    getFundClassDrawdownData (fundClassReturnData) {
+        const drawdown = {};
+        for (const [cls, clsData] of Object.entries(fundClassReturnData.data)) {
+            const cumReturn = statistic.cumsum(clsData);
+            drawdown[cls] = statistic.drawdown(cumReturn);
+        }
+        return { time: fundClassReturnData.time, data: drawdown };
+    }
+
+    getDrawdownData (cumReturnData) {
 
         return {
             time: cumReturnData.time,
-            drawdownGeometric: cal(cumReturnData.cumReturn.geometric),
-            drawdownArithmetic: cal(cumReturnData.cumReturn.arithmetic),
+            drawdownGeometric: statistic.drawdown(cumReturnData.cumReturn.geometric),
+            drawdownArithmetic: statistic.drawdown(cumReturnData.cumReturn.arithmetic),
         }
     }
 

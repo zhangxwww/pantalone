@@ -62,4 +62,25 @@ function averageMean (value1, value2, weight1, weight2, method = 'arithmetic') {
     }
 }
 
-export default { mean, std, rolling, expanding, nanmean, nanstd, countNotNaN, averageMean };
+function drawdown (cum) {
+    let peak = cum[0];
+    const drawdown = [Number.NaN];
+    for (let i = 1; i < cum.length; i++) {
+        if (isNaN(peak) || cum[i] > peak) {
+            peak = cum[i];
+        }
+        drawdown.push((peak - cum[i]) / peak);
+    }
+    return drawdown;
+}
+
+function cumsum (array) {
+    const res = Array(array.length).fill(Number.NaN);
+    res[0] = array[0];
+    for (let i = 1; i < array.length; i++) {
+        res[i] = isNaN(res[i - 1]) ? array[i] : res[i - 1] + array[i];
+    }
+    return res;
+}
+
+export default { mean, std, rolling, expanding, nanmean, nanstd, countNotNaN, averageMean, drawdown, cumsum };

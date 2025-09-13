@@ -27,6 +27,14 @@
             </el-row>
             <el-row style="margin-top: 60px">
                 <el-col :span="12">
+                    <div id="fund-amount-ratio-change-by-asset-line-graph" style="width: 100%; height: 300px"></div>
+                </el-col>
+                <el-col :span="12">
+                    <div id="fund-drawdown-change-by-asset-line-graph" style="width: 100%; height: 300px"></div>
+                </el-col>
+            </el-row>
+            <el-row style="margin-top: 60px">
+                <el-col :span="12">
                     <div id="rick-indicator-line-graph" style="width: 100%; height: 300px"></div>
                 </el-col>
                 <el-col :span="12">
@@ -214,7 +222,9 @@ import {
     drawRiskIndicatorLineGraph,
     drawDrawdownLineGraph,
     drawFundAmountChangeByAssetLineGraph,
+    drawFundAmountRatioChangeByAssetLineGraph,
     drawFundReturnChangeByAssetLineGraph,
+    drawFundDrawdownChangeByAssetLineGraph,
 
     drawEmptyAssetChangeLineGraph,
     drawEmptyAssetDeltaChangeBarGraph,
@@ -226,7 +236,9 @@ import {
     drawEmptyRiskIndicatorLineGraph,
     drawEmptyDrawdownLineGraph,
     drawEmptyFundAmountChangeByAssetLineGraph,
-    drawEmptyFundReturnChangeByAssetLineGraph
+    drawEmptyFundAmountRatioChangeByAssetLineGraph,
+    drawEmptyFundReturnChangeByAssetLineGraph,
+    drawEmptyFundDrawdownChangeByAssetLineGraph
 } from '@/scripts/graph.js'
 import { getGitUpdatedRequest } from '../scripts/requests'
 
@@ -393,7 +405,9 @@ export default {
                 this.riskIndicatorLineGraph = initGraph('rick-indicator-line-graph');
                 this.drawdownLineGraph = initGraph('drawdown-line-graph');
                 this.fundAmountChangeByAssetLineGraph = initGraph('fund-amount-change-by-asset-line-graph');
+                this.fundAmountRatioChangeByAssetLineGraph = initGraph('fund-amount-ratio-change-by-asset-line-graph');
                 this.fundReturnChangeByAssetLineGraph = initGraph('fund-return-change-by-asset-line-graph');
+                this.fundDrawdownChangeByAssetLineGraph = initGraph('fund-drawdown-change-by-asset-line-graph');
             },
             drawEmpty: () => {
                 const dates = this.record.sampleDates(this.drawMonths);
@@ -408,7 +422,9 @@ export default {
                 drawEmptyRiskIndicatorLineGraph(this.riskIndicatorLineGraph, dates);
                 drawEmptyDrawdownLineGraph(this.drawdownLineGraph, dates);
                 drawEmptyFundAmountChangeByAssetLineGraph(this.fundAmountChangeByAssetLineGraph, dates);
-                drawEmptyFundReturnChangeByAssetLineGraph(this.fundReturnChangeByAssetLineGraph, dates)
+                drawEmptyFundAmountRatioChangeByAssetLineGraph(this.fundAmountRatioChangeByAssetLineGraph, dates);
+                drawEmptyFundReturnChangeByAssetLineGraph(this.fundReturnChangeByAssetLineGraph, dates);
+                drawEmptyFundDrawdownChangeByAssetLineGraph(this.fundDrawdownChangeByAssetLineGraph, dates);
                 this.setAllGraphLoading();
             },
             draw: async () => {
@@ -461,9 +477,17 @@ export default {
                 drawFundAmountChangeByAssetLineGraph(this.fundAmountChangeByAssetLineGraph, fundAmountChangeByAsset);
                 this.fundAmountChangeByAssetLineGraph.hideLoading();
 
-                const fundReturnChangeyAsset = this.record.getFundClassReturnData(this.drawMonths);
-                drawFundReturnChangeByAssetLineGraph(this.fundReturnChangeByAssetLineGraph, fundReturnChangeyAsset);
+                const fundReturnChangeByAsset = this.record.getFundClassReturnData(this.drawMonths);
+                drawFundReturnChangeByAssetLineGraph(this.fundReturnChangeByAssetLineGraph, fundReturnChangeByAsset);
                 this.fundReturnChangeByAssetLineGraph.hideLoading();
+
+                const fundAmountRatioChangeByAsset = this.record.getFundClassRatioChangeData(fundAmountChangeByAsset);
+                drawFundAmountRatioChangeByAssetLineGraph(this.fundAmountRatioChangeByAssetLineGraph, fundAmountRatioChangeByAsset);
+                this.fundAmountRatioChangeByAssetLineGraph.hideLoading();
+
+                const fundDrawdownChangeByAsset = this.record.getFundClassDrawdownData(fundReturnChangeByAsset);
+                drawFundDrawdownChangeByAssetLineGraph(this.fundDrawdownChangeByAssetLineGraph, fundDrawdownChangeByAsset);
+                this.fundDrawdownChangeByAssetLineGraph.hideLoading();
             },
             setMonthChangeGraphLoading: () => {
                 this.assetChangeLineGraph.showLoading();
@@ -474,6 +498,8 @@ export default {
                 this.drawdownLineGraph.showLoading();
                 this.fundAmountChangeByAssetLineGraph.showLoading();
                 this.fundReturnChangeByAssetLineGraph.showLoading();
+                this.fundAmountRatioChangeByAssetLineGraph.showLoading();
+                this.fundDrawdownChangeByAssetLineGraph.showLoading();
             },
             setAllGraphLoading: () => {
                 this.assetChangeLineGraph.showLoading();
@@ -487,6 +513,8 @@ export default {
                 this.liquidityReturnPositionScatterGraph.showLoading();
                 this.fundAmountChangeByAssetLineGraph.showLoading();
                 this.fundReturnChangeByAssetLineGraph.showLoading();
+                this.fundAmountRatioChangeByAssetLineGraph.showLoading();
+                this.fundDrawdownChangeByAssetLineGraph.showLoading();
             },
             setAllGraphUnLoading: () => {
                 this.assetChangeLineGraph.hideLoading();
@@ -500,6 +528,8 @@ export default {
                 this.liquidityReturnPositionScatterGraph.hideLoading();
                 this.fundAmountChangeByAssetLineGraph.hideLoading();
                 this.fundReturnChangeByAssetLineGraph.hideLoading();
+                this.fundAmountRatioChangeByAssetLineGraph.hideLoading();
+                this.fundDrawdownChangeByAssetLineGraph.hideLoading();
             },
             onDrawMonthsChange: async () => {
                 localStorage.setItem('drawMonths', this.drawMonths);
@@ -601,6 +631,8 @@ export default {
         this.drawdownLineGraph.dispose();
         this.fundAmountChangeByAssetLineGraph.dispose();
         this.fundReturnChangeByAssetLineGraph.dispose();
+        this.fundAmountRatioChangeByAssetLineGraph.dispose();
+        this.assetChangeLineGraph.dispose();
     },
 
 }
