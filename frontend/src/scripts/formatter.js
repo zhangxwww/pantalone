@@ -10,3 +10,7 @@ export function timeFormat (t, short = false) {
     }
     return formatted;
 }
+
+export function percentileFormat (value) {
+    return Number.isNaN(value) || value === Infinity || value === -Infinity ? '-' : (value * 100).toFixed(2) + '%';
+}

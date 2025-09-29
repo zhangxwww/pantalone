@@ -743,7 +743,7 @@ export function drawFundAmountChangeByAssetLineGraph (chart, data) {
     console.log(data);
     const option = {
         title: {
-            text: "大类资产总额",
+            text: "基金大类资产总额",
             x: "center",
             y: "top",
             textAlign: "center"
@@ -818,7 +818,7 @@ export function drawFundAmountRatioChangeByAssetLineGraph (chart, data) {
     console.log(data);
     const option = {
         title: {
-            text: "大类资产占比",
+            text: "基金大类资产占比",
             x: "center",
             y: "top",
             textAlign: "center"
@@ -898,7 +898,7 @@ export function drawFundReturnChangeByAssetLineGraph (chart, data) {
     console.log(data);
     const option = {
         title: {
-            text: "大类资产收益",
+            text: "基金大类资产收益",
             x: "center",
             y: "top",
             textAlign: "center"
@@ -979,7 +979,7 @@ export function drawFundDrawdownChangeByAssetLineGraph (chart, data) {
     console.log(data);
     const option = {
         title: {
-            text: "大类资产收益回撤",
+            text: "基金大类资产收益回撤",
             x: "center",
             y: "top",
             textAlign: "center"

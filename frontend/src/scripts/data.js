@@ -1,5 +1,5 @@
 import statistic from './statistic.js';
-import { timeFormat } from './formatter.js';
+import { timeFormat, percentileFormat } from './formatter.js';
 import { classifyFund, allClasses } from './fundClassifier.js';
 import {
     getChinaBondYieldDataRequest,
@@ -94,8 +94,8 @@ export default class Data {
                 mHis.referenceAmountFmt = mHis.referenceAmount.toFixed(2);
 
                 mHis.beginningTimeFmt = timeFormat(mHis.beginningTime);
-                mHis.annualizedReturnRateFmt = (mHis.annualizedReturnRate * 100).toFixed(2) + '%';
-                mHis.latestReturnRateFmt = (mHis.latestReturnRate * 100).toFixed(2) + '%';
+                mHis.annualizedReturnRateFmt = percentileFormat(mHis.annualizedReturnRate);
+                mHis.latestReturnRateFmt = percentileFormat(mHis.latestReturnRate);
                 mHis.currentAmountFmt = mHis.currentAmount.toFixed(2);
                 mHis.currentSharesFmt = mHis.currentShares.toFixed(2);
                 mHis.cumReturnFmt = mHis.cumReturn.toFixed(2);
@@ -117,7 +117,7 @@ export default class Data {
                 fHis.beginningAmountFmt = fHis.beginningAmount.toFixed(2);
                 fHis.endingAmountFmt = fHis.endingAmount.toFixed(2);
 
-                fHis.rateFmt = (fHis.rate * 100).toFixed(2) + '%';
+                fHis.rateFmt = percentileFormat(fHis.rate);
             }
         }
         for (let uData of data.fundData) {
@@ -171,23 +171,23 @@ export default class Data {
 
                 uHis.cumInvestFmt = uHis.cumInvest.toFixed(2);
                 uHis.cumReturnFmt = uHis.cumReturn.toFixed(2);
-                uHis.latestReturnRateFmt = (uHis.latestReturnRate * 100).toFixed(2) + '%';
+                uHis.latestReturnRateFmt = percentileFormat(uHis.latestReturnRate);
                 uHis.cumDividendFmt = uHis.cumDividend.toFixed(2);
 
                 const endingTime = new Date(uHis.currentTime);
                 endingTime.setDate(endingTime.getDate() + uHis.lockupPeriod);
                 uHis.residualLockupPeriod = Math.max(Math.ceil((endingTime - new Date()) / (1000 * 3600 * 24)), 2);
 
-                uHis.annualizedReturnRateFmt = (uHis.annualizedReturnRate * 100).toFixed(2) + '%';
+                uHis.annualizedReturnRateFmt = percentileFormat(uHis.annualizedReturnRate);
 
                 uHis.drawdown = (uHis.maxNetValue - uHis.currentNetValue) / uHis.maxNetValue;
-                uHis.drawdownFmt = (uHis.drawdown * 100).toFixed(2) + '%';
+                uHis.drawdownFmt = percentileFormat(uHis.drawdown);
                 uHis.maxDrawdown = Math.max(latest ? latest.maxDrawdown : 0, uHis.drawdown);
-                uHis.maxDrawdownFmt = (uHis.maxDrawdown * 100).toFixed(2) + '%';
+                uHis.maxDrawdownFmt = percentileFormat(uHis.maxDrawdown);
 
                 uHis.maxCumReturn = Math.max(uHis.cumReturn, latest ? latest.maxCumReturn : 0);
                 uHis.returnDrawdown = (uHis.maxCumReturn - uHis.cumReturn) / uHis.maxCumReturn;
-                uHis.returnDrawdownFmt = (uHis.returnDrawdown * 100).toFixed(2) + '%';
+                uHis.returnDrawdownFmt = percentileFormat(uHis.returnDrawdown);
             }
         }
         console.log(data);

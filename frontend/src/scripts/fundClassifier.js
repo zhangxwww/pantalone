@@ -1,5 +1,5 @@
 function isBond (fund) {
-    return fund.indexOf('债') !== -1;
+    return fund.indexOf('债') !== -1 || fund.indexOf('一年持有') !== -1;
 }
 
 function isUSStock (fund) {
@@ -11,7 +11,7 @@ function isGold (fund) {
 }
 
 function isGlobal (fund) {
-    return fund.indexOf('全球') !== -1 && fund.indexOf('股票') !== -1 || fund.indexOf('日本') !== -1;
+    return fund.indexOf('全球') !== -1 && fund.indexOf('股票') !== -1 || fund.indexOf('日本') !== -1 || fund.indexOf('富国蓝筹精选') !== -1 || fund.indexOf('全球') !== -1 && fund.indexOf('商品') !== -1 || fund.indexOf('恒生') !== -1;
 }
 
 function isDefensive (fund) {
