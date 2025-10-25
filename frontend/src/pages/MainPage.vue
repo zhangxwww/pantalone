@@ -198,6 +198,7 @@
             <add-fund-dialog ref="addFundDialog" @add="onAddData"></add-fund-dialog>
 
             <side-chat :page="'首页'" />
+
         </el-main>
         <el-footer>
             <version-footer />
@@ -341,6 +342,18 @@ export default {
                 }, this.editId);
             },
             addFundData: async (form) => {
+                if (this.editId === null) { // add new fund data
+                    const symbol = form.symbol;
+                    if (this.getFundSymbols().includes(symbol)) {
+                        ElNotification({
+                            title: "检查到重复基金代码",
+                            type: "error",
+                            dangerouslyUseHTMLString: true,
+                            duration: 0
+                        });
+                        return;
+                    }
+                }
                 await this.record.addData('fund', {
                     name: form.name,
                     symbol: form.symbol,

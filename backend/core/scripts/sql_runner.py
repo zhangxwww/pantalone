@@ -4,6 +4,9 @@ import shutil
 
 from src.libs.utils.path import get_db_path
 
+# cd backend/core
+# python -m scripts.sql_runner .\src\sql\xxx.sql
+
 
 if __name__ == "__main__":
     sql_file = sys.argv[1]
