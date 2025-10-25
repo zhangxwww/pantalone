@@ -33,12 +33,25 @@ function isGrowth (fund) {
         || fund.indexOf('科技') !== -1;
 }
 
+function isGlobal (fund) {
+    return fund.indexOf('全球') !== -1
+        || fund.indexOf('日本') !== -1
+        || fund.indexOf('日经') !== -1
+        || fund.indexOf('富国蓝筹精选') !== -1;
+}
+
+function isMixed (fund) {
+    return fund.indexOf('混合') !== -1;
+}
+
 const classMap = {
     "黄金": isGold,
     "债券": isBond,
     "美股": isUSStock,
     "价值": isDefensive,
     "成长": isGrowth,
+    "混合": isMixed,
+    "全球": isGlobal,
     "其他": isOther,
 };
 
